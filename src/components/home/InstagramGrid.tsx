@@ -1,0 +1,127 @@
+import { motion } from 'framer-motion'
+import { Play } from 'lucide-react'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
+
+const INSTAGRAM_URL = 'https://instagram.com/somosgreenlife'
+
+const posts = [
+  { shortcode: 'DYIqsqCmwlZ', type: 'photo' },
+  { shortcode: 'DWetdncjDO6', type: 'video' },
+  { shortcode: 'DXnIYVKlp2d', type: 'photo' },
+]
+
+export function InstagramGrid() {
+  const { ref, isInView } = useScrollReveal()
+
+  return (
+    <section className="py-24 bg-cream-50 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+
+        {/* Header */}
+        <div ref={ref} className="flex flex-col items-center text-center mb-12">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            className="font-mono text-[11px] uppercase tracking-[0.2em] text-moss-500 mb-3"
+          >
+            Instagram
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 }}
+            className="font-display text-[clamp(2rem,4vw,3rem)] font-medium text-ink-900 tracking-tight leading-tight"
+          >
+            Síguenos en{' '}
+            <em className="text-forest-800 not-italic">@somosgreenlife</em>
+          </motion.h2>
+        </div>
+
+        {/* 3 posts */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center"
+        >
+          {posts.map((post, i) => {
+            const isCenter = i === 1
+            return (
+              <div
+                key={post.shortcode}
+                className={`relative rounded-2xl overflow-hidden shadow-lg ${
+                  isCenter ? 'md:-my-6 shadow-xl' : 'shadow-md'
+                }`}
+              >
+                <iframe
+                  src={`https://www.instagram.com/p/${post.shortcode}/embed/`}
+                  className="w-full border-0 block"
+                  style={{ height: isCenter ? '540px' : '460px' }}
+                  scrolling="no"
+                  allowTransparency
+                  title={`Instagram post ${post.shortcode}`}
+                />
+
+                {/* Circular badge overlay on the video */}
+                {isCenter && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="relative w-28 h-28 flex items-center justify-center">
+                      {/* Rotating text ring */}
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+                        className="absolute inset-0"
+                      >
+                        <svg viewBox="0 0 120 120" className="w-full h-full">
+                          <defs>
+                            <path
+                              id="circlePath"
+                              d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
+                            />
+                          </defs>
+                          <text fontSize="9.5" fill="white" letterSpacing="2" fontFamily="monospace" fontWeight="600">
+                            <textPath href="#circlePath">
+                              VER EN INSTAGRAM • @SOMOSGREENLIFE •
+                            </textPath>
+                          </text>
+                        </svg>
+                      </motion.div>
+
+                      {/* Play button center */}
+                      <div className="w-11 h-11 rounded-full bg-white/25 backdrop-blur-sm border border-white/40 flex items-center justify-center">
+                        <Play size={16} className="text-white ml-0.5" fill="white" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </motion.div>
+
+        {/* Follow button */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.4 }}
+          className="flex justify-center mt-12"
+        >
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-7 py-3 rounded-full border border-ink-900/12 bg-white text-sm font-semibold text-ink-900 hover:bg-forest-950 hover:text-cream-50 hover:border-forest-950 transition-all duration-200"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+            </svg>
+            Seguir en Instagram
+          </a>
+        </motion.div>
+
+      </div>
+    </section>
+  )
+}
