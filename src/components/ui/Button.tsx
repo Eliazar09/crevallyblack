@@ -1,4 +1,5 @@
 import { forwardRef } from 'react'
+import { Link } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 
 type ButtonVariant = 'primary' | 'ghost' | 'outline' | 'whatsapp'
@@ -40,6 +41,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     )
 
     if (as === 'a' && href) {
+      const isInternal = href.startsWith('/')
+      if (isInternal) {
+        return (
+          <Link to={href} className={base}>
+            {children}
+          </Link>
+        )
+      }
       return (
         <a href={href} target={target} rel={rel} className={base}>
           {children}

@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, MessageCircle, ChevronDown, Star } from 'lucide-react'
 import { Button } from '../ui/Button'
@@ -232,9 +233,9 @@ export function Hero() {
               </div>
               <div>
                 <p className="font-display text-lg font-medium text-cream-50 leading-tight">100% Natural</p>
-                <a href="/tienda" className="text-xs text-moss-400 hover:text-gold-400 uppercase tracking-widest transition-colors font-mono">
+                <Link to="/tienda" className="text-xs text-moss-400 hover:text-gold-400 uppercase tracking-widest transition-colors font-mono">
                   VER TIENDA →
-                </a>
+                </Link>
               </div>
             </motion.div>
 
