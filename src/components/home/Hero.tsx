@@ -46,14 +46,20 @@ export function Hero() {
         style={{ y: bgParallax }}
         className="absolute inset-0 scale-[1.08] will-change-transform"
       >
-        <img
-          src="/images/fotos de parte do site/hero.png"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover object-center"
-          loading="eager"
-          fetchPriority="high"
-        />
+        <picture>
+          <source
+            media="(max-width: 639px)"
+            srcSet="/images/fotos de parte do site/herosoparateelfone.png"
+          />
+          <img
+            src="/images/fotos de parte do site/hero.png"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </picture>
       </motion.div>
 
       {/* Gradient overlays */}
