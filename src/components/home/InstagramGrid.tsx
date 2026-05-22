@@ -58,7 +58,7 @@ export function InstagramGrid() {
                   className="w-full border-0 block"
                   style={{ height: isCenter ? '540px' : '460px' }}
                   scrolling="no"
-                  allowTransparency
+                  allowTransparency={true}
                   title={`Instagram post ${post.shortcode}`}
                 />
 
