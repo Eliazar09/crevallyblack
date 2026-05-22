@@ -110,12 +110,13 @@ export default function Product() {
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="aspect-square rounded-3xl overflow-hidden bg-cream-200"
+            className="rounded-3xl overflow-hidden bg-cream-200 flex items-center justify-center p-6"
+          style={{ minHeight: '420px' }}
           >
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain max-h-[520px]"
               loading="eager"
             />
           </motion.div>
