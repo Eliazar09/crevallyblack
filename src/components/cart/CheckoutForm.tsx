@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ArrowLeft, MessageCircle } from 'lucide-react'
+import { ArrowLeft, MessageCircle, FileDown } from 'lucide-react'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { useCart } from '../../hooks/useCart'
 import { buildWhatsAppLink, type CustomerData } from '../../lib/whatsapp'
+import { generateInvoicePDF } from '../../lib/invoice'
 
 interface CheckoutFormProps {
   onBack: () => void
@@ -13,6 +14,9 @@ interface CheckoutFormProps {
 export function CheckoutForm({ onBack, onClose }: CheckoutFormProps) {
   const { items, clearCart } = useCart()
   const [errors, setErrors] = useState<Partial<CustomerData>>({})
+  const [submitted, setSubmitted] = useState(false)
+  const [submittedForm, setSubmittedForm] = useState<CustomerData | null>(null)
+  const [submittedItems, setSubmittedItems] = useState(items)
   const [form, setForm] = useState<CustomerData>({
     nombre: '',
     telefono: '',
@@ -40,11 +44,49 @@ export function CheckoutForm({ onBack, onClose }: CheckoutFormProps) {
     const link = buildWhatsAppLink(items, form)
     const opened = window.open(link, '_blank')
     if (opened) {
+      setSubmittedForm({ ...form })
+      setSubmittedItems([...items])
+      setSubmitted(true)
       clearCart()
-      onClose()
     } else {
       alert('Por favor, permite las ventanas emergentes (popups) para abrir WhatsApp.')
     }
+  }
+
+  function handleDownloadInvoice() {
+    if (submittedForm) generateInvoicePDF(submittedItems, submittedForm)
+  }
+
+  if (submitted) {
+    return (
+      <div className="p-5 space-y-5 text-center">
+        <div className="flex flex-col items-center gap-3 py-4">
+          <div className="w-12 h-12 rounded-full bg-forest-800/20 flex items-center justify-center">
+            <MessageCircle size={22} className="text-forest-400" />
+          </div>
+          <p className="font-display text-base font-semibold text-cream-100">¡Pedido enviado!</p>
+          <p className="text-xs text-ink-500 max-w-xs">
+            Tu pedido fue enviado por WhatsApp. Te contactaremos para coordinar el pago y la entrega.
+          </p>
+        </div>
+
+        <div className="border-t border-ink-800 pt-4 space-y-2">
+          <button
+            onClick={handleDownloadInvoice}
+            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl border border-ink-700 text-xs font-medium text-ink-300 hover:text-cream-100 hover:border-ink-500 transition-colors"
+          >
+            <FileDown size={14} />
+            Descargar factura en PDF
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full text-xs text-ink-500 hover:text-ink-300 transition-colors py-2"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
