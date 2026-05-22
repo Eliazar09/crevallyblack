@@ -12,8 +12,8 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>GreenLife — Bienestar Natural desde Venezuela</title>
-        <meta name="description" content="GreenLife — Suplementos naturales premium. Emagrecedores, detox, vitaminas, colágeno, whey y más. +5000 clientes satisfechos. Envíos a toda Venezuela." />
+        <title>GreenLife Caracas — Suplementos Naturales en Venezuela</title>
+        <meta name="description" content="GreenLife Caracas — Suplementos naturales premium en Venezuela. Emagrecedores, detox, vitaminas, colágeno, whey y más. +5000 clientes satisfechos. Envíos a Caracas y toda Venezuela." />
       </Helmet>
       <Hero />
 <Categories />

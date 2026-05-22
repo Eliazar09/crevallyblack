@@ -79,7 +79,7 @@ export function Hero() {
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="flex items-center gap-3"
+              className="hidden sm:flex items-center gap-3"
             >
               <motion.div
                 className="h-px bg-gold-400/60"
