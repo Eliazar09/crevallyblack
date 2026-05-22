@@ -114,12 +114,12 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
         </div>
 
         {/* Body */}
-        <div className="flex flex-col flex-1 p-4 gap-3">
+        <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2 sm:gap-3">
 
           {/* Name + Price */}
           <div className="flex items-start justify-between gap-2">
             <Link to={`/producto/${product.id}`} className="flex-1 min-w-0">
-              <h3 className={`font-semibold text-[14px] leading-snug line-clamp-2 hover:opacity-75 transition-opacity ${dark ? 'text-cream-100' : 'text-ink-900'}`}>
+              <h3 className={`font-semibold text-[13px] sm:text-[14px] leading-snug line-clamp-2 hover:opacity-75 transition-opacity ${dark ? 'text-cream-100' : 'text-ink-900'}`}>
                 {product.name}
               </h3>
             </Link>
@@ -134,12 +134,12 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
           </div>
 
           {/* Description */}
-          <p className="text-[12px] text-ink-700 leading-relaxed line-clamp-2">
+          <p className="text-[11px] sm:text-[12px] text-ink-700 leading-relaxed line-clamp-2">
             {product.short}
           </p>
 
-          {/* Metadata dividers row */}
-          <div className={`flex items-center text-[11px] font-medium border-t pt-3 ${dark ? 'border-white/8 text-cream-200' : 'border-ink-900/8 text-ink-700'}`}>
+          {/* Metadata dividers row — hidden on small mobile */}
+          <div className={`hidden sm:flex items-center text-[11px] font-medium border-t pt-3 ${dark ? 'border-white/8 text-cream-200' : 'border-ink-900/8 text-ink-700'}`}>
             <div className="flex items-center gap-1.5 flex-1">
               <Leaf size={11} strokeWidth={2} className={dark ? 'text-moss-300' : 'text-forest-700'} />
               <span>Natural</span>
@@ -160,8 +160,8 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
             )}
           </div>
 
-          {/* Benefit tags */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Benefit tags — hidden on small mobile */}
+          <div className="hidden sm:flex flex-wrap gap-1.5">
             {shortBenefits.map((b, i) => (
               <span
                 key={i}
@@ -175,13 +175,13 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
           {/* CTA button */}
           <button
             onClick={handleAddToCart}
-            className={`mt-auto w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.97] flex items-center justify-center gap-2 ${
+            className={`mt-auto w-full py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.97] flex items-center justify-center gap-2 ${
               dark
                 ? 'bg-gold-400 text-forest-950 hover:bg-gold-300'
                 : 'bg-forest-950 text-cream-50 hover:bg-forest-800'
             }`}
           >
-            <ShoppingCart size={14} strokeWidth={1.5} />
+            <ShoppingCart size={13} strokeWidth={1.5} />
             Añadir al carrito
           </button>
         </div>

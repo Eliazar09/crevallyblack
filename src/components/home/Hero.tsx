@@ -56,8 +56,8 @@ export function Hero() {
       </motion.div>
 
       {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-forest-950/92 via-forest-950/55 to-forest-950/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-forest-950/90 via-transparent to-forest-950/35" />
+      <div className="absolute inset-0 bg-gradient-to-r from-forest-950/95 via-forest-950/75 to-forest-950/30 sm:from-forest-950/92 sm:via-forest-950/55 sm:to-forest-950/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-forest-950/95 via-forest-950/20 to-forest-950/50 sm:from-forest-950/90 sm:via-transparent sm:to-forest-950/35" />
 
       {/* Cursor glow */}
       <div
@@ -70,8 +70,8 @@ export function Hero() {
 
       {/* Main content */}
       <div className="relative z-20 flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-28 pb-10">
-          <div className="max-w-[580px] space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-24 sm:pt-28 pb-6 sm:pb-10">
+          <div className="max-w-[580px] space-y-5 sm:space-y-8">
 
             {/* Eyebrow */}
             <motion.div
@@ -90,7 +90,7 @@ export function Hero() {
             </motion.div>
 
             {/* Headline clip-reveal */}
-            <h1 className="font-display text-[clamp(3rem,7vw,5.5rem)] leading-[0.95] font-light text-cream-50 tracking-tight">
+            <h1 className="font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] font-light text-cream-50 tracking-tight">
               <span className="block overflow-hidden pb-1">
                 <motion.span
                   className="block"
@@ -119,11 +119,10 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.55 }}
-              className="text-[17px] text-cream-200/65 leading-relaxed max-w-[42ch]"
+              className="text-[15px] sm:text-[17px] text-cream-200/75 leading-relaxed max-w-[38ch]"
             >
-              Transforma tu vida con suplementos naturales premium.
-              Formulados para resultados reales, respaldados por miles
-              de venezolanas que ya cambiaron su bienestar.
+              Suplementos naturales premium para resultados reales.
+              Más de 5.000 venezolanas ya transformaron su bienestar.
             </motion.p>
 
             {/* CTAs */}
@@ -159,7 +158,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.82 }}
-              className="flex items-center gap-8 pt-2"
+              className="flex items-center gap-6 sm:gap-8 pt-1 sm:pt-2"
             >
               {[
                 { value: '+5.000', label: 'clientas' },
@@ -187,14 +186,14 @@ export function Hero() {
       {/* Bottom social proof strip */}
       <div className="relative z-20 border-t border-white/8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 py-5">
+          <div className="flex flex-row items-center gap-4 sm:gap-6 py-4 sm:py-5">
 
             {/* Reviews card */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.05 }}
-              className="flex items-center gap-4 bg-white/6 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3.5"
+              className="flex items-center gap-3 bg-white/6 backdrop-blur-sm border border-white/10 rounded-2xl px-3 sm:px-5 py-2.5 sm:py-3.5"
             >
               {/* Avatars */}
               <div className="flex -space-x-2">
@@ -226,7 +225,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.15 }}
-              className="flex items-center gap-3"
+              className="hidden sm:flex items-center gap-3"
             >
               <div className="w-8 h-8 rounded-full border border-gold-400/40 bg-gold-400/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-gold-400 text-[10px] font-bold">✓</span>
