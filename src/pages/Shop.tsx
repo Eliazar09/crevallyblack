@@ -2,13 +2,15 @@ import { useState, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { products, type ProductCategory } from '../data/products'
+import { type ProductCategory } from '../data/products'
 import { Filters, type SortOption } from '../components/shop/Filters'
 import { ProductCard } from '../components/shop/ProductCard'
 import { ProductQuickView } from '../components/shop/ProductQuickView'
+import { usePublicProducts } from '../hooks/useProducts'
 import type { Product } from '../data/products'
 
 export default function Shop() {
+  const { products } = usePublicProducts()
   const [searchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<'all' | ProductCategory>(

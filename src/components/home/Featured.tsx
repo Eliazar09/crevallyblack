@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
-import { getFeaturedProducts } from '../../data/products'
+import { usePublicProducts } from '../../hooks/useProducts'
 import { formatPrice } from '../../lib/currency'
 import { useCart } from '../../hooks/useCart'
 
@@ -13,7 +13,8 @@ export function Featured() {
   const { ref, isInView } = useScrollReveal()
   const { addItem } = useCart()
   const navigate = useNavigate()
-  const featured = getFeaturedProducts()
+  const { products } = usePublicProducts()
+  const featured = products.filter((p) => p.featured)
   const [page, setPage] = useState(0)
 
   const totalPages = Math.ceil(featured.length / PER_PAGE)

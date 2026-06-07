@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { lazy, Suspense } from 'react'
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
 import { CartDrawer } from './components/cart/CartDrawer'
 import { ScrollProgress } from './components/ui/ScrollProgress'
 import { ScrollToTop } from './components/ScrollToTop'
+import { AdminLayout } from './components/admin/layout/AdminLayout'
+import { RequireAuth } from './components/admin/layout/RequireAuth'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Product from './pages/Product'
@@ -12,6 +15,17 @@ import Kits from './pages/Kits'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
+import Login from './pages/admin/Login'
+
+// Admin pages — lazy loaded
+const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
+const Productos    = lazy(() => import('./pages/admin/Productos'))
+const ProductoForm = lazy(() => import('./pages/admin/ProductoForm'))
+const Ventas       = lazy(() => import('./pages/admin/Ventas'))
+const VentaNueva   = lazy(() => import('./pages/admin/VentaNueva'))
+const Clientes     = lazy(() => import('./pages/admin/Clientes'))
+const Inventario   = lazy(() => import('./pages/admin/Inventario'))
+const Finanzas     = lazy(() => import('./pages/admin/Finanzas'))
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation()
@@ -32,7 +46,6 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 
 function AppLayout() {
   const location = useLocation()
-
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <ScrollToTop />
@@ -58,10 +71,55 @@ function AppLayout() {
   )
 }
 
+const AdminSuspense = () => (
+  <div className="min-h-[100dvh] bg-forest-950 flex items-center justify-center">
+    <div className="w-6 h-6 rounded-full border-2 border-gold-400 border-t-transparent animate-spin" />
+  </div>
+)
+
 export default function App() {
   return (
     <BrowserRouter>
-      <AppLayout />
+      <Routes>
+        {/* Admin login — público */}
+        <Route path="/admin/login" element={<Login />} />
+
+        {/* Admin — protegido */}
+        <Route element={<RequireAuth />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={
+              <Suspense fallback={<AdminSuspense />}><Dashboard /></Suspense>
+            } />
+            <Route path="/admin/productos" element={
+              <Suspense fallback={<AdminSuspense />}><Productos /></Suspense>
+            } />
+            <Route path="/admin/productos/nuevo" element={
+              <Suspense fallback={<AdminSuspense />}><ProductoForm /></Suspense>
+            } />
+            <Route path="/admin/productos/:id" element={
+              <Suspense fallback={<AdminSuspense />}><ProductoForm /></Suspense>
+            } />
+            <Route path="/admin/ventas" element={
+              <Suspense fallback={<AdminSuspense />}><Ventas /></Suspense>
+            } />
+            <Route path="/admin/ventas/nueva" element={
+              <Suspense fallback={<AdminSuspense />}><VentaNueva /></Suspense>
+            } />
+            <Route path="/admin/clientes" element={
+              <Suspense fallback={<AdminSuspense />}><Clientes /></Suspense>
+            } />
+            <Route path="/admin/inventario" element={
+              <Suspense fallback={<AdminSuspense />}><Inventario /></Suspense>
+            } />
+            <Route path="/admin/finanzas" element={
+              <Suspense fallback={<AdminSuspense />}><Finanzas /></Suspense>
+            } />
+          </Route>
+        </Route>
+
+        {/* Site público */}
+        <Route path="/*" element={<AppLayout />} />
+      </Routes>
     </BrowserRouter>
   )
 }
