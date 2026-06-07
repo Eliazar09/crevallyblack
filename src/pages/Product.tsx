@@ -3,7 +3,8 @@ import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ShoppingBag, Check, ChevronDown, ChevronUp } from 'lucide-react'
-import { getProductById, getProductsByCategory } from '../data/products'
+import { getProductsByCategory } from '../data/products'
+import { usePublicProducts } from '../hooks/useProducts'
 import { CategoryBadge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { ProductCard } from '../components/shop/ProductCard'
@@ -35,7 +36,8 @@ const faqItems = [
 export default function Product() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const product = id ? getProductById(id) : undefined
+  const { products, loading: productsLoading } = usePublicProducts()
+  const product = id ? products.find((p) => p.id === id) : undefined
   const [quantity, setQuantity] = useState(1)
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     product?.options?.[0]?.value
@@ -49,6 +51,20 @@ export default function Product() {
     window.scrollTo(0, 0)
   }, [id])
 
+  useEffect(() => {
+    if (product?.options?.[0]?.value) {
+      setSelectedOption(product.options[0].value)
+    }
+  }, [product])
+
+  if (productsLoading) {
+    return (
+      <div className="min-h-[100dvh] bg-cream-50 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-forest-800 border-t-transparent animate-spin" />
+      </div>
+    )
+  }
+
   if (!product) {
     return (
       <div className="min-h-[100dvh] bg-cream-50 flex flex-col items-center justify-center gap-4">
@@ -60,8 +76,8 @@ export default function Product() {
     )
   }
 
-  const related = getProductsByCategory(product.category)
-    .filter((p) => p.id !== product.id)
+  const related = products
+    .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4)
 
   const activeOption = product.options?.find((o) => o.value === selectedOption)
