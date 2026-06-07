@@ -16,12 +16,12 @@ const catLabel: Record<string, string> = {
   belleza:'Belleza', descanso:'Descanso', vitaminas:'Vitaminas', masculino:'Masculino',
 }
 const statusColors: Record<string, string> = {
-  activo: 'text-green-400 bg-green-400/10',
+  activo:   'text-green-400 bg-green-400/10',
   inactivo: 'text-ink-500 bg-white/5',
-  agotado: 'text-red-400 bg-red-400/10',
+  borrador: 'text-amber-400 bg-amber-400/10',
 }
 const statusLabel: Record<string, string> = {
-  activo:'Activo', inactivo:'Inactivo', agotado:'Agotado',
+  activo:'Activo', inactivo:'Inactivo', borrador:'Borrador',
 }
 
 export default function Productos() {

@@ -16,7 +16,7 @@ export interface DbProduct {
   category: ProductCategory
   sku: string | null
   featured: boolean
-  status: 'activo' | 'inactivo' | 'agotado'
+  status: 'activo' | 'inactivo' | 'borrador'
   stock_quantity: number
   min_stock: number
   created_at: string

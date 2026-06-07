@@ -98,6 +98,7 @@ export async function createSale(payload: SalePayload): Promise<string> {
     amount: payload.total,
     description: `Venta #${saleId.slice(-6)} — ${payload.client_name}`,
     related_sale_id: saleId,
+    date: new Date().toISOString().slice(0, 10),
   })
   if (txErr) throw txErr
 
@@ -115,6 +116,6 @@ export async function getSales(filters?: { from?: string; to?: string }) {
 }
 
 export async function getExchangeRate(): Promise<number> {
-  const { data } = await supabase.from('settings').select('value').eq('key', 'tasa_bcv').single()
-  return Number(data?.value) || 40
+  const { data } = await supabase.from('settings').select('exchange_rate').eq('id', 1).single()
+  return Number(data?.exchange_rate) || 40
 }

@@ -9,14 +9,14 @@ import { Modal } from '../../components/ui/Modal'
 import { useToast } from '../../hooks/useToast'
 import { cn } from '../../lib/cn'
 
-const typeLabel: Record<string, string> = { minorista: 'Minorista', mayorista: 'Mayorista', vip: 'VIP' }
+const typeLabel: Record<string, string> = { cliente: 'Cliente', distribuidor: 'Distribuidor', mayorista: 'Mayorista' }
 const typeColor: Record<string, string> = {
-  minorista: 'text-cream-200 bg-white/8',
-  mayorista: 'text-gold-400 bg-gold-400/10',
-  vip: 'text-purple-400 bg-purple-400/10',
+  cliente:     'text-cream-200 bg-white/8',
+  distribuidor:'text-gold-400 bg-gold-400/10',
+  mayorista:   'text-purple-400 bg-purple-400/10',
 }
 
-const emptyForm: ClientInsert = { name:'', phone:'', email:'', cedula:'', city:'', type:'minorista', notes:'' }
+const emptyForm: ClientInsert = { name:'', phone:'', email:'', cedula:'', city:'', type:'cliente', notes:'' }
 const field = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-cream-100 placeholder:text-ink-500 focus:outline-none focus:border-gold-400/40 transition-colors'
 const lbl = 'text-xs font-mono text-ink-500 uppercase tracking-wider'
 
@@ -164,9 +164,9 @@ export default function Clientes() {
             <div className="space-y-1 sm:col-span-2">
               <label className={lbl}>Tipo</label>
               <select value={form.type} onChange={(e)=>set('type',e.target.value as any)} className={field}>
-                <option value="minorista">Minorista</option>
+                <option value="cliente">Cliente</option>
+                <option value="distribuidor">Distribuidor</option>
                 <option value="mayorista">Mayorista</option>
-                <option value="vip">VIP</option>
               </select>
             </div>
             <div className="space-y-1 sm:col-span-2">

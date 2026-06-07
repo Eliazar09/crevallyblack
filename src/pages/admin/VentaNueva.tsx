@@ -80,7 +80,7 @@ export default function VentaNueva() {
   async function createQuickClient() {
     if (!newClientName.trim()) return null
     try {
-      const c = await createClient({ name: newClientName, phone: newClientPhone, email: '', cedula: '', city: '', type: 'minorista', notes: '' })
+      const c = await createClient({ name: newClientName, phone: newClientPhone, email: '', cedula: '', city: '', type: 'cliente', notes: '' })
       setClients((prev) => [c, ...prev])
       setSelectedClient(c)
       setShowNewClient(false)

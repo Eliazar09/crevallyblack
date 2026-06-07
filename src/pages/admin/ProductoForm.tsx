@@ -15,7 +15,7 @@ const catLabel: Record<string, string> = {
 type FormState = {
   name: string; short: string; description: string; how_to_use: string
   image: string; price: string; cost_price: string; category: ProductCategory
-  sku: string; featured: boolean; status: 'activo' | 'inactivo' | 'agotado'
+  sku: string; featured: boolean; status: 'activo' | 'inactivo' | 'borrador'
   stock_quantity: string; min_stock: string
   benefits: string[]
   options: Array<{ label: string; value: string; price: string }>
@@ -24,7 +24,7 @@ type FormState = {
 const empty: FormState = {
   name:'', short:'', description:'', how_to_use:'', image:'',
   price:'', cost_price:'', category:'adelgazamiento', sku:'',
-  featured:false, status:'activo', stock_quantity:'0', min_stock:'5',
+  featured:false, status:'activo' as 'activo'|'inactivo'|'borrador', stock_quantity:'0', min_stock:'5',
   benefits:[''], options:[],
 }
 
@@ -182,7 +182,7 @@ export default function ProductoForm() {
               <select value={form.status} onChange={(e) => set('status', e.target.value as any)} className={field}>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
-                <option value="agotado">Agotado</option>
+                <option value="borrador">Borrador</option>
               </select>
             </div>
             <div className="space-y-1">

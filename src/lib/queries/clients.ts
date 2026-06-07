@@ -7,12 +7,13 @@ export interface DbClient {
   email: string | null
   cedula: string | null
   city: string | null
-  type: 'minorista' | 'mayorista' | 'vip'
+  type: 'cliente' | 'distribuidor' | 'mayorista'
   notes: string | null
   created_at: string
   updated_at: string
 }
 
+export type ClientType = 'cliente' | 'distribuidor' | 'mayorista'
 export type ClientInsert = Omit<DbClient, 'id' | 'created_at' | 'updated_at'>
 
 export async function getClients(search?: string) {
