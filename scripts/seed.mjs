@@ -63,7 +63,6 @@ const products = [
 console.log(`Inserindo ${products.length} produtos...`)
 
 const rows = products.map((p) => ({
-  id: p.id,
   name: p.name,
   short: p.short,
   description: p.description,
@@ -71,18 +70,22 @@ const rows = products.map((p) => ({
   how_to_use: p.how_to_use,
   image: p.image,
   images: [],
-  options: p.options ?? null,
+  options: p.options ?? [],
   price: p.price,
-  cost_price: null,
+  cost_price: 0,
   category: p.category,
-  sku: null,
+  sku: p.id,           // guarda p1/p2... como SKU para referência
   featured: p.featured ?? false,
   status: 'activo',
   stock_quantity: 50,
   min_stock: 5,
 }))
 
-const { error } = await supabase.from('products').upsert(rows, { onConflict: 'id' })
+// Evita duplicar: apaga antes e insere
+const { error: delErr } = await supabase.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+if (delErr) console.warn('Aviso ao limpar:', delErr.message)
+
+const { error } = await supabase.from('products').insert(rows)
 if (error) {
   console.error('Erro:', error.message)
   process.exit(1)
