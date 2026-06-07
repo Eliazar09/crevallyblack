@@ -52,7 +52,7 @@ export default function Shop() {
     }
 
     return list
-  }, [search, category, sort])
+  }, [search, category, sort, products])
 
   return (
     <div className="min-h-[100dvh] bg-cream-50">
