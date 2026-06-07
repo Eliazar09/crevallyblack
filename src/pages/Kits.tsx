@@ -2,7 +2,6 @@ import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { TrendingUp, Package, Users, MessageCircle, Leaf, Star } from 'lucide-react'
 import { KitTiers } from '../components/kits/KitTiers'
-import { ProfitCalculator } from '../components/kits/ProfitCalculator'
 import { buildDirectWhatsAppLink } from '../lib/whatsapp'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
@@ -105,10 +104,40 @@ export default function Kits() {
         <KitTiers />
       </div>
 
-      {/* Calculator */}
+      {/* 3 pasos */}
       <div className="bg-forest-900/30 py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <ProfitCalculator />
+          <div className="text-center mb-12">
+            <p className="section-eyebrow mb-3">Así de fácil</p>
+            <h2 className="font-display text-[clamp(1.8rem,3vw,2.5rem)] font-medium text-cream-50 tracking-tight">
+              3 pasos para empezar
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                step: '01',
+                title: 'Elige tu kit',
+                desc: 'Selecciona el tier que se ajuste a tu presupuesto e intención de venta. Desde 1 kit para empezar.',
+              },
+              {
+                step: '02',
+                title: 'Escribe a Jennifer',
+                desc: 'Contáctanos por WhatsApp. Te respondemos en minutos con los detalles de pago y entrega.',
+              },
+              {
+                step: '03',
+                title: 'Vende y gana',
+                desc: 'Recibe tu kit, usa nuestro material de marketing y empieza a generar ingresos desde el primer día.',
+              },
+            ].map((item) => (
+              <div key={item.step} className="relative rounded-2xl border border-white/10 bg-forest-900/40 p-7 space-y-3">
+                <span className="font-mono text-4xl font-bold text-gold-400/20 leading-none">{item.step}</span>
+                <h3 className="font-display text-lg font-medium text-cream-50">{item.title}</h3>
+                <p className="text-sm text-ink-500 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

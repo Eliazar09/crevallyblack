@@ -5,13 +5,7 @@ import { buildKitWhatsAppLink } from '../../lib/whatsapp'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 import { cn } from '../../lib/cn'
 
-const kitImages: Record<string, string[]> = {
-  k1: ['/images/products/product-p1.jpg', '/images/products/product-p4.jpg'],
-  k2: ['/images/products/product-p1.jpg', '/images/products/product-p2.jpg', '/images/products/product-p4.jpg'],
-  k3: ['/images/products/product-p1.jpg', '/images/products/product-p2.jpg', '/images/products/product-p3.jpg', '/images/products/product-p4.jpg'],
-  k4: ['/images/products/product-p1.jpg', '/images/products/product-p2.jpg', '/images/products/product-p3.jpg', '/images/products/product-p5.jpg', '/images/products/product-p6.jpg'],
-  k5: ['/images/products/product-p1.jpg', '/images/products/product-p2.jpg', '/images/products/product-p3.jpg', '/images/products/product-p4.jpg', '/images/products/product-p5.jpg', '/images/products/product-p6.jpg'],
-}
+const KIT_IMAGE = "/images/fotos de parte do site/kitImagem do WhatsApp de 2025-09-09 à(s) 23.00.14_f0e7e84f.jpg"
 
 export function KitTiers() {
   const { ref, isInView } = useScrollReveal()
@@ -21,7 +15,6 @@ export function KitTiers() {
       <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {kits.map((kit, i) => {
           const profit = RETAIL_PRICE_PER_KIT - kit.pricePerUnit
-          const images = kitImages[kit.id] ?? []
 
           return (
             <motion.div
@@ -45,35 +38,10 @@ export function KitTiers() {
                 </div>
               )}
 
-              {/* Product images mosaic */}
-              <div className="relative h-28 overflow-hidden bg-forest-950/60 flex-shrink-0">
-                {images.length === 1 && (
-                  <img src={images[0]} alt="" className="w-full h-full object-cover opacity-80" />
-                )}
-                {images.length === 2 && (
-                  <div className="grid grid-cols-2 h-full">
-                    {images.map((src, j) => (
-                      <img key={j} src={src} alt="" className="w-full h-full object-cover opacity-80" />
-                    ))}
-                  </div>
-                )}
-                {images.length === 3 && (
-                  <div className="grid grid-cols-3 h-full">
-                    {images.map((src, j) => (
-                      <img key={j} src={src} alt="" className="w-full h-full object-cover opacity-80" />
-                    ))}
-                  </div>
-                )}
-                {images.length >= 4 && (
-                  <div className="grid grid-cols-4 h-full">
-                    {images.slice(0, 4).map((src, j) => (
-                      <img key={j} src={src} alt="" className="w-full h-full object-cover opacity-80" />
-                    ))}
-                  </div>
-                )}
-
-                {/* Dark overlay + product count */}
-                <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-forest-950/20 to-transparent" />
+              {/* Kit image */}
+              <div className="relative h-36 overflow-hidden bg-forest-950/60 flex-shrink-0">
+                <img src={KIT_IMAGE} alt="Kit GreenLife" className="w-full h-full object-cover object-top" />
+                <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-forest-950/10 to-transparent" />
                 <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-forest-950/70 backdrop-blur-sm rounded-full px-2 py-0.5">
                   <Package size={9} className="text-gold-400" />
                   <span className="text-[9px] font-mono text-gold-400 font-bold">
