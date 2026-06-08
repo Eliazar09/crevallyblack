@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, MessageCircle, Package } from 'lucide-react'
+import { Check, MessageCircle, Star } from 'lucide-react'
 import { kits, RETAIL_PRICE_PER_KIT } from '../../data/kits'
 import { buildKitWhatsAppLink } from '../../lib/whatsapp'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
@@ -7,89 +7,116 @@ import { cn } from '../../lib/cn'
 
 const KIT_IMAGE = "/images/fotos de parte do site/kitImagem do WhatsApp de 2025-09-09 à(s) 23.00.14_f0e7e84f.jpg"
 
+const TIER_COLORS = [
+  { gradient: 'from-forest-900 to-forest-800', accent: 'text-moss-400', ring: '' },
+  { gradient: 'from-forest-900 to-forest-800', accent: 'text-moss-400', ring: '' },
+  { gradient: 'from-[#2a1a00] to-[#3d2800]',  accent: 'text-gold-400',  ring: 'ring-1 ring-gold-400/30' },
+  { gradient: 'from-forest-900 to-forest-800', accent: 'text-moss-400', ring: '' },
+  { gradient: 'from-forest-900 to-forest-800', accent: 'text-moss-400', ring: '' },
+]
+
 export function KitTiers() {
   const { ref, isInView } = useScrollReveal()
 
   return (
     <section className="py-16">
-      <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-start">
         {kits.map((kit, i) => {
           const profit = RETAIL_PRICE_PER_KIT - kit.pricePerUnit
+          const colors = TIER_COLORS[i] ?? TIER_COLORS[0]
 
           return (
             <motion.div
               key={kit.id}
-              initial={{ opacity: 0, y: 32 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.09 }}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
               className={cn(
-                'relative flex flex-col rounded-2xl border overflow-hidden',
+                'relative flex flex-col rounded-3xl border overflow-hidden',
                 kit.featured
-                  ? 'bg-gold-400/5 border-gold-400/40 ring-1 ring-gold-400/20'
-                  : 'bg-forest-900/40 border-white/10'
+                  ? `bg-gradient-to-b ${colors.gradient} border-gold-400/40 shadow-2xl shadow-gold-400/10 scale-[1.03] ${colors.ring}`
+                  : 'bg-forest-900/50 border-white/8 hover:border-white/20 transition-colors duration-300'
               )}
             >
               {/* Popular badge */}
               {kit.featured && (
-                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10">
-                  <span className="bg-gold-400 text-forest-950 text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-                    Popular
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
+                  <span className="flex items-center gap-1 bg-gold-400 text-forest-950 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+                    <Star size={8} fill="currentColor" />Popular
                   </span>
                 </div>
               )}
 
-              {/* Kit image */}
-              <div className="relative h-36 overflow-hidden bg-forest-950/60 flex-shrink-0">
-                <img src={KIT_IMAGE} alt="Kit GreenLife" className="w-full h-full object-cover object-top" />
-                <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-forest-950/10 to-transparent" />
-                <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-forest-950/70 backdrop-blur-sm rounded-full px-2 py-0.5">
-                  <Package size={9} className="text-gold-400" />
-                  <span className="text-[9px] font-mono text-gold-400 font-bold">
+              {/* Image — completa, sem corte */}
+              <div className={cn(
+                'relative flex-shrink-0 flex items-center justify-center overflow-hidden',
+                kit.featured ? 'bg-[#1a0f00]/60' : 'bg-forest-950/50'
+              )}>
+                <img
+                  src={KIT_IMAGE}
+                  alt={`Kit ${kit.tier}`}
+                  className="w-full h-auto object-contain"
+                  style={{ maxHeight: 220 }}
+                />
+                {/* Gradient overlay suave no fundo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                {/* Badge quantidade */}
+                <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1">
+                  <span className="text-[10px] font-mono font-bold text-gold-400">
                     {kit.minQuantity === 1 ? '1 kit' : `${kit.minQuantity}+ kits`}
                   </span>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="flex flex-col flex-1 p-5 gap-4">
+              <div className="flex flex-col flex-1 p-4 gap-3.5">
+                {/* Tier name */}
+                <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-ink-500">
+                  {kit.tier}
+                </p>
+
+                {/* Price + discount */}
                 <div>
-                  <p className="section-eyebrow mb-1">{kit.tier}</p>
-                  <p className="font-display text-2xl font-medium text-cream-50">
-                    <span className="font-mono text-gold-400">${kit.pricePerUnit}</span>
-                    <span className="text-sm font-sans text-ink-500 font-normal ml-1">/kit</span>
-                  </p>
+                  <div className="flex items-baseline gap-1">
+                    <span className={cn('font-mono text-3xl font-bold', kit.featured ? 'text-gold-400' : 'text-cream-50')}>
+                      ${kit.pricePerUnit}
+                    </span>
+                    <span className="text-xs text-ink-500 font-sans">/kit</span>
+                  </div>
                   {kit.discount > 0 && (
-                    <p className="font-mono text-xs text-moss-400 mt-0.5">
-                      −{kit.discount}% descuento
-                    </p>
+                    <p className="text-[11px] text-moss-400 font-mono mt-0.5">−{kit.discount}% descuento</p>
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <p className="text-xs text-ink-500 font-mono">Ganancia por kit:</p>
-                  <p className="font-mono text-lg font-medium text-green-400">
-                    +${profit}
-                  </p>
+                {/* Profit highlight */}
+                <div className={cn(
+                  'flex items-center justify-between px-3 py-2 rounded-xl',
+                  kit.featured ? 'bg-gold-400/10 border border-gold-400/20' : 'bg-white/5 border border-white/5'
+                )}>
+                  <span className="text-[11px] text-ink-500 font-mono">Ganancia/kit</span>
+                  <span className="font-mono font-bold text-green-400 text-base">+${profit}</span>
                 </div>
 
+                {/* Benefits */}
                 <ul className="space-y-2 flex-1">
                   {kit.benefits.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-xs text-cream-200/80">
-                      <Check size={12} strokeWidth={2.5} className="text-moss-400 mt-0.5 flex-shrink-0" />
+                    <li key={b} className="flex items-start gap-2 text-[11px] text-cream-200/80 leading-relaxed">
+                      <Check size={11} strokeWidth={2.5} className="text-moss-400 mt-0.5 flex-shrink-0" />
                       {b}
                     </li>
                   ))}
                 </ul>
 
+                {/* CTA */}
                 <a
                   href={buildKitWhatsAppLink(kit.tier, kit.minQuantity, kit.pricePerUnit)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    'flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 active:scale-95',
+                    'flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all duration-200 active:scale-95 mt-1',
                     kit.featured
-                      ? 'bg-gold-400 text-forest-950 hover:bg-gold-300'
-                      : 'bg-white/5 border border-white/10 text-cream-100 hover:bg-white/10'
+                      ? 'bg-gold-400 text-forest-950 hover:bg-gold-300 shadow-lg shadow-gold-400/20'
+                      : 'bg-white/8 border border-white/10 text-cream-100 hover:bg-white/15'
                   )}
                 >
                   <MessageCircle size={14} strokeWidth={2} />
