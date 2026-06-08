@@ -1,29 +1,45 @@
-import { useEffect, useState } from 'react'
+import { create } from 'zustand'
 import { getActiveProducts } from '../lib/queries/products'
 import { dbProductToPublic } from '../lib/mappers'
 import { isSupabaseConfigured } from '../lib/supabase'
 import { products as staticProducts } from '../data/products'
 import type { Product } from '../data/products'
 
-interface UseProductsResult {
+interface ProductsStore {
   products: Product[]
   loading: boolean
+  fetched: boolean
+  fetch: () => Promise<void>
 }
 
-export function usePublicProducts(): UseProductsResult {
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(isSupabaseConfigured)
+const useProductsStore = create<ProductsStore>((set, get) => ({
+  products: [],
+  loading: false,
+  fetched: false,
 
-  useEffect(() => {
+  async fetch() {
+    if (get().fetched || get().loading) return
+    set({ loading: true })
     if (!isSupabaseConfigured) {
-      setProducts(staticProducts)
+      set({ products: staticProducts, loading: false, fetched: true })
       return
     }
-    getActiveProducts()
-      .then((data) => setProducts(data.map(dbProductToPublic)))
-      .catch(() => setProducts(staticProducts))
-      .finally(() => setLoading(false))
-  }, [])
+    try {
+      const data = await getActiveProducts()
+      set({ products: data.map(dbProductToPublic), loading: false, fetched: true })
+    } catch {
+      set({ products: staticProducts, loading: false, fetched: true })
+    }
+  },
+}))
+
+export function usePublicProducts() {
+  const { products, loading, fetch } = useProductsStore()
+
+  // trigger fetch on first use
+  if (!useProductsStore.getState().fetched && !useProductsStore.getState().loading) {
+    fetch()
+  }
 
   return { products, loading }
 }
