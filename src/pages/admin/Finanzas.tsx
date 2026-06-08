@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { DollarSign, TrendingDown, TrendingUp, Plus, BarChart2 } from 'lucide-react'
+import { DollarSign, TrendingDown, TrendingUp, Plus, BarChart2, Trash2 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
-import { getTransactions, getMonthlyFinance, createTransaction, getFinanceSummary, type Transaction, type MonthlyFinance } from '../../lib/queries/finance'
+import { getTransactions, getMonthlyFinance, createTransaction, getFinanceSummary, deleteTransaction, type Transaction, type MonthlyFinance } from '../../lib/queries/finance'
+import { ConfirmDialog } from '../../components/admin/ui/ConfirmDialog'
 import { StatCard } from '../../components/admin/ui/StatCard'
 import { StatCardSkeleton } from '../../components/admin/ui/Skeleton'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
@@ -31,6 +32,8 @@ export default function Finanzas() {
   const [txAmount, setTxAmount] = useState('')
   const [txDesc, setTxDesc] = useState('')
   const [saving, setSaving] = useState(false)
+  const [toDelete, setToDelete] = useState<Transaction | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const { push } = useToast()
 
   async function load() {
@@ -53,6 +56,18 @@ export default function Finanzas() {
       load()
     } catch { push('Error al registrar transacción', 'error') }
     finally { setSaving(false) }
+  }
+
+  async function handleDelete() {
+    if (!toDelete) return
+    setDeleting(true)
+    try {
+      await deleteTransaction(toDelete.id)
+      push('Transacción eliminada')
+      setToDelete(null)
+      load()
+    } catch { push('Error al eliminar', 'error') }
+    finally { setDeleting(false) }
   }
 
   const filtered = filterType === 'all' ? transactions : transactions.filter((t) => t.type === filterType)
@@ -84,7 +99,8 @@ export default function Finanzas() {
           <>
             <StatCard title="Ingresos del mes" value={formatPrice(summary?.ingresos??0)} icon={TrendingUp} accent="green" delay={0} />
             <StatCard title="Egresos del mes"  value={formatPrice(summary?.egresos??0)}  icon={TrendingDown} accent="red"  delay={0.05} />
-            <StatCard title="Ganancia neta"    value={formatPrice(summary?.ganancia??0)} icon={DollarSign}   accent="gold" delay={0.1} />
+            <StatCard title="Ganancia neta"    value={formatPrice(summary?.ganancia??0)} icon={DollarSign}   accent="gold" delay={0.1}
+              trend={(summary?.ganancia??0) >= 0 ? 'up' : 'down'} />
           </>
         )}
       </div>
@@ -146,7 +162,7 @@ export default function Finanzas() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  {['Tipo','Categoría','Descripción','Monto','Fecha'].map((h)=>(
+                  {['Tipo','Categoría','Descripción','Monto','Fecha',''].map((h)=>(
                     <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-gray-500">{h}</th>
                   ))}
                 </tr>
@@ -167,6 +183,11 @@ export default function Finanzas() {
                       {t.type === 'ingreso' ? '+' : '-'}{formatPrice(t.amount)}
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{new Date(t.created_at).toLocaleDateString('es-VE')}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => setToDelete(t)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                        <Trash2 size={13} />
+                      </button>
+                    </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -174,6 +195,10 @@ export default function Finanzas() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog open={!!toDelete} title="¿Eliminar transacción?"
+        description={`Se eliminará la transacción de ${toDelete ? formatPrice(toDelete.amount) : ''}.`}
+        onConfirm={handleDelete} onCancel={() => setToDelete(null)} loading={deleting} />
 
       {/* Modal nueva transacción */}
       <Modal isOpen={modalOpen} onClose={()=>setModalOpen(false)} title="Nueva transacción">

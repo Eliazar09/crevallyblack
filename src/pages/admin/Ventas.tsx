@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, ShoppingCart, DollarSign, TrendingUp } from 'lucide-react'
-import { getSales, methodLabels, type DbSale } from '../../lib/queries/sales'
+import { Plus, ShoppingCart, DollarSign, TrendingUp, Trash2 } from 'lucide-react'
+import { getSales, deleteSale, methodLabels, type DbSale } from '../../lib/queries/sales'
+import { ConfirmDialog } from '../../components/admin/ui/ConfirmDialog'
 import { formatPrice } from '../../lib/currency'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Skeleton } from '../../components/admin/ui/Skeleton'
 import { StatCard } from '../../components/admin/ui/StatCard'
 import { cn } from '../../lib/cn'
+import { useToast } from '../../hooks/useToast'
 
 const statusLabel: Record<string, string> = { pagado:'Pagado', pendiente:'Pendiente', parcial:'Parcial' }
 const statusColor: Record<string, string> = {
@@ -26,10 +28,24 @@ function monthRange() {
 export default function Ventas() {
   const [sales, setSales] = useState<DbSale[]>([])
   const [loading, setLoading] = useState(true)
+  const [toDelete, setToDelete] = useState<DbSale | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const { push } = useToast()
 
-  useEffect(() => {
-    getSales().then(setSales).finally(() => setLoading(false))
-  }, [])
+  function load() { getSales().then(setSales).finally(() => setLoading(false)) }
+  useEffect(() => { load() }, [])
+
+  async function handleDelete() {
+    if (!toDelete) return
+    setDeleting(true)
+    try {
+      await deleteSale(toDelete.id)
+      push('Venta eliminada')
+      setToDelete(null)
+      load()
+    } catch { push('Error al eliminar', 'error') }
+    finally { setDeleting(false) }
+  }
 
   const { from } = monthRange()
   const monthlySales = sales.filter((s) => s.created_at >= from)
@@ -65,7 +81,7 @@ export default function Ventas() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                {['#','Cliente','Método','Total','Estado','Fecha'].map((h)=>(
+                {['#','Cliente','Método','Total','Estado','Fecha',''].map((h)=>(
                   <th key={h} className="px-4 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                 ))}
               </tr>
@@ -88,12 +104,20 @@ export default function Ventas() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-400 text-xs">{new Date(s.created_at).toLocaleDateString('es-VE')}</td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => setToDelete(s)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                      <Trash2 size={13} />
+                    </button>
+                  </td>
                 </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+      <ConfirmDialog open={!!toDelete} title="¿Eliminar venta?"
+        description={`La venta de ${toDelete?.client_name} por ${toDelete ? '$' + toDelete.total : ''} será eliminada.`}
+        onConfirm={handleDelete} onCancel={() => setToDelete(null)} loading={deleting} />
     </div>
   )
 }

@@ -26,6 +26,7 @@ const VentaNueva   = lazy(() => import('./pages/admin/VentaNueva'))
 const Clientes     = lazy(() => import('./pages/admin/Clientes'))
 const Inventario   = lazy(() => import('./pages/admin/Inventario'))
 const Finanzas     = lazy(() => import('./pages/admin/Finanzas'))
+const Agenda       = lazy(() => import('./pages/admin/Agenda'))
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation()
@@ -72,8 +73,8 @@ function AppLayout() {
 }
 
 const AdminSuspense = () => (
-  <div className="min-h-[100dvh] bg-forest-950 flex items-center justify-center">
-    <div className="w-6 h-6 rounded-full border-2 border-gold-400 border-t-transparent animate-spin" />
+  <div className="flex items-center justify-center h-64">
+    <div className="w-6 h-6 rounded-full border-2 border-forest-700 border-t-transparent animate-spin" />
   </div>
 )
 
@@ -113,6 +114,9 @@ export default function App() {
             } />
             <Route path="/admin/finanzas" element={
               <Suspense fallback={<AdminSuspense />}><Finanzas /></Suspense>
+            } />
+            <Route path="/admin/agenda" element={
+              <Suspense fallback={<AdminSuspense />}><Agenda /></Suspense>
             } />
           </Route>
         </Route>

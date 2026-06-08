@@ -115,6 +115,11 @@ export async function getSales(filters?: { from?: string; to?: string }) {
   return data as DbSale[]
 }
 
+export async function deleteSale(id: string) {
+  const { error } = await supabase.from('sales').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function getExchangeRate(): Promise<number> {
   const { data } = await supabase.from('settings').select('exchange_rate').eq('id', 1).single()
   return Number(data?.exchange_rate) || 40

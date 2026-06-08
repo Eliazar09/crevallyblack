@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Package, ShoppingCart, Users,
-  Boxes, BarChart2, LogOut, Leaf, X
+  Boxes, BarChart2, LogOut, Leaf, X, CalendarDays
 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
 import { cn } from '../../../lib/cn'
@@ -14,6 +14,7 @@ const nav = [
   { to: '/admin/clientes',  icon: Users,            label: 'Clientes' },
   { to: '/admin/inventario',icon: Boxes,            label: 'Inventario' },
   { to: '/admin/finanzas',  icon: BarChart2,        label: 'Finanzas' },
+  { to: '/admin/agenda',    icon: CalendarDays,     label: 'Agenda' },
 ]
 
 interface SidebarProps {

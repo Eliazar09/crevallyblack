@@ -51,6 +51,11 @@ export async function createTransaction(payload: {
   if (error) throw error
 }
 
+export async function deleteTransaction(id: string) {
+  const { error } = await supabase.from('transactions').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function getFinanceSummary() {
   const now = new Date()
   const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
