@@ -1,4 +1,5 @@
-import { useEffect, useState, FormEvent } from 'react'
+import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { getProductById, createProduct, updateProduct, type DbProduct } from '../../lib/queries/products'

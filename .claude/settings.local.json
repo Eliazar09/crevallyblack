@@ -31,7 +31,11 @@
       "PowerShell($content = Get-Content \"C:\\\\Users\\\\frank\\\\.claude\\\\projects\\\\c--Users-frank-Desktop-Sites-Venezuela-greenlife\\\\7f28e64a-2744-415e-8fd5-e6a35c4f8cd3.jsonl\" -Raw; $lines = $content -split \"`n\" | Where-Object { $_ -ne \"\" } | Select-Object -Last 30; $lines | ForEach-Object { try { $j = $_ | ConvertFrom-Json; if \\($j.type -eq \"human\" -or $j.type -eq \"assistant\"\\) { $j | ConvertTo-Json -Depth 2 } } catch {} })",
       "Bash(cat .env)",
       "Bash(cat .env.local)",
-      "Bash(node scripts/seed.mjs)"
+      "Bash(node scripts/seed.mjs)",
+      "Bash(git rm *)",
+      "Bash(ls \"c:\\\\Users\\\\frank\\\\Desktop\\\\Sites\\\\Venezuela\" 2>/dev/null | head -20)",
+      "Read(//c/Users/frank/Desktop/Sites/Venezuela/**)",
+      "Bash(node -e ' *)"
     ]
   }
 }

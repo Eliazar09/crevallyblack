@@ -7,7 +7,6 @@ import { createSale, getExchangeRate, methodLabels, type PaymentMethod, type Pay
 import { formatPrice } from '../../lib/currency'
 import { useToast } from '../../hooks/useToast'
 import { buildWhatsAppLink } from '../../lib/whatsapp'
-import { cn } from '../../lib/cn'
 
 const methods = Object.keys(methodLabels) as PaymentMethod[]
 const bsMetodos: PaymentMethod[] = ['pago_movil', 'transferencia']
@@ -103,7 +102,7 @@ export default function VentaNueva() {
         unit_price: e.unitPrice,
         subtotal: e.unitPrice * e.quantity,
       }))
-      const saleId = await createSale({
+      await createSale({
         client_id: selectedClient?.id ?? null,
         client_name: clientName,
         items, subtotal, discount, total,
@@ -118,7 +117,7 @@ export default function VentaNueva() {
       // Optional WhatsApp notification
       if (selectedClient?.phone) {
         const link = buildWhatsAppLink(
-          items.map((i) => ({ productId: i.product_id, name: i.product_name, image: '', price: i.unit_price, quantity: i.quantity })),
+          items.map((i) => ({ id: i.product_id, productId: i.product_id, name: i.product_name, image: '', price: i.unit_price, quantity: i.quantity })),
           { nombre: clientName, telefono: selectedClient.phone, ciudad: selectedClient.city ?? '' }
         )
         window.open(link, '_blank')

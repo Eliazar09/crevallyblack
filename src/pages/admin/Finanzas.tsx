@@ -114,7 +114,7 @@ export default function Finanzas() {
               <Tooltip
                 contentStyle={{ background: '#0F2410', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}
                 labelStyle={{ color: '#F6F5EF', fontSize: 12 }}
-                formatter={(v: number) => [`$${v.toFixed(2)}`, '']}
+                formatter={(v) => [`$${Number(v ?? 0).toFixed(2)}`, '']}
               />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#6A6A6A' }} />
               <Area type="monotone" dataKey="ingresos" name="Ingresos" stroke="#4ade80" strokeWidth={2} fill="url(#gIngresos)" />

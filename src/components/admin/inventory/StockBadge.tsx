@@ -8,7 +8,6 @@ interface StockBadgeProps {
 export function StockBadge({ stock, minStock }: StockBadgeProps) {
   const isOut  = stock === 0
   const isLow  = !isOut && stock <= minStock
-  const isOk   = !isOut && !isLow
 
   return (
     <span className={cn(
