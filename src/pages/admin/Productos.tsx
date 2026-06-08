@@ -95,50 +95,92 @@ export default function Productos() {
         <EmptyState icon={Package} title="Sin productos" description="Crea tu primer producto para empezar."
           action={<Link to="/admin/productos/nuevo" className="text-sm text-forest-700 hover:text-forest-600 font-medium">+ Nuevo producto</Link>} />
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                {['Producto','Categoría','Precio','Stock','Estado',''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {products.map((p, i) => (
-                <motion.tr key={p.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                  className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {p.image && <img src={p.image} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0 bg-gray-100" />}
-                      <p className="text-gray-900 font-medium truncate max-w-[200px]">{p.name}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs capitalize">{catLabel[p.category] ?? p.category}</td>
-                  <td className="px-4 py-3 font-mono font-semibold text-gray-900">{formatPrice(p.price)}</td>
-                  <td className="px-4 py-3 font-mono text-gray-700">{p.stock_quantity}</td>
-                  <td className="px-4 py-3">
-                    <span className={cn('px-2.5 py-0.5 rounded-full text-[11px] font-semibold border', statusColors[p.status])}>
+        <>
+          {/* Mobile cards */}
+          <div className="sm:hidden grid grid-cols-2 gap-3">
+            {products.map((p, i) => (
+              <motion.div key={p.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                {p.image ? (
+                  <img src={p.image} alt={p.name} className="w-full h-32 object-cover bg-gray-100" />
+                ) : (
+                  <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                    <Package size={24} className="text-gray-300" />
+                  </div>
+                )}
+                <div className="p-3 flex flex-col flex-1 gap-2">
+                  <div>
+                    <p className="text-gray-900 font-semibold text-sm leading-tight line-clamp-2">{p.name}</p>
+                    <p className="text-[11px] text-gray-400 capitalize mt-0.5">{catLabel[p.category] ?? p.category}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-gray-900 text-sm">{formatPrice(p.price)}</span>
+                    <span className={cn('px-2 py-0.5 rounded-full text-[10px] font-semibold border', statusColors[p.status])}>
                       {statusLabel[p.status]}
                     </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <Link to={`/admin/productos/${p.id}`}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-forest-700 hover:bg-forest-50 transition-colors">
-                        <Pencil size={13} />
-                      </Link>
-                      <button onClick={() => setToDelete(p)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <p className="text-[11px] text-gray-400">{p.stock_quantity} en stock</p>
+                  <div className="flex gap-2 mt-auto pt-1">
+                    <Link to={`/admin/productos/${p.id}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-forest-50 text-forest-700 text-xs font-semibold border border-forest-100 hover:bg-forest-100 transition-colors">
+                      <Pencil size={11} /> Editar
+                    </Link>
+                    <button onClick={() => setToDelete(p)}
+                      className="p-2 rounded-xl bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 transition-colors">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  {['Producto','Categoría','Precio','Stock','Estado',''].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {products.map((p, i) => (
+                  <motion.tr key={p.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                    className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        {p.image && <img src={p.image} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0 bg-gray-100" />}
+                        <p className="text-gray-900 font-medium truncate max-w-[200px]">{p.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 text-xs capitalize">{catLabel[p.category] ?? p.category}</td>
+                    <td className="px-4 py-3 font-mono font-semibold text-gray-900">{formatPrice(p.price)}</td>
+                    <td className="px-4 py-3 font-mono text-gray-700">{p.stock_quantity}</td>
+                    <td className="px-4 py-3">
+                      <span className={cn('px-2.5 py-0.5 rounded-full text-[11px] font-semibold border', statusColors[p.status])}>
+                        {statusLabel[p.status]}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 justify-end">
+                        <Link to={`/admin/productos/${p.id}`}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-forest-700 hover:bg-forest-50 transition-colors">
+                          <Pencil size={13} />
+                        </Link>
+                        <button onClick={() => setToDelete(p)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       <ConfirmDialog open={!!toDelete} title="¿Eliminar producto?"

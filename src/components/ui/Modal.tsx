@@ -47,7 +47,7 @@ export function Modal({ isOpen, onClose, children, className, size = 'md' }: Mod
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className={cn(
-              'relative w-full bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl',
+              'relative w-full bg-white border border-gray-200 rounded-3xl overflow-y-auto shadow-xl max-h-[90dvh]',
               sizes[size],
               className
             )}

@@ -54,4 +54,11 @@ export async function createMovement(payload: {
     reason: payload.reason,
   })
   if (error) throw error
+
+  const { data: prod } = await supabase.from('products').select('stock_quantity').eq('id', payload.product_id).single()
+  if (prod) {
+    await supabase.from('products')
+      .update({ stock_quantity: Math.max(0, prod.stock_quantity + qty) })
+      .eq('id', payload.product_id)
+  }
 }

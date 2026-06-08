@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Plus, Trash2, Briefcase, User, Building2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Briefcase, User, Building2, ShoppingCart } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { getSales } from '../../lib/queries/sales'
 
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
@@ -60,8 +61,20 @@ export default function Agenda() {
   const [store, setStore] = useState<Store>(loadStore)
   const [text, setText] = useState('')
   const [noteType, setNoteType] = useState<Note['type']>('trabajo')
+  const [salesByDate, setSalesByDate] = useState<Record<string, number>>({})
 
   useEffect(() => { saveStore(store) }, [store])
+
+  useEffect(() => {
+    getSales().then((sales) => {
+      const byDate: Record<string, number> = {}
+      for (const s of sales) {
+        const key = s.created_at.slice(0, 10)
+        byDate[key] = (byDate[key] ?? 0) + 1
+      }
+      setSalesByDate(byDate)
+    }).catch(() => {})
+  }, [])
 
   const days = getCalendarDays(year, month)
   const today = todayKey()
@@ -92,6 +105,8 @@ export default function Agenda() {
     .flatMap(([k, notes]) => notes.map(n => ({ ...n, dateKey: k })))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, 30)
+
+  const selDaySales = salesByDate[selKey] ?? 0
 
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
@@ -129,6 +144,7 @@ export default function Agenda() {
               const isToday = key === today
               const isSel = d === selectedDay && selKey === key
               const hasNotes = (store[key] ?? []).length > 0
+              const hasSales = (salesByDate[key] ?? 0) > 0
               return (
                 <button key={d} onClick={() => setSelectedDay(d)}
                   className={cn('relative h-9 w-full rounded-xl text-sm font-medium transition-all',
@@ -136,17 +152,47 @@ export default function Agenda() {
                     isToday ? 'bg-forest-100 text-forest-700 font-bold' :
                     'text-gray-700 hover:bg-gray-100')}>
                   {d}
-                  {hasNotes && !isSel && (
-                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-forest-500" />
+                  {!isSel && (hasNotes || hasSales) && (
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                      {hasNotes && <span className="w-1 h-1 rounded-full bg-forest-500" />}
+                      {hasSales && <span className="w-1 h-1 rounded-full bg-blue-500" />}
+                    </span>
                   )}
                 </button>
               )
             })}
           </div>
+
+          {/* Legenda */}
+          <div className="flex items-center gap-4 pt-1">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-forest-500" />
+              <span className="text-[10px] text-gray-400">Nota</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-[10px] text-gray-400">Venta</span>
+            </div>
+          </div>
         </div>
 
         {/* Panel notas del día */}
         <div className="lg:col-span-3 space-y-4">
+          {/* Indicador de ventas del día */}
+          {selDaySales > 0 && (
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3">
+              <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <ShoppingCart size={14} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-800">
+                  {selDaySales} {selDaySales === 1 ? 'venta realizada' : 'ventas realizadas'}
+                </p>
+                <p className="text-xs text-blue-600">Ver detalles en la sección de Ventas</p>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
             <p className="font-semibold text-gray-900 capitalize text-sm">
               {formatFullDate(year, month, selectedDay)}

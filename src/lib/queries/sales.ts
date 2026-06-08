@@ -91,6 +91,16 @@ export async function createSale(payload: SalePayload): Promise<string> {
   const { error: movErr } = await supabase.from('inventory_movements').insert(movements)
   if (movErr) throw movErr
 
+  // Decrement stock_quantity for each sold product
+  for (const item of payload.items) {
+    const { data: prod } = await supabase.from('products').select('stock_quantity').eq('id', item.product_id).single()
+    if (prod) {
+      await supabase.from('products')
+        .update({ stock_quantity: Math.max(0, prod.stock_quantity - item.quantity) })
+        .eq('id', item.product_id)
+    }
+  }
+
   // Financial transaction (ingreso)
   const { error: txErr } = await supabase.from('transactions').insert({
     type: 'ingreso',
