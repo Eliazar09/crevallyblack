@@ -15,34 +15,31 @@ const catLabel: Record<string, string> = {
 
 type FormState = {
   name: string; short: string; description: string; how_to_use: string
-  image: string; price: string; cost_price: string; category: ProductCategory
-  sku: string; featured: boolean; status: 'activo' | 'inactivo' | 'borrador'
-  stock_quantity: string; min_stock: string
+  image: string; price: string; category: ProductCategory
+  featured: boolean; status: 'activo' | 'inactivo' | 'borrador'
+  stock_quantity: string
   benefits: string[]
-  options: Array<{ label: string; value: string; price: string }>
 }
 
 const empty: FormState = {
   name:'', short:'', description:'', how_to_use:'', image:'',
-  price:'', cost_price:'', category:'adelgazamiento', sku:'',
-  featured:false, status:'activo' as 'activo'|'inactivo'|'borrador', stock_quantity:'0', min_stock:'5',
-  benefits:[''], options:[],
+  price:'', category:'adelgazamiento',
+  featured:false, status:'activo', stock_quantity:'0',
+  benefits:[''],
 }
 
 function fromDb(p: DbProduct): FormState {
   return {
     name: p.name, short: p.short, description: p.description,
     how_to_use: p.how_to_use, image: p.image, price: String(p.price),
-    cost_price: String(p.cost_price ?? ''), category: p.category,
-    sku: p.sku ?? '', featured: p.featured, status: p.status,
-    stock_quantity: String(p.stock_quantity), min_stock: String(p.min_stock),
+    category: p.category, featured: p.featured, status: p.status,
+    stock_quantity: String(p.stock_quantity),
     benefits: p.benefits.length ? p.benefits : [''],
-    options: (p.options ?? []).map((o) => ({ ...o, price: String(o.price ?? '') })),
   }
 }
 
-const field = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-cream-100 placeholder:text-ink-500 focus:outline-none focus:border-gold-400/40 transition-colors'
-const label = 'text-xs font-mono text-ink-500 uppercase tracking-wider'
+const field = 'w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-forest-600/50 focus:bg-white transition-colors'
+const lbl = 'text-xs font-semibold text-gray-500 uppercase tracking-wider'
 
 export default function ProductoForm() {
   const { id } = useParams<{ id: string }>()
@@ -66,26 +63,34 @@ export default function ProductoForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    if (!form.name.trim()) { push('El nombre es obligatorio', 'error'); return }
+    if (!form.price) { push('El precio es obligatorio', 'error'); return }
     setSaving(true)
     try {
       const payload = {
-        name: form.name, short: form.short, description: form.description,
-        how_to_use: form.how_to_use, image: form.image, images: [],
-        price: Number(form.price), cost_price: form.cost_price ? Number(form.cost_price) : null,
-        category: form.category, sku: form.sku || null,
-        featured: form.featured, status: form.status,
-        stock_quantity: Number(form.stock_quantity), min_stock: Number(form.min_stock),
+        name: form.name.trim(),
+        short: form.short.trim(),
+        description: form.description.trim(),
+        how_to_use: form.how_to_use.trim(),
+        image: form.image,
+        images: [],
+        price: Number(form.price),
+        cost_price: 0,
+        category: form.category,
+        sku: null,
+        featured: form.featured,
+        status: form.status,
+        stock_quantity: Number(form.stock_quantity),
+        min_stock: 5,
         benefits: form.benefits.filter(Boolean),
-        options: form.options.length
-          ? form.options.map((o) => ({ label: o.label, value: o.value, price: o.price ? Number(o.price) : undefined }))
-          : null,
+        options: [],
       }
       if (isNew) await createProduct(payload as any)
       else await updateProduct(id!, payload)
-      push(isNew ? 'Producto creado' : 'Producto actualizado')
+      push(isNew ? '¡Producto creado!' : 'Producto actualizado')
       navigate('/admin/productos')
-    } catch {
-      push('Error al guardar el producto', 'error')
+    } catch (err: any) {
+      push(`Error: ${err?.message ?? 'No se pudo guardar'}`, 'error')
     } finally {
       setSaving(false)
     }
@@ -93,114 +98,102 @@ export default function ProductoForm() {
 
   if (loading) return (
     <div className="p-6 flex items-center justify-center h-64">
-      <div className="w-6 h-6 rounded-full border-2 border-gold-400 border-t-transparent animate-spin" />
+      <div className="w-6 h-6 rounded-full border-2 border-forest-700 border-t-transparent animate-spin" />
     </div>
   )
 
   return (
-    <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-5">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="text-ink-500 hover:text-cream-200 transition-colors">
-          <ArrowLeft size={18} />
+        <button onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-colors bg-white">
+          <ArrowLeft size={16} />
         </button>
-        <h1 className="font-display text-2xl font-medium text-cream-50">
+        <h1 className="font-display text-xl font-semibold text-gray-900">
           {isNew ? 'Nuevo producto' : 'Editar producto'}
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+
         {/* Foto */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-3">
-          <p className={label}>Foto del producto</p>
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-3">
+          <p className={lbl}>Foto del producto</p>
           <PhotoUploader value={form.image} onChange={(v) => set('image', v)} />
         </div>
 
         {/* Info básica */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-4">
-          <p className="text-sm font-semibold text-cream-100">Información general</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1 sm:col-span-2">
-              <label className={label}>Nombre *</label>
-              <input required value={form.name} onChange={(e) => set('name', e.target.value)} className={field} placeholder="Nombre del producto" />
-            </div>
-            <div className="space-y-1 sm:col-span-2">
-              <label className={label}>Descripción corta *</label>
-              <input required value={form.short} onChange={(e) => set('short', e.target.value)} className={field} placeholder="Una línea descriptiva" />
-            </div>
-            <div className="space-y-1 sm:col-span-2">
-              <label className={label}>Descripción completa</label>
-              <textarea value={form.description} onChange={(e) => set('description', e.target.value)} rows={4}
-                className={field + ' resize-none'} placeholder="Descripción detallada…" />
-            </div>
-            <div className="space-y-1 sm:col-span-2">
-              <label className={label}>Modo de uso</label>
-              <textarea value={form.how_to_use} onChange={(e) => set('how_to_use', e.target.value)} rows={2}
-                className={field + ' resize-none'} placeholder="¿Cómo se usa?" />
-            </div>
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
+          <p className="text-sm font-semibold text-gray-900">Información general</p>
+          <div className="space-y-1">
+            <label className={lbl}>Nombre *</label>
+            <input required value={form.name} onChange={(e) => set('name', e.target.value)}
+              className={field} placeholder="Nombre del producto" />
+          </div>
+          <div className="space-y-1">
+            <label className={lbl}>Descripción corta</label>
+            <input value={form.short} onChange={(e) => set('short', e.target.value)}
+              className={field} placeholder="Una línea descriptiva" />
+          </div>
+          <div className="space-y-1">
+            <label className={lbl}>Descripción completa</label>
+            <textarea value={form.description} onChange={(e) => set('description', e.target.value)}
+              rows={3} className={field + ' resize-none'} placeholder="Descripción detallada…" />
+          </div>
+          <div className="space-y-1">
+            <label className={lbl}>Modo de uso</label>
+            <textarea value={form.how_to_use} onChange={(e) => set('how_to_use', e.target.value)}
+              rows={2} className={field + ' resize-none'} placeholder="¿Cómo se usa?" />
           </div>
         </div>
 
-        {/* Precios y stock */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-4">
-          <p className="text-sm font-semibold text-cream-100">Precios y stock</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Precio y stock */}
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
+          <p className="text-sm font-semibold text-gray-900">Precio y stock</p>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className={label}>Precio ($) *</label>
+              <label className={lbl}>Precio (USD) *</label>
               <input required type="number" min="0" step="0.01" value={form.price}
-                onChange={(e) => set('price', e.target.value)} className={field} placeholder="0" />
+                onChange={(e) => set('price', e.target.value)} className={field} placeholder="0.00" />
             </div>
             <div className="space-y-1">
-              <label className={label}>Costo ($)</label>
-              <input type="number" min="0" step="0.01" value={form.cost_price}
-                onChange={(e) => set('cost_price', e.target.value)} className={field} placeholder="0" />
-            </div>
-            <div className="space-y-1">
-              <label className={label}>Stock actual</label>
+              <label className={lbl}>Cantidad en stock</label>
               <input type="number" min="0" value={form.stock_quantity}
                 onChange={(e) => set('stock_quantity', e.target.value)} className={field} />
             </div>
-            <div className="space-y-1">
-              <label className={label}>Stock mínimo</label>
-              <input type="number" min="0" value={form.min_stock}
-                onChange={(e) => set('min_stock', e.target.value)} className={field} />
-            </div>
           </div>
         </div>
 
-        {/* Clasificación */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-4">
-          <p className="text-sm font-semibold text-cream-100">Clasificación</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Categoría y estado */}
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
+          <p className="text-sm font-semibold text-gray-900">Clasificación</p>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className={label}>Categoría *</label>
+              <label className={lbl}>Categoría *</label>
               <select value={form.category} onChange={(e) => set('category', e.target.value as ProductCategory)}
                 className={field}>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{catLabel[c]}</option>)}
               </select>
             </div>
             <div className="space-y-1">
-              <label className={label}>Estado</label>
+              <label className={lbl}>Estado</label>
               <select value={form.status} onChange={(e) => set('status', e.target.value as any)} className={field}>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
                 <option value="borrador">Borrador</option>
               </select>
             </div>
-            <div className="space-y-1">
-              <label className={label}>SKU</label>
-              <input value={form.sku} onChange={(e) => set('sku', e.target.value)} className={field} placeholder="GL-001" />
-            </div>
           </div>
           <label className="flex items-center gap-2.5 cursor-pointer select-none w-fit">
             <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)}
-              className="accent-gold-400 w-4 h-4" />
-            <span className="text-sm text-cream-200">Destacado (aparece en Inicio)</span>
+              className="accent-forest-700 w-4 h-4 rounded" />
+            <span className="text-sm text-gray-700">Destacado (aparece en la página de inicio)</span>
           </label>
         </div>
 
         {/* Beneficios */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-3">
-          <p className="text-sm font-semibold text-cream-100">Beneficios</p>
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-3">
+          <p className="text-sm font-semibold text-gray-900">Beneficios</p>
           {form.benefits.map((b, i) => (
             <div key={i} className="flex gap-2">
               <input value={b} onChange={(e) => {
@@ -208,55 +201,26 @@ export default function ProductoForm() {
               }} className={field} placeholder={`Beneficio ${i + 1}`} />
               {form.benefits.length > 1 && (
                 <button type="button" onClick={() => set('benefits', form.benefits.filter((_, j) => j !== i))}
-                  className="text-ink-500 hover:text-red-400 transition-colors">
-                  <Trash2 size={14} />
+                  className="text-gray-400 hover:text-red-500 transition-colors">
+                  <Trash2 size={15} />
                 </button>
               )}
             </div>
           ))}
           <button type="button" onClick={() => set('benefits', [...form.benefits, ''])}
-            className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1">
+            className="text-xs text-forest-700 hover:text-forest-600 flex items-center gap-1 font-medium">
             <Plus size={12} />Agregar beneficio
           </button>
         </div>
 
-        {/* Variantes */}
-        <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-3">
-          <p className="text-sm font-semibold text-cream-100">Variantes (opcional)</p>
-          {form.options.map((opt, i) => (
-            <div key={i} className="grid grid-cols-3 gap-2 items-center">
-              <input value={opt.label} onChange={(e) => {
-                const no = [...form.options]; no[i] = { ...no[i], label: e.target.value }; set('options', no)
-              }} className={field} placeholder="Etiqueta (ej: 30 Caps)" />
-              <input value={opt.value} onChange={(e) => {
-                const no = [...form.options]; no[i] = { ...no[i], value: e.target.value }; set('options', no)
-              }} className={field} placeholder="Valor (ej: 30caps)" />
-              <div className="flex gap-2">
-                <input type="number" value={opt.price} onChange={(e) => {
-                  const no = [...form.options]; no[i] = { ...no[i], price: e.target.value }; set('options', no)
-                }} className={field} placeholder="Precio" />
-                <button type="button" onClick={() => set('options', form.options.filter((_, j) => j !== i))}
-                  className="text-ink-500 hover:text-red-400">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
-          <button type="button"
-            onClick={() => set('options', [...form.options, { label:'', value:'', price:'' }])}
-            className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1">
-            <Plus size={12} />Agregar variante
-          </button>
-        </div>
-
         {/* Actions */}
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-end pt-1">
           <button type="button" onClick={() => navigate(-1)}
-            className="px-5 py-2.5 rounded-full text-sm text-ink-400 border border-white/10 hover:bg-white/5 transition-colors">
+            className="px-5 py-2.5 rounded-full text-sm text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
             Cancelar
           </button>
           <button type="submit" disabled={saving}
-            className="px-6 py-2.5 rounded-full text-sm font-semibold bg-gold-400 text-forest-950 hover:bg-gold-300 disabled:opacity-60 transition-colors">
+            className="px-6 py-2.5 rounded-full text-sm font-semibold bg-forest-700 text-white hover:bg-forest-600 disabled:opacity-60 transition-colors">
             {saving ? 'Guardando…' : isNew ? 'Crear producto' : 'Guardar cambios'}
           </button>
         </div>

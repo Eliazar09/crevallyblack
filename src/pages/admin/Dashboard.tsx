@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { DollarSign, ShoppingCart, Users, Package, ArrowRight } from 'lucide-react'
+import { DollarSign, ShoppingCart, Users, Package, ArrowRight, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { StatCard } from '../../components/admin/ui/StatCard'
 import { StatCardSkeleton } from '../../components/admin/ui/Skeleton'
-import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { supabase } from '../../lib/supabase'
 import { formatPrice } from '../../lib/currency'
+import { useAuth } from '../../hooks/useAuth'
 
 interface DashStats {
   ingresos: number
@@ -25,10 +25,18 @@ interface RecentSale {
 
 const methodLabels: Record<string, string> = {
   pago_movil: 'Pago Móvil', divisas: 'Divisas', zelle: 'Zelle',
-  transferencia: 'Transferencia', binance: 'Binance', punto: 'Punto', otro: 'Otro',
+  transferencia: 'Transf.', binance: 'Binance', punto: 'Punto', otro: 'Otro',
 }
 
+const quickLinks = [
+  { to: '/admin/ventas/nueva', label: 'Nueva venta',    icon: ShoppingCart, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
+  { to: '/admin/productos/nuevo', label: 'Nuevo producto', icon: Package,      color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+  { to: '/admin/clientes',    label: 'Ver clientes',    icon: Users,         color: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100' },
+]
+
 export default function Dashboard() {
+  const { user } = useAuth()
+  const name = user?.email?.split('@')[0] ?? 'Admin'
   const [stats, setStats] = useState<DashStats | null>(null)
   const [recent, setRecent] = useState<RecentSale[]>([])
   const [loading, setLoading] = useState(true)
@@ -61,10 +69,20 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="font-display text-2xl font-medium text-cream-50">Dashboard</h1>
-        <p className="text-sm text-ink-500 mt-0.5">Resumen del mes actual</p>
-      </div>
+
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-forest-700 flex items-center justify-center flex-shrink-0">
+          <TrendingUp size={20} className="text-white" strokeWidth={1.8} />
+        </div>
+        <div>
+          <h1 className="font-display text-xl font-semibold text-gray-900">
+            Bienvenida, <span className="text-forest-700 capitalize">{name}</span>
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">Resumen del mes actual · GreenLife Venezuela</p>
+        </div>
+      </motion.div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -75,68 +93,78 @@ export default function Dashboard() {
             <StatCard title="Ingresos del mes" value={formatPrice(stats?.ingresos ?? 0)} icon={DollarSign} accent="green" delay={0} />
             <StatCard title="Ventas del mes"   value={String(stats?.ventas ?? 0)}         icon={ShoppingCart} accent="gold"  delay={0.05} />
             <StatCard title="Clientes"          value={String(stats?.clientes ?? 0)}       icon={Users}        accent="blue"  delay={0.1} />
-            <StatCard title="Stock bajo"        value={String(stats?.stockBajo ?? 0)}      icon={Package}      accent="red"   delay={0.15}
-              subtitle="productos con alerta" />
+            <StatCard title="Stock bajo"        value={String(stats?.stockBajo ?? 0)}      icon={Package}      accent="red"   delay={0.15} subtitle="productos con alerta" />
           </>
         )}
       </div>
 
+      {/* Quick actions */}
+      <div className="grid grid-cols-3 gap-3">
+        {quickLinks.map(({ to, label, icon: Icon, color }) => (
+          <Link key={to} to={to}
+            className={`flex flex-col sm:flex-row items-center sm:gap-3 gap-1.5 p-4 rounded-2xl border transition-all font-medium text-sm ${color}`}>
+            <Icon size={18} strokeWidth={1.8} />
+            <span className="text-center sm:text-left text-xs sm:text-sm">{label}</span>
+            <ArrowRight size={13} className="hidden sm:block ml-auto" />
+          </Link>
+        ))}
+      </div>
+
       {/* Recent sales */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="bg-forest-900/60 border border-white/5 rounded-2xl overflow-hidden"
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <p className="text-sm font-semibold text-cream-100">Últimas ventas</p>
-          <Link to="/admin/ventas" className="flex items-center gap-1 text-xs text-gold-400 hover:text-gold-300 transition-colors">
-            Ver todas <ArrowRight size={12} />
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Últimas ventas</p>
+            <p className="text-xs text-gray-400 mt-0.5">Actividad reciente</p>
+          </div>
+          <Link to="/admin/ventas"
+            className="flex items-center gap-1.5 text-xs font-medium text-forest-700 hover:text-forest-600 transition-colors bg-forest-50 px-3 py-1.5 rounded-full border border-forest-200">
+            Ver todas <ArrowRight size={11} />
           </Link>
         </div>
 
         {recent.length === 0 ? (
-          <EmptyState icon={ShoppingCart} title="Sin ventas aún" description="Registra tu primera venta en el módulo de Ventas." />
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center">
+              <ShoppingCart size={20} className="text-gray-400" strokeWidth={1.5} />
+            </div>
+            <p className="text-sm text-gray-500">Sin ventas este mes</p>
+            <Link to="/admin/ventas/nueva" className="text-xs text-forest-700 hover:underline font-medium">
+              Registrar primera venta →
+            </Link>
+          </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/5">
-                {['Cliente', 'Método', 'Total', 'Fecha'].map((h) => (
-                  <th key={h} className="px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-widest text-ink-500">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recent.map((s) => (
-                <tr key={s.id} className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors">
-                  <td className="px-5 py-3 text-cream-100 font-medium">{s.client_name}</td>
-                  <td className="px-5 py-3 text-ink-500 text-xs">{methodLabels[s.payment_method] ?? s.payment_method}</td>
-                  <td className="px-5 py-3 font-mono text-green-400">{formatPrice(s.total)}</td>
-                  <td className="px-5 py-3 text-ink-500 text-xs">
-                    {new Date(s.created_at).toLocaleDateString('es-VE')}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  {['Cliente', 'Método', 'Total', 'Fecha'].map((h) => (
+                    <th key={h} className="px-5 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {recent.map((s, i) => (
+                  <motion.tr key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
+                    className="hover:bg-gray-50 transition-colors">
+                    <td className="px-5 py-3.5 font-medium text-gray-900">{s.client_name}</td>
+                    <td className="px-5 py-3.5">
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium">
+                        {methodLabels[s.payment_method] ?? s.payment_method}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 font-mono font-semibold text-emerald-600">{formatPrice(s.total)}</td>
+                    <td className="px-5 py-3.5 text-gray-400 text-xs">
+                      {new Date(s.created_at).toLocaleDateString('es-VE')}
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </motion.div>
-
-      {/* Quick links */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {[
-          { to: '/admin/ventas/nueva', label: 'Nueva venta', icon: ShoppingCart },
-          { to: '/admin/productos/nuevo', label: 'Nuevo producto', icon: Package },
-          { to: '/admin/clientes', label: 'Ver clientes', icon: Users },
-        ].map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to} to={to}
-            className="flex items-center gap-3 p-4 rounded-2xl bg-forest-900/40 border border-white/5 hover:border-gold-400/20 hover:bg-white/3 transition-all group"
-          >
-            <Icon size={16} className="text-gold-400" strokeWidth={1.6} />
-            <span className="text-sm text-cream-200 group-hover:text-cream-50 transition-colors">{label}</span>
-            <ArrowRight size={12} className="ml-auto text-ink-500 group-hover:text-gold-400 transition-colors" />
-          </Link>
-        ))}
-      </div>
     </div>
   )
 }

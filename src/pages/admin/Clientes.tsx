@@ -11,14 +11,14 @@ import { cn } from '../../lib/cn'
 
 const typeLabel: Record<string, string> = { cliente: 'Cliente', distribuidor: 'Distribuidor', mayorista: 'Mayorista' }
 const typeColor: Record<string, string> = {
-  cliente:     'text-cream-200 bg-white/8',
-  distribuidor:'text-gold-400 bg-gold-400/10',
-  mayorista:   'text-purple-400 bg-purple-400/10',
+  cliente:     'text-gray-700 bg-gray-100 border-gray-200',
+  distribuidor:'text-amber-700 bg-amber-50 border-amber-200',
+  mayorista:   'text-violet-700 bg-violet-50 border-violet-200',
 }
 
 const emptyForm: ClientInsert = { name:'', phone:'', email:'', cedula:'', city:'', type:'cliente', notes:'' }
-const field = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-cream-100 placeholder:text-ink-500 focus:outline-none focus:border-gold-400/40 transition-colors'
-const lbl = 'text-xs font-mono text-ink-500 uppercase tracking-wider'
+const field = 'w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-forest-600/40 transition-colors'
+const lbl = 'text-xs font-semibold text-gray-500 uppercase tracking-wider'
 
 export default function Clientes() {
   const [clients, setClients] = useState<DbClient[]>([])
@@ -79,55 +79,56 @@ export default function Clientes() {
     <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-medium text-cream-50">Clientes</h1>
-          <p className="text-sm text-ink-500">{clients.length} clientes registrados</p>
+          <h1 className="font-display text-2xl font-semibold text-gray-900">Clientes</h1>
+          <p className="text-sm text-gray-500">{clients.length} clientes registrados</p>
         </div>
         <button onClick={openNew}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gold-400 text-forest-950 font-semibold text-sm hover:bg-gold-300 transition-colors">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-forest-700 text-white font-semibold text-sm hover:bg-forest-600 transition-colors">
           <Plus size={15} />Nuevo cliente
         </button>
       </div>
 
       <div className="relative max-w-sm">
-        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500" />
+        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
         <input value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nombre, teléfono o cédula…"
-          className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-cream-100 placeholder:text-ink-500 focus:outline-none focus:border-gold-400/40" />
+          placeholder="Buscar por nombre, teléfono…"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-forest-600/40" />
       </div>
 
       {loading ? (
         <div className="space-y-2">{Array.from({length:5}).map((_,i)=><Skeleton key={i} className="h-14 w-full"/>)}</div>
       ) : clients.length === 0 ? (
-        <EmptyState icon={Users} title="Sin clientes" description="Agrega tu primer cliente." action={<button onClick={openNew} className="text-sm text-gold-400">+ Nuevo cliente</button>} />
+        <EmptyState icon={Users} title="Sin clientes" description="Agrega tu primer cliente."
+          action={<button onClick={openNew} className="text-sm text-forest-700 font-medium">+ Nuevo cliente</button>} />
       ) : (
-        <div className="rounded-2xl border border-white/5 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 bg-white/2">
+              <tr className="border-b border-gray-100 bg-gray-50">
                 {['Nombre','Teléfono','Ciudad','Tipo',''].map((h)=>(
-                  <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-ink-500">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {clients.map((c, i) => (
-                <motion.tr key={c.id} initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} transition={{delay:i*0.03}}
-                  className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors">
+                <motion.tr key={c.id} initial={{opacity:0,y:4}} animate={{opacity:1,y:0}} transition={{delay:i*0.03}}
+                  className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
-                    <p className="text-cream-100 font-medium">{c.name}</p>
-                    {c.email && <p className="text-[11px] text-ink-500">{c.email}</p>}
+                    <p className="text-gray-900 font-medium">{c.name}</p>
+                    {c.email && <p className="text-[11px] text-gray-400">{c.email}</p>}
                   </td>
-                  <td className="px-4 py-3 text-ink-500">{c.phone ?? '—'}</td>
-                  <td className="px-4 py-3 text-ink-500">{c.city ?? '—'}</td>
+                  <td className="px-4 py-3 text-gray-500">{c.phone ?? '—'}</td>
+                  <td className="px-4 py-3 text-gray-500">{c.city ?? '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={cn('px-2 py-0.5 rounded-full text-[11px] font-medium', typeColor[c.type])}>
+                    <span className={cn('px-2.5 py-0.5 rounded-full text-[11px] font-semibold border', typeColor[c.type])}>
                       {typeLabel[c.type]}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
-                      <button onClick={()=>openEdit(c)} className="p-1.5 rounded-lg text-ink-500 hover:text-gold-400 hover:bg-gold-400/10 transition-colors"><Pencil size={13}/></button>
-                      <button onClick={()=>setToDelete(c)} className="p-1.5 rounded-lg text-ink-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"><Trash2 size={13}/></button>
+                      <button onClick={()=>openEdit(c)} className="p-1.5 rounded-lg text-gray-400 hover:text-forest-700 hover:bg-forest-50 transition-colors"><Pencil size={13}/></button>
+                      <button onClick={()=>setToDelete(c)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={13}/></button>
                     </div>
                   </td>
                 </motion.tr>
@@ -137,9 +138,9 @@ export default function Clientes() {
         </div>
       )}
 
-      {/* Modal crear/editar */}
-      <Modal isOpen={modalOpen} onClose={()=>setModalOpen(false)} title={editing ? 'Editar cliente' : 'Nuevo cliente'}>
+      <Modal isOpen={modalOpen} onClose={()=>setModalOpen(false)}>
         <div className="p-5 space-y-4">
+          <p className="font-semibold text-gray-900 pr-8">{editing ? 'Editar cliente' : 'Nuevo cliente'}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1 sm:col-span-2">
               <label className={lbl}>Nombre completo *</label>
@@ -175,8 +176,8 @@ export default function Clientes() {
             </div>
           </div>
           <div className="flex gap-3 justify-end pt-2">
-            <button onClick={()=>setModalOpen(false)} className="px-4 py-2 rounded-full text-sm text-ink-400 border border-white/10 hover:bg-white/5">Cancelar</button>
-            <button onClick={handleSave} disabled={saving} className="px-5 py-2 rounded-full text-sm font-semibold bg-gold-400 text-forest-950 hover:bg-gold-300 disabled:opacity-60">
+            <button onClick={()=>setModalOpen(false)} className="px-4 py-2 rounded-full text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Cancelar</button>
+            <button onClick={handleSave} disabled={saving} className="px-5 py-2 rounded-full text-sm font-semibold bg-forest-700 text-white hover:bg-forest-600 disabled:opacity-60">
               {saving ? 'Guardando…' : editing ? 'Guardar' : 'Crear cliente'}
             </button>
           </div>

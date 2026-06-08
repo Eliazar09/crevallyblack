@@ -32,27 +32,30 @@ export function PhotoUploader({ value, onChange }: PhotoUploaderProps) {
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
         onClick={() => inputRef.current?.click()}
-        className="relative border-2 border-dashed border-white/15 rounded-2xl overflow-hidden cursor-pointer hover:border-gold-400/40 transition-colors"
+        className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-forest-400 hover:bg-forest-50/30 transition-colors"
         style={{ minHeight: 160 }}
       >
         {value ? (
           <>
-            <img src={value} alt="preview" className="w-full h-40 object-cover" />
+            <img src={value} alt="preview" className="w-full h-40 object-contain bg-gray-50" />
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onChange('') }}
-              className="absolute top-2 right-2 bg-forest-950/80 rounded-full p-1 text-cream-200 hover:text-red-400 transition-colors"
+              className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5 text-gray-600 hover:text-red-500 transition-colors shadow-sm border border-gray-200"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-40 gap-2 text-ink-500">
+          <div className="flex flex-col items-center justify-center h-40 gap-2.5 text-gray-400">
             {uploading
-              ? <Loader size={22} className="animate-spin text-gold-400" />
+              ? <Loader size={22} className="animate-spin text-forest-700" />
               : <>
-                  <Upload size={22} />
-                  <p className="text-xs">Arrastra o haz clic para subir foto</p>
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                    <Upload size={18} />
+                  </div>
+                  <p className="text-sm">Arrastra o haz clic para subir foto</p>
+                  <p className="text-xs text-gray-300">PNG, JPG, WEBP</p>
                 </>
             }
           </div>
@@ -60,7 +63,7 @@ export function PhotoUploader({ value, onChange }: PhotoUploaderProps) {
       </div>
       <input ref={inputRef} type="file" accept="image/*" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   )
 }

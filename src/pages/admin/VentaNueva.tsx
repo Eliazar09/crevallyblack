@@ -11,8 +11,8 @@ import { buildWhatsAppLink } from '../../lib/whatsapp'
 const methods = Object.keys(methodLabels) as PaymentMethod[]
 const bsMetodos: PaymentMethod[] = ['pago_movil', 'transferencia']
 
-const field = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-cream-100 placeholder:text-ink-500 focus:outline-none focus:border-gold-400/40 transition-colors'
-const lbl = 'text-xs font-mono text-ink-500 uppercase tracking-wider'
+const field = 'w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-forest-600/40 transition-colors'
+const lbl = 'text-xs font-semibold text-gray-500 uppercase tracking-wider'
 
 interface CartEntry { product: DbProduct; quantity: number; unitPrice: number }
 
@@ -131,57 +131,57 @@ export default function VentaNueva() {
   return (
     <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="text-ink-500 hover:text-cream-200 transition-colors"><ArrowLeft size={18} /></button>
-        <h1 className="font-display text-2xl font-medium text-cream-50">Nueva venta</h1>
+        <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-700 transition-colors"><ArrowLeft size={18} /></button>
+        <h1 className="font-display text-2xl font-medium text-gray-900">Nueva venta</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: productos + cliente */}
         <div className="lg:col-span-2 space-y-5">
           {/* Cliente */}
-          <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-3">
-            <p className="text-sm font-semibold text-cream-100">Cliente</p>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-3">
+            <p className="text-sm font-semibold text-gray-900">Cliente</p>
             {selectedClient ? (
-              <div className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
                 <div>
-                  <p className="text-sm text-cream-100 font-medium">{selectedClient.name}</p>
-                  <p className="text-xs text-ink-500">{selectedClient.phone}</p>
+                  <p className="text-sm text-gray-900 font-medium">{selectedClient.name}</p>
+                  <p className="text-xs text-gray-500">{selectedClient.phone}</p>
                 </div>
-                <button onClick={() => setSelectedClient(null)} className="text-ink-500 hover:text-red-400 text-xs">Cambiar</button>
+                <button onClick={() => setSelectedClient(null)} className="text-gray-500 hover:text-red-400 text-xs">Cambiar</button>
               </div>
             ) : (
               <>
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input value={clientSearch} onChange={(e) => setClientSearch(e.target.value)}
                     placeholder="Buscar cliente…" className={field + ' pl-9'} />
                 </div>
                 {clientSearch && filteredClients.length > 0 && (
-                  <div className="border border-white/10 rounded-xl overflow-hidden">
+                  <div className="border border-gray-200 rounded-xl overflow-hidden">
                     {filteredClients.map((c) => (
                       <button key={c.id} onClick={() => { setSelectedClient(c); setClientSearch('') }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-cream-100 hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors">
-                        {c.name} <span className="text-ink-500 text-xs ml-2">{c.phone}</span>
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-900 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors">
+                        {c.name} <span className="text-gray-500 text-xs ml-2">{c.phone}</span>
                       </button>
                     ))}
                   </div>
                 )}
                 {!selectedClient && (
                   <div className="space-y-2">
-                    <p className="text-xs text-ink-500">O ingresa el nombre directamente:</p>
+                    <p className="text-xs text-gray-500">O ingresa el nombre directamente:</p>
                     <input value={guestName} onChange={(e) => setGuestName(e.target.value)}
                       placeholder="Nombre del cliente" className={field} />
                   </div>
                 )}
                 <button onClick={() => setShowNewClient(!showNewClient)}
-                  className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                  className="text-xs text-forest-700 hover:text-gold-300 flex items-center gap-1">
                   <Plus size={12} />Crear nuevo cliente
                 </button>
                 {showNewClient && (
-                  <div className="space-y-2 border border-white/10 rounded-xl p-3">
+                  <div className="space-y-2 border border-gray-200 rounded-xl p-3">
                     <input value={newClientName} onChange={(e) => setNewClientName(e.target.value)} className={field} placeholder="Nombre *" />
                     <input value={newClientPhone} onChange={(e) => setNewClientPhone(e.target.value)} className={field} placeholder="Teléfono" />
-                    <button onClick={createQuickClient} className="px-4 py-2 rounded-xl bg-gold-400/20 text-gold-400 text-xs font-semibold hover:bg-gold-400/30">Guardar cliente</button>
+                    <button onClick={createQuickClient} className="px-4 py-2 rounded-xl bg-gold-400/20 text-forest-700 text-xs font-semibold hover:bg-gold-400/30">Guardar cliente</button>
                   </div>
                 )}
               </>
@@ -189,23 +189,23 @@ export default function VentaNueva() {
           </div>
 
           {/* Productos */}
-          <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-3">
-            <p className="text-sm font-semibold text-cream-100">Productos</p>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-3">
+            <p className="text-sm font-semibold text-gray-900">Productos</p>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <input value={prodSearch} onChange={(e) => setProdSearch(e.target.value)}
                 placeholder="Buscar producto por nombre o SKU…" className={field + ' pl-9'} />
             </div>
             {prodSearch && (
-              <div className="border border-white/10 rounded-xl overflow-hidden">
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
                 {filteredProds.map((p) => (
                   <button key={p.id} onClick={() => addToCart(p)}
-                    className="w-full text-left px-4 py-2.5 text-sm text-cream-100 hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors flex justify-between">
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-900 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors flex justify-between">
                     <span>{p.name}</span>
-                    <span className="font-mono text-gold-400">{formatPrice(p.price)}</span>
+                    <span className="font-mono text-forest-700">{formatPrice(p.price)}</span>
                   </button>
                 ))}
-                {filteredProds.length === 0 && <p className="px-4 py-3 text-sm text-ink-500">Sin resultados</p>}
+                {filteredProds.length === 0 && <p className="px-4 py-3 text-sm text-gray-500">Sin resultados</p>}
               </div>
             )}
 
@@ -213,44 +213,44 @@ export default function VentaNueva() {
             {cart.length > 0 && (
               <div className="space-y-2 mt-2">
                 {cart.map((e) => (
-                  <div key={e.product.id} className="flex items-center gap-3 bg-white/3 rounded-xl px-3 py-2.5">
+                  <div key={e.product.id} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-cream-100 truncate">{e.product.name}</p>
+                      <p className="text-sm text-gray-900 truncate">{e.product.name}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setQty(e.product.id, e.quantity - 1)} className="w-6 h-6 rounded-full bg-white/10 text-cream-200 text-sm flex items-center justify-center hover:bg-white/20">−</button>
-                      <span className="font-mono text-sm text-cream-100 w-6 text-center">{e.quantity}</span>
-                      <button onClick={() => setQty(e.product.id, e.quantity + 1)} className="w-6 h-6 rounded-full bg-white/10 text-cream-200 text-sm flex items-center justify-center hover:bg-white/20">+</button>
+                      <button onClick={() => setQty(e.product.id, e.quantity - 1)} className="w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center hover:bg-gray-200">−</button>
+                      <span className="font-mono text-sm text-gray-900 w-6 text-center">{e.quantity}</span>
+                      <button onClick={() => setQty(e.product.id, e.quantity + 1)} className="w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center hover:bg-gray-200">+</button>
                     </div>
                     <input type="number" value={e.unitPrice} onChange={(ev) => setPrice(e.product.id, Number(ev.target.value))}
-                      className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm font-mono text-cream-100 text-center focus:outline-none focus:border-gold-400/40" />
-                    <span className="font-mono text-xs text-gold-400 w-16 text-right">{formatPrice(e.unitPrice * e.quantity)}</span>
-                    <button onClick={() => removeFromCart(e.product.id)} className="text-ink-500 hover:text-red-400"><Trash2 size={13}/></button>
+                      className="w-20 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-sm font-mono text-gray-900 text-center focus:outline-none focus:border-gold-400/40" />
+                    <span className="font-mono text-xs text-forest-700 w-16 text-right">{formatPrice(e.unitPrice * e.quantity)}</span>
+                    <button onClick={() => removeFromCart(e.product.id)} className="text-gray-500 hover:text-red-400"><Trash2 size={13}/></button>
                   </div>
                 ))}
               </div>
             )}
-            {cart.length === 0 && <p className="text-xs text-ink-500 text-center py-4">Busca y agrega productos al pedido</p>}
+            {cart.length === 0 && <p className="text-xs text-gray-500 text-center py-4">Busca y agrega productos al pedido</p>}
           </div>
         </div>
 
         {/* Right: resumen + pago */}
         <div className="space-y-5">
-          <div className="bg-forest-900/60 border border-white/5 rounded-2xl p-5 space-y-4">
-            <p className="text-sm font-semibold text-cream-100">Resumen</p>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
+            <p className="text-sm font-semibold text-gray-900">Resumen</p>
 
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-ink-500"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
+              <div className="flex justify-between text-gray-500"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
               <div className="flex justify-between items-center">
-                <span className="text-ink-500">Descuento</span>
+                <span className="text-gray-500">Descuento</span>
                 <input type="number" min="0" value={discount} onChange={(e) => setDiscount(Number(e.target.value))}
-                  className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm font-mono text-cream-100 text-right focus:outline-none focus:border-gold-400/40" />
+                  className="w-20 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-sm font-mono text-gray-900 text-right focus:outline-none focus:border-gold-400/40" />
               </div>
-              <div className="flex justify-between font-semibold text-cream-50 border-t border-white/8 pt-2">
-                <span>Total USD</span><span className="font-mono text-gold-400">{formatPrice(total)}</span>
+              <div className="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-2">
+                <span>Total USD</span><span className="font-mono text-forest-700">{formatPrice(total)}</span>
               </div>
               {totalBs && (
-                <div className="flex justify-between text-ink-500 text-xs">
+                <div className="flex justify-between text-gray-500 text-xs">
                   <span>Total Bs (tasa {exchangeRate})</span>
                   <span className="font-mono">Bs {(totalBs).toLocaleString('es-VE', {maximumFractionDigits:2})}</span>
                 </div>
@@ -294,7 +294,7 @@ export default function VentaNueva() {
             </button>
 
             {selectedClient?.phone && (
-              <p className="text-xs text-ink-500 text-center flex items-center justify-center gap-1">
+              <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-1">
                 <MessageCircle size={11} />Se enviará confirmación por WhatsApp
               </p>
             )}

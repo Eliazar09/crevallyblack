@@ -8,7 +8,7 @@ export function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <div className="flex h-[100dvh] bg-forest-950 text-cream-100 overflow-hidden">
+    <div className="flex h-[100dvh] bg-gray-50 text-gray-900 overflow-hidden">
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar onMenuOpen={() => setMobileOpen(true)} />

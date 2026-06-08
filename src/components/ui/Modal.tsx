@@ -22,18 +22,12 @@ const sizes = {
 
 export function Modal({ isOpen, onClose, children, className, size = 'md' }: ModalProps) {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     if (isOpen) window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [isOpen, onClose])
@@ -43,29 +37,27 @@ export function Modal({ isOpen, onClose, children, className, size = 'md' }: Mod
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-ink-900/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 16 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className={cn(
-              'relative w-full bg-forest-900 border border-white/10 rounded-3xl overflow-hidden',
+              'relative w-full bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl',
               sizes[size],
               className
             )}
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/5 border border-white/10 text-cream-200 hover:bg-white/10 transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 hover:bg-gray-200 transition-colors"
               aria-label="Cerrar"
             >
-              <X size={16} />
+              <X size={15} />
             </button>
             {children}
           </motion.div>
