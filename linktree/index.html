@@ -18,8 +18,8 @@
       --ink:     10, 26, 10;
       --ink-2:   15, 36, 16;
       --paper:   250, 248, 243;
-      --paper-dim: 210, 205, 190;
-      --paper-soft: 160, 155, 140;
+      --paper-dim: 232, 229, 220;
+      --paper-soft: 200, 196, 182;
       --gold:    212, 184, 106;
       --green:   37, 211, 102;
       --forest:  26, 60, 10;
@@ -117,7 +117,8 @@
       font-size: 9.5px; font-weight: 500;
       text-transform: uppercase; letter-spacing: .17em;
       color: rgb(var(--paper));
-      border: 1px solid rgba(var(--paper),.12);
+      border: 1px solid rgba(var(--green),.22);
+      border-radius: 999px;
       background: rgba(var(--ink-2),.7);
       backdrop-filter: blur(10px);
       padding: 8px 16px; margin-bottom: 28px;
@@ -162,7 +163,8 @@
     /* ══ SOBRE ══ */
     .about {
       width: 100%;
-      border: 1px solid rgba(var(--paper),.08);
+      border: 1px solid rgba(var(--green),.18);
+      border-radius: 12px;
       background: rgba(var(--ink-2),.6);
       backdrop-filter: blur(14px);
       padding: 24px 22px; margin-bottom: 40px;
@@ -171,7 +173,7 @@
 
     .about::before {
       content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background: linear-gradient(90deg, rgb(var(--gold)), transparent 70%);
+      background: linear-gradient(90deg, rgb(var(--gold)), rgba(var(--green),.4) 50%, transparent 80%);
     }
 
     .about-img {
@@ -218,13 +220,14 @@
     }
 
     /* ══ PRODUCTOS (cards tipo servicios) ══ */
-    .services { width: 100%; display: flex; flex-direction: column; gap: 3px; margin-bottom: 40px; }
+    .services { width: 100%; display: flex; flex-direction: column; gap: 4px; margin-bottom: 40px; }
 
     .svc {
       position: relative;
       display: grid; grid-template-columns: auto 1fr auto;
       align-items: center; gap: 16px;
-      padding: 20px; border: 1px solid rgba(var(--paper),.09);
+      padding: 20px; border: 1px solid rgba(var(--green),.15);
+      border-radius: 10px;
       background: rgba(var(--ink-2),.55); backdrop-filter: blur(14px);
       text-decoration: none; color: inherit;
       transition: border-color .3s, background .3s, transform .35s var(--ease);
@@ -233,13 +236,14 @@
 
     .svc::before {
       content:''; position:absolute; left:0; top:0;
-      width:2px; height:0; background:rgb(var(--gold));
+      width:2px; height:0; background:rgb(var(--green));
       transition: height .45s var(--ease);
     }
     .svc:hover::before { height:100%; }
-    .svc:hover { border-color:rgba(var(--paper),.18); background:rgba(var(--ink-2),.82); transform:translateX(5px); }
-    .svc.featured { border-color:rgba(var(--gold),.28); background:rgba(var(--gold),.05); }
-    .svc.featured:hover { border-color:rgba(var(--gold),.5); }
+    .svc:hover { border-color:rgba(var(--green),.35); background:rgba(var(--ink-2),.82); transform:translateX(5px); }
+    .svc.featured { border-color:rgba(var(--gold),.35); background:rgba(var(--gold),.06); }
+    .svc.featured::before { background:rgb(var(--gold)); }
+    .svc.featured:hover { border-color:rgba(var(--gold),.55); }
 
     .svc-icon {
       width:42px; height:42px;
@@ -278,11 +282,12 @@
 
     /* ══ GALERÍA ══ */
     .portfolio { width:100%; margin-bottom:40px; }
-    .proj-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; }
+    .proj-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:4px; }
 
     .proj {
       position:relative; aspect-ratio:4/5; overflow:hidden;
-      border:1px solid rgba(var(--paper),.09);
+      border:1px solid rgba(var(--green),.15);
+      border-radius: 10px;
       text-decoration:none; display:block; background:rgba(var(--ink-2),.8);
     }
     .proj img {
@@ -303,18 +308,19 @@
     .proj-name { font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:500; text-transform:uppercase; letter-spacing:.12em; color:rgb(var(--paper)); }
 
     /* ══ CONTACTO ══ */
-    .contacts { width:100%; display:flex; flex-direction:column; gap:2px; margin-bottom:40px; }
+    .contacts { width:100%; display:flex; flex-direction:column; gap:4px; margin-bottom:40px; }
 
     .contact {
       display:grid; grid-template-columns:20px 1fr 14px;
       align-items:center; gap:14px; padding:14px 18px;
-      border:1px solid rgba(var(--paper),.08);
+      border:1px solid rgba(var(--green),.14);
+      border-radius: 10px;
       background:rgba(var(--ink),.4); backdrop-filter:blur(8px);
       text-decoration:none; color:rgb(var(--paper-dim));
       font-size:.875rem; font-weight:400;
       transition: color .25s, border-color .25s, background .25s, transform .3s var(--ease);
     }
-    .contact:hover { color:rgb(var(--paper)); border-color:rgba(var(--paper),.16); background:rgba(var(--ink-2),.7); transform:translateX(4px); }
+    .contact:hover { color:rgb(var(--paper)); border-color:rgba(var(--green),.32); background:rgba(var(--ink-2),.7); transform:translateX(4px); }
     .contact svg { width:16px; height:16px; flex-shrink:0; }
     .contact .arr { opacity:0; transform:translateX(-4px); transition:opacity .3s, transform .3s; }
     .contact:hover .arr { opacity:.5; transform:translateX(0); }
@@ -322,7 +328,8 @@
     /* ══ FINAL CTA ══ */
     .final {
       width:100%; position:relative; overflow:hidden;
-      border:1px solid rgba(var(--gold),.25);
+      border:1px solid rgba(var(--gold),.30);
+      border-radius: 14px;
       background:rgba(var(--ink-2),.7); backdrop-filter:blur(16px);
       padding:36px 28px 32px; text-align:center;
     }
@@ -368,7 +375,22 @@
       margin-top:36px; font-family:'JetBrains Mono',monospace;
       font-size:9px; letter-spacing:.18em; text-transform:uppercase;
       color:rgba(var(--paper-soft),.28); text-align:center;
+      display:flex; flex-direction:column; align-items:center; gap:10px;
     }
+
+    .credit {
+      font-family:'JetBrains Mono',monospace;
+      font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(var(--paper-soft),.22);
+      display:flex; align-items:center; gap:7px;
+    }
+
+    .credit a {
+      color:rgba(var(--green),.55);
+      text-decoration:none;
+      transition: color .25s;
+    }
+    .credit a:hover { color:rgba(var(--green),.9); }
 
     /* ── Reveal ── */
     .r { opacity:0; transform:translateY(22px); animation:up .7s var(--ease) forwards; }
@@ -620,7 +642,13 @@
     </a>
   </div>
 
-  <footer class="r r7">&copy; <span id="yr"></span> GreenLife Venezuela · Todos los derechos reservados</footer>
+  <footer class="r r7">
+    <span>&copy; <span id="yr"></span> GreenLife Venezuela · Todos los derechos reservados</span>
+    <span class="credit">
+      Hecho por
+      <a href="https://es.arvexagency.online/" target="_blank" rel="noopener noreferrer">Arvex Agency</a>
+    </span>
+  </footer>
 
 </main>
 
