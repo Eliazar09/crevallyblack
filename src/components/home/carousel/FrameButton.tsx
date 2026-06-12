@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef } from 'react'
 import React from 'react'
 import { motion } from 'framer-motion'
 
-function cn(...classes: Array<string | undefined | null | false>) {
-  return classes.filter(Boolean).join(' ')
+function cn(...classes: Array<string | string[] | undefined | null | false>) {
+  return classes.flat().filter(Boolean).join(' ')
 }
 
 type ButtonVariant = 'outline' | 'default' | 'secondary' | 'green'
