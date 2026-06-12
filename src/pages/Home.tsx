@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async'
+import { lazy, Suspense } from 'react'
 import { Hero } from '../components/home/Hero'
 import { Categories } from '../components/home/Categories'
 import { Featured } from '../components/home/Featured'
@@ -8,15 +9,20 @@ import { InstagramGrid } from '../components/home/InstagramGrid'
 import { FAQ } from '../components/home/FAQ'
 import { CTASection } from '../components/home/CTASection'
 
+const CarouselSection = lazy(() => import('../components/home/CarouselSection'))
+
 export default function Home() {
   return (
     <>
       <Helmet>
-        <title>GreenLife Caracas — Suplementos Naturales en Venezuela</title>
-        <meta name="description" content="GreenLife Caracas — Suplementos naturales premium en Venezuela. Emagrecedores, detox, vitaminas, colágeno, whey y más. +5000 clientes satisfechos. Envíos a Caracas y toda Venezuela." />
+        <title>Crevally Black — Streetwear Premium do Brasil</title>
+        <meta name="description" content="Crevally Black — Moda streetwear premium feita no Brasil. Camisetas, moletons, calças, conjuntos e acessórios com identidade única. Qualidade e estilo para quem manda no jogo." />
       </Helmet>
       <Hero />
-<Categories />
+      <Suspense fallback={<div className="h-96 bg-cream-50" />}>
+        <CarouselSection />
+      </Suspense>
+      <Categories />
       <Featured />
       <HowItWorks />
       <Testimonials />

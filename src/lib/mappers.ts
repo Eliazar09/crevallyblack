@@ -7,12 +7,14 @@ export function dbProductToPublic(p: DbProduct): Product {
     name: p.name,
     short: p.short,
     description: p.description,
-    benefits: p.benefits ?? [],
-    howToUse: p.how_to_use,
+    composition: p.composition ?? '',
+    care: p.care ?? '',
+    model_info: p.model_info ?? '',
+    sizes: p.sizes ?? [],
+    colors: p.colors ?? [],
     image: p.image,
     price: p.price,
     category: p.category,
     featured: p.featured,
-    options: p.options ?? undefined,
   }
 }

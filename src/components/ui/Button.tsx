@@ -16,11 +16,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-gold-400 text-forest-950 hover:bg-gold-300 active:scale-[0.98] font-semibold border border-gold-400/50',
+    'bg-ink-900 text-cream-50 hover:bg-ink-700 active:scale-[0.98] font-semibold border border-ink-900',
   ghost:
     'bg-transparent text-cream-100 border border-white/20 hover:border-white/40 hover:bg-white/5 active:scale-[0.98]',
   outline:
-    'bg-transparent text-forest-800 border border-forest-800/30 hover:border-forest-800/60 hover:bg-forest-800/5 active:scale-[0.98]',
+    'bg-transparent text-ink-800 border border-ink-800/30 hover:border-ink-800/60 hover:bg-ink-800/5 active:scale-[0.98]',
   whatsapp:
     'bg-[#25D366] text-white hover:bg-[#1fb855] active:scale-[0.98] font-semibold',
 }

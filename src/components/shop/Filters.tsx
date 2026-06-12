@@ -6,20 +6,20 @@ export type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'name'
 
 const categoryOptions: { value: 'all' | ProductCategory; label: string }[] = [
   { value: 'all', label: 'Todos' },
-  { value: 'adelgazamiento', label: 'Adelgazamiento' },
-  { value: 'detox', label: 'Detox' },
-  { value: 'fitness', label: 'Fitness' },
-  { value: 'belleza', label: 'Belleza' },
-  { value: 'descanso', label: 'Descanso' },
-  { value: 'vitaminas', label: 'Vitaminas' },
-  { value: 'masculino', label: 'Masculino' },
+  { value: 'camisetas', label: 'Camisetas' },
+  { value: 'moletons', label: 'Moletons' },
+  { value: 'calcas', label: 'Calças' },
+  { value: 'shorts', label: 'Shorts' },
+  { value: 'bones', label: 'Bonés' },
+  { value: 'conjuntos', label: 'Conjuntos' },
+  { value: 'acessorios', label: 'Acessórios' },
 ]
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'featured', label: 'Destacados' },
-  { value: 'price-asc', label: 'Precio ↑' },
-  { value: 'price-desc', label: 'Precio ↓' },
-  { value: 'name', label: 'Nombre' },
+  { value: 'featured', label: 'Destaques' },
+  { value: 'price-asc', label: 'Preço ↑' },
+  { value: 'price-desc', label: 'Preço ↓' },
+  { value: 'name', label: 'Nome' },
 ]
 
 interface FiltersProps {
@@ -50,8 +50,8 @@ export function Filters({
               type="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar productos..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-ink-900/10 bg-white text-sm text-ink-900 placeholder:text-ink-500 focus:outline-none focus:border-forest-800/30 transition-colors"
+              placeholder="Buscar produtos..."
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-ink-900/10 bg-white text-sm text-ink-900 placeholder:text-ink-500 focus:outline-none focus:border-coffee-500/40 transition-colors"
             />
             {search && (
               <button
@@ -66,7 +66,7 @@ export function Filters({
           <select
             value={sort}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="px-3 py-2.5 rounded-xl border border-ink-900/10 bg-white text-sm text-ink-900 focus:outline-none focus:border-forest-800/30 cursor-pointer"
+            className="px-3 py-2.5 rounded-xl border border-ink-900/10 bg-white text-sm text-ink-900 focus:outline-none focus:border-coffee-500/40 cursor-pointer"
           >
             {sortOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -83,8 +83,8 @@ export function Filters({
               className={cn(
                 'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border',
                 category === opt.value
-                  ? 'bg-forest-800 text-cream-50 border-forest-800'
-                  : 'bg-white text-ink-500 border-ink-900/10 hover:border-forest-800/20 hover:text-ink-900'
+                  ? 'bg-ink-900 text-cream-50 border-ink-900'
+                  : 'bg-white text-ink-500 border-ink-900/10 hover:border-ink-900/30 hover:text-ink-900'
               )}
             >
               {opt.label}

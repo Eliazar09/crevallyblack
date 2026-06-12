@@ -27,12 +27,12 @@ export function TestimonialsColumn({ testimonials, duration = 15, className }: P
             {testimonials.map((t) => (
               <div
                 key={`${copy}-${t.id}`}
-                className="p-6 rounded-2xl border border-ink-900/8 bg-white shadow-sm shadow-forest-800/5 max-w-xs w-full"
+                className="p-6 rounded-2xl border border-ink-900/8 bg-white shadow-sm shadow-coffee-500/5 max-w-xs w-full"
               >
                 {/* Stars */}
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} size={11} className="fill-gold-400 text-gold-400" />
+                    <Star key={i} size={11} className="fill-coffee-400 text-coffee-400" />
                   ))}
                 </div>
 

@@ -1,28 +1,27 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jennifer — GreenLife Venezuela</title>
-  <meta name="description" content="Suplementos naturales premium para tu bienestar. +5.000 venezolanas transformaron su vida con GreenLife.">
+  <title>Crevally Black — Streetwear Premium do Brasil</title>
+  <meta name="description" content="Streetwear premium feito no Brasil. +2.000 clientes já vestem Crevally Black.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --ink:     10, 26, 10;
-      --ink-2:   15, 36, 16;
-      --paper:   250, 248, 243;
-      --paper-dim: 232, 229, 220;
-      --paper-soft: 200, 196, 182;
-      --gold:    212, 184, 106;
+      --ink:     10, 10, 12;
+      --ink-2:   20, 18, 22;
+      --cream:   250, 248, 243;
+      --cream-dim: 220, 215, 206;
+      --cream-soft: 175, 170, 160;
+      --coffee:  184, 123, 82;
       --green:   37, 211, 102;
-      --forest:  26, 60, 10;
       --ease:    cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -30,7 +29,7 @@
 
     body {
       background: rgb(var(--ink));
-      color: rgb(var(--paper));
+      color: rgb(var(--cream));
       font-family: 'Manrope', sans-serif;
       min-height: 100dvh;
       overflow-x: hidden;
@@ -42,15 +41,15 @@
     .ov-grad {
       position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: linear-gradient(to bottom,
-        rgba(var(--ink),.85) 0%,
-        rgba(var(--ink),.50) 35%,
-        rgba(var(--ink),.60) 65%,
-        rgba(var(--ink),.94) 100%);
+        rgba(var(--ink),.88) 0%,
+        rgba(var(--ink),.52) 35%,
+        rgba(var(--ink),.62) 65%,
+        rgba(var(--ink),.96) 100%);
     }
 
     .ov-noise {
       position: fixed; inset: 0; z-index: 2; pointer-events: none;
-      opacity: .04; mix-blend-mode: overlay;
+      opacity: .038; mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 256px;
     }
@@ -58,90 +57,103 @@
     main {
       position: relative; z-index: 10;
       width: 100%; max-width: 580px;
-      margin: 0 auto; padding: 52px 22px 72px;
+      margin: 0 auto; padding: 0 0 80px;
       display: flex; flex-direction: column; align-items: center;
     }
 
-    .div { width: 100%; height: 1px; background: rgba(var(--paper),.07); margin: 40px 0; }
+    .pad { padding: 0 22px; width: 100%; }
 
     .sec {
-      width: 100%; margin-bottom: 14px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .18em;
-      color: rgb(var(--gold));
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .2em;
+      color: rgba(var(--coffee), 1);
+      margin-bottom: 12px;
     }
 
-    /* ══ HERO ══ */
+    .div { width: 100%; height: 1px; background: rgba(var(--cream),.055); margin: 36px 0; }
+
+    /* ══ HERO (full-bleed photo) ══ */
     .hero {
-      width: 100%; text-align: center;
-      display: flex; flex-direction: column; align-items: center;
-      margin-bottom: 44px;
+      width: 100%; position: relative; overflow: hidden;
+      min-height: 60dvh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      margin-bottom: 36px;
     }
 
-    .logo-wrap {
-      width: 96px; height: 96px;
-      border-radius: 50%; overflow: hidden;
-      border: 2px solid rgba(var(--gold), .35);
-      margin-bottom: 22px;
-      box-shadow: 0 0 40px rgba(var(--gold), .15);
-      animation: logo-float 4s ease-in-out infinite;
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 60%,
+        rgba(var(--ink),.85) 85%,
+        rgba(var(--ink),.98) 100%
+      );
     }
 
-    @keyframes logo-float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-7px); }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 22px 30px;
     }
 
-    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .22em;
+      color: rgb(var(--coffee));
+      margin-bottom: 10px;
+    }
 
     .hero h1 {
-      font-family: 'Fraunces', serif;
-      font-weight: 300;
-      font-size: clamp(2.4rem, 8vw, 3.2rem);
-      line-height: 1; letter-spacing: -.025em;
-      color: rgb(var(--paper)); margin-bottom: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 22vw, 7.5rem);
+      line-height: .88; letter-spacing: .06em;
+      color: rgb(var(--cream));
+      margin-bottom: 16px;
     }
 
-    .hero h1 em { font-style: italic; color: rgb(var(--gold)); }
+    .hero h1 .slash { color: rgb(var(--coffee)); }
 
     .hero-sub {
-      font-size: clamp(.95rem, 3vw, 1.05rem);
-      color: rgb(var(--paper-dim)); line-height: 1.65;
-      max-width: 34ch; margin-bottom: 22px; font-weight: 400;
+      font-size: .9rem; font-weight: 400;
+      color: rgba(var(--cream-dim), .85);
+      line-height: 1.6; max-width: 30ch;
+      margin-bottom: 22px;
     }
 
     .badge {
       display: inline-flex; align-items: center; gap: 8px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px; font-weight: 500;
+      font-size: 9px; font-weight: 500;
       text-transform: uppercase; letter-spacing: .17em;
-      color: rgb(var(--paper));
-      border: 1px solid rgba(var(--green),.22);
+      color: rgb(var(--cream));
+      border: 1px solid rgba(var(--coffee),.28);
       border-radius: 999px;
-      background: rgba(var(--ink-2),.7);
-      backdrop-filter: blur(10px);
-      padding: 8px 16px; margin-bottom: 28px;
+      background: rgba(var(--ink-2),.8);
+      backdrop-filter: blur(12px);
+      padding: 7px 16px; margin-bottom: 24px;
     }
 
     .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgb(var(--gold));
-      animation: blink 2s ease-in-out infinite;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgb(var(--coffee));
+      animation: blink 2.2s ease-in-out infinite;
     }
 
-    @keyframes blink { 0%,100%{opacity:.4} 50%{opacity:1} }
+    @keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
 
     .cta-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-    @media(min-width:460px){ .cta-row { flex-direction: row; } }
+    @media(min-width:440px){ .cta-row { flex-direction: row; } }
 
     .btn {
       flex: 1; display: flex; align-items: center; justify-content: center;
-      gap: 9px; font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: .14em;
-      padding: 15px 22px; text-decoration: none;
-      border: none; cursor: pointer;
+      gap: 9px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; letter-spacing: .1em;
+      padding: 14px 22px; text-decoration: none;
+      cursor: pointer; border: none;
       transition: transform .35s var(--ease), box-shadow .35s, background .25s;
       position: relative; overflow: hidden;
     }
@@ -151,194 +163,228 @@
     .btn:hover { transform: translateY(-3px); }
     .btn:active { transform: translateY(0); }
 
-    .btn-gold {
-      background: rgb(var(--gold)); color: rgb(var(--ink));
-      box-shadow: 0 0 40px rgba(var(--gold),.25);
+    .btn-coffee {
+      background: rgb(var(--coffee)); color: rgb(var(--ink));
+      box-shadow: 0 0 36px rgba(var(--coffee),.22);
     }
-    .btn-gold:hover { box-shadow: 0 0 60px rgba(var(--gold),.42), 0 16px 40px rgba(0,0,0,.45); }
+    .btn-coffee:hover { box-shadow: 0 0 56px rgba(var(--coffee),.42), 0 16px 40px rgba(0,0,0,.4); }
 
-    .btn-w { background: rgba(var(--paper),.1); color: rgb(var(--paper)); border: 1px solid rgba(var(--paper),.18); backdrop-filter:blur(8px); }
-    .btn-w:hover { background: rgba(var(--paper),.18); box-shadow: 0 16px 40px rgba(0,0,0,.4); }
+    .btn-ghost {
+      background: rgba(var(--cream),.09); color: rgb(var(--cream));
+      border: 1px solid rgba(var(--cream),.16); backdrop-filter: blur(8px);
+    }
+    .btn-ghost:hover { background: rgba(var(--cream),.16); box-shadow: 0 16px 40px rgba(0,0,0,.4); }
 
     /* ══ SOBRE ══ */
     .about {
       width: 100%;
-      border: 1px solid rgba(var(--green),.18);
-      border-radius: 12px;
+      border: 1px solid rgba(var(--coffee),.16);
+      border-radius: 14px;
       background: rgba(var(--ink-2),.6);
-      backdrop-filter: blur(14px);
-      padding: 24px 22px; margin-bottom: 40px;
+      backdrop-filter: blur(16px);
+      padding: 22px;
       position: relative; overflow: hidden;
     }
 
     .about::before {
       content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background: linear-gradient(90deg, rgb(var(--gold)), rgba(var(--green),.4) 50%, transparent 80%);
+      background: linear-gradient(90deg, rgb(var(--coffee)), rgba(var(--coffee),.3) 55%, transparent 80%);
     }
 
     .about-img {
       width: 100%; aspect-ratio: 16/7;
       overflow: hidden; margin-bottom: 18px;
-      border-radius: 4px;
+      border-radius: 8px;
     }
 
     .about-img img {
       width: 100%; height: 100%; object-fit: cover;
-      object-position: center 25%;
-      filter: brightness(.75) saturate(.9);
+      object-position: center 40%;
+      filter: brightness(.78) saturate(.88);
     }
 
     .about-title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700; font-size: clamp(1.5rem,5vw,2rem);
-      color: rgb(var(--paper)); margin-bottom: 12px;
-      line-height: 1.2; letter-spacing: -.02em;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.5rem, 6vw, 2.1rem);
+      letter-spacing: .05em; line-height: 1;
+      color: rgb(var(--cream)); margin-bottom: 10px;
     }
 
     .about-text {
-      font-size: .9rem; font-weight: 400;
-      color: rgb(var(--paper-dim)); line-height: 1.7; margin-bottom: 16px;
+      font-size: .875rem; font-weight: 400;
+      color: rgb(var(--cream-dim)); line-height: 1.7; margin-bottom: 18px;
     }
 
     .about-stats {
       display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 12px; border-top: 1px solid rgba(var(--paper),.07); padding-top: 16px;
+      gap: 12px; border-top: 1px solid rgba(var(--cream),.06); padding-top: 16px;
     }
 
-    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat { display: flex; flex-direction: column; gap: 3px; }
 
     .stat-num {
-      font-family: 'Fraunces', serif; font-weight: 700;
-      font-size: 1.6rem; color: rgb(var(--gold)); line-height: 1;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem; color: rgb(var(--coffee)); line-height: 1;
     }
 
     .stat-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 8px; font-weight: 400;
-      text-transform: uppercase; letter-spacing: .15em;
-      color: rgba(var(--paper-soft),.7);
+      text-transform: uppercase; letter-spacing: .14em;
+      color: rgba(var(--cream-soft),.6);
     }
 
-    /* ══ PRODUCTOS (cards tipo servicios) ══ */
-    .services { width: 100%; display: flex; flex-direction: column; gap: 4px; margin-bottom: 40px; }
+    /* ══ LINK CARDS ══ */
+    .links { width: 100%; display: flex; flex-direction: column; gap: 5px; }
 
-    .svc {
+    .lnk {
       position: relative;
-      display: grid; grid-template-columns: auto 1fr auto;
-      align-items: center; gap: 16px;
-      padding: 20px; border: 1px solid rgba(var(--green),.15);
-      border-radius: 10px;
+      display: grid; grid-template-columns: auto 1fr auto auto;
+      align-items: center; gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid rgba(var(--cream),.07);
+      border-radius: 12px;
       background: rgba(var(--ink-2),.55); backdrop-filter: blur(14px);
       text-decoration: none; color: inherit;
-      transition: border-color .3s, background .3s, transform .35s var(--ease);
+      transition: border-color .3s, background .3s, transform .3s var(--ease);
       overflow: hidden;
     }
 
-    .svc::before {
+    .lnk::before {
       content:''; position:absolute; left:0; top:0;
-      width:2px; height:0; background:rgb(var(--green));
+      width: 2px; height: 0;
       transition: height .45s var(--ease);
     }
-    .svc:hover::before { height:100%; }
-    .svc:hover { border-color:rgba(var(--green),.35); background:rgba(var(--ink-2),.82); transform:translateX(5px); }
-    .svc.featured { border-color:rgba(var(--gold),.35); background:rgba(var(--gold),.06); }
-    .svc.featured::before { background:rgb(var(--gold)); }
-    .svc.featured:hover { border-color:rgba(var(--gold),.55); }
 
-    .svc-icon {
-      width:42px; height:42px;
-      border: 1px solid rgba(var(--paper),.1);
-      background: rgba(var(--ink),.6);
-      display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; transition:transform .35s var(--ease);
-    }
-    .svc:hover .svc-icon { transform: scale(1.1) rotate(5deg); }
-    .svc.featured .svc-icon { border-color:rgba(var(--gold),.25); background:rgba(var(--gold),.1); }
-    .svc-icon svg { width:20px; height:20px; }
+    .lnk.hi    { border-color: rgba(var(--coffee),.28); background: rgba(var(--coffee),.07); }
+    .lnk.hi::before   { background: rgb(var(--coffee)); }
+    .lnk.mid::before  { background: rgba(var(--cream),.45); }
+    .lnk.wa::before   { background: rgb(var(--green)); }
 
-    .svc-body { min-width:0; }
-    .svc-name { font-family:'Fraunces',serif; font-weight:400; font-size:1.1rem; color:rgb(var(--paper)); line-height:1.2; margin-bottom:3px; }
-    .svc-desc { font-size:.825rem; font-weight:400; color:rgb(var(--paper-dim)); line-height:1.5; }
+    .lnk:hover::before { height: 100%; }
+    .lnk:hover { transform: translateX(5px); background: rgba(var(--ink-2),.85); }
+    .lnk.hi:hover { border-color: rgba(var(--coffee),.5); }
+    .lnk.wa:hover { border-color: rgba(var(--green),.32); }
 
-    .svc-tag {
-      font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:500;
-      text-transform:uppercase; letter-spacing:.13em;
-      padding:5px 10px; border:1px solid rgba(var(--paper),.1);
-      color:rgba(var(--paper-soft),.9); white-space:nowrap;
-      flex-shrink:0; transition:border-color .25s, color .25s;
-    }
-    .svc.featured .svc-tag { border-color:rgba(var(--gold),.35); color:rgb(var(--gold)); background:rgba(var(--gold),.07); }
-    .svc:hover .svc-tag { border-color:rgba(var(--paper),.22); color:rgb(var(--paper)); }
-
-    .svc-arrow {
-      width:32px; height:32px; border-radius:50%;
-      border:1px solid rgba(var(--paper),.1);
-      display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; transition:background .3s, border-color .3s, transform .35s var(--ease);
-    }
-    .svc:hover .svc-arrow { background:rgb(var(--gold)); border-color:rgb(var(--gold)); transform:rotate(45deg); }
-    .svc-arrow svg { width:13px; height:13px; }
-    .svc:hover .svc-arrow svg { color:rgb(var(--ink)); }
-
-    /* ══ GALERÍA ══ */
-    .portfolio { width:100%; margin-bottom:40px; }
-    .proj-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:4px; }
-
-    .proj {
-      position:relative; aspect-ratio:4/5; overflow:hidden;
-      border:1px solid rgba(var(--green),.15);
+    .lnk-icon {
+      width: 42px; height: 42px; flex-shrink: 0;
+      border: 1px solid rgba(var(--cream),.1);
       border-radius: 10px;
-      text-decoration:none; display:block; background:rgba(var(--ink-2),.8);
+      background: rgba(var(--ink),.55);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .35s var(--ease), background .25s;
     }
-    .proj img {
-      width:100%; height:100%; object-fit:cover;
-      transition: transform .75s var(--ease), filter .5s;
-      filter: brightness(.65) saturate(.85);
-    }
-    .proj:hover img { transform:scale(1.12); filter:brightness(.3) saturate(.5); }
 
-    .proj-overlay {
-      position:absolute; inset:0; padding:14px;
-      display:flex; flex-direction:column; justify-content:flex-end;
-      opacity:0; transform:translateY(8px);
+    .lnk:hover .lnk-icon { transform: scale(1.09) rotate(4deg); }
+    .lnk.hi .lnk-icon { border-color: rgba(var(--coffee),.28); background: rgba(var(--coffee),.12); }
+    .lnk.wa .lnk-icon { border-color: rgba(var(--green),.24); background: rgba(var(--green),.07); }
+    .lnk-icon svg { width: 19px; height: 19px; }
+
+    .lnk-body { min-width: 0; }
+    .lnk-name {
+      font-family: 'Manrope', sans-serif; font-weight: 700; font-size: .95rem;
+      color: rgb(var(--cream)); line-height: 1.2; margin-bottom: 2px;
+    }
+    .lnk-desc { font-size: .78rem; color: rgb(var(--cream-dim)); line-height: 1.4; }
+
+    .lnk-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 8.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .11em;
+      padding: 4px 10px; border-radius: 4px;
+      border: 1px solid rgba(var(--cream),.1);
+      color: rgba(var(--cream-soft),.85); white-space: nowrap; flex-shrink: 0;
+      transition: border-color .25s, color .25s;
+    }
+    .lnk.hi .lnk-tag { border-color: rgba(var(--coffee),.34); color: rgb(var(--coffee)); background: rgba(var(--coffee),.06); }
+
+    .lnk-arr {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      border: 1px solid rgba(var(--cream),.1);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .3s, border-color .3s, transform .35s var(--ease);
+    }
+    .lnk:hover .lnk-arr { background: rgb(var(--coffee)); border-color: rgb(var(--coffee)); transform: rotate(45deg); }
+    .lnk.wa:hover .lnk-arr { background: rgb(var(--green)); border-color: rgb(var(--green)); }
+    .lnk-arr svg { width: 12px; height: 12px; }
+    .lnk:hover .lnk-arr svg { color: rgb(var(--ink)); }
+
+    /* ══ GALERIA ══ */
+    .gallery { width: 100%; }
+    .gal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto auto;
+      gap: 5px;
+    }
+
+    .gal {
+      position: relative; overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid rgba(var(--coffee),.12);
+      background: rgba(var(--ink-2),.8); display: block;
+      aspect-ratio: 3/4;
+      text-decoration: none;
+    }
+
+    .gal.wide {
+      grid-column: 1 / -1;
+      aspect-ratio: 21/9;
+    }
+
+    .gal img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .75s var(--ease), filter .5s;
+      filter: brightness(.72) saturate(.85);
+    }
+    .gal:hover img { transform: scale(1.1); filter: brightness(.28) saturate(.45); }
+
+    .gal-ov {
+      position: absolute; inset: 0; padding: 14px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      opacity: 0; transform: translateY(8px);
       transition: opacity .4s, transform .4s var(--ease);
     }
-    .proj:hover .proj-overlay { opacity:1; transform:translateY(0); }
-    .proj-result { font-family:'JetBrains Mono',monospace; font-size:8px; font-weight:500; text-transform:uppercase; letter-spacing:.15em; color:rgb(var(--gold)); margin-bottom:3px; }
-    .proj-name { font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:500; text-transform:uppercase; letter-spacing:.12em; color:rgb(var(--paper)); }
+    .gal:hover .gal-ov { opacity: 1; transform: translateY(0); }
+    .gal-tag { font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: .15em; color: rgb(var(--coffee)); margin-bottom: 3px; }
+    .gal-name { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: rgb(var(--cream)); }
 
-    /* ══ CONTACTO ══ */
-    .contacts { width:100%; display:flex; flex-direction:column; gap:4px; margin-bottom:40px; }
+    /* ══ CONTATO ══ */
+    .contacts { width: 100%; display: flex; flex-direction: column; gap: 4px; }
 
-    .contact {
-      display:grid; grid-template-columns:20px 1fr 14px;
-      align-items:center; gap:14px; padding:14px 18px;
-      border:1px solid rgba(var(--green),.14);
+    .ct {
+      display: grid; grid-template-columns: 20px 1fr 14px;
+      align-items: center; gap: 14px; padding: 14px 18px;
+      border: 1px solid rgba(var(--cream),.08);
       border-radius: 10px;
-      background:rgba(var(--ink),.4); backdrop-filter:blur(8px);
-      text-decoration:none; color:rgb(var(--paper-dim));
-      font-size:.875rem; font-weight:400;
+      background: rgba(var(--ink),.4); backdrop-filter: blur(8px);
+      text-decoration: none; color: rgba(var(--cream-dim),.85);
+      font-size: .875rem; font-weight: 400;
       transition: color .25s, border-color .25s, background .25s, transform .3s var(--ease);
     }
-    .contact:hover { color:rgb(var(--paper)); border-color:rgba(var(--green),.32); background:rgba(var(--ink-2),.7); transform:translateX(4px); }
-    .contact svg { width:16px; height:16px; flex-shrink:0; }
-    .contact .arr { opacity:0; transform:translateX(-4px); transition:opacity .3s, transform .3s; }
-    .contact:hover .arr { opacity:.5; transform:translateX(0); }
+    .ct:hover { color: rgb(var(--cream)); border-color: rgba(var(--coffee),.25); background: rgba(var(--ink-2),.7); transform: translateX(4px); }
+    .ct svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .ct .arr { opacity: 0; transform: translateX(-4px); transition: opacity .3s, transform .3s; }
+    .ct:hover .arr { opacity: .45; transform: translateX(0); }
 
     /* ══ FINAL CTA ══ */
     .final {
-      width:100%; position:relative; overflow:hidden;
-      border:1px solid rgba(var(--gold),.30);
-      border-radius: 14px;
-      background:rgba(var(--ink-2),.7); backdrop-filter:blur(16px);
-      padding:36px 28px 32px; text-align:center;
+      width: 100%;
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(var(--coffee),.26);
+      border-radius: 16px;
+      background: rgba(var(--ink-2),.72); backdrop-filter: blur(18px);
+      padding: 38px 26px 34px; text-align: center;
     }
-    .final::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:rgb(var(--gold)); }
+
+    .final::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent 0%, rgb(var(--coffee)) 50%, transparent 100%);
+    }
 
     .final-glow {
-      position:absolute; top:-60px; left:50%; transform:translateX(-50%);
-      width:320px; height:160px;
-      background:radial-gradient(ellipse, rgba(var(--gold),.15) 0%, transparent 70%);
+      position:absolute; top:-55px; left:50%; transform:translateX(-50%);
+      width:310px; height:150px;
+      background:radial-gradient(ellipse, rgba(var(--coffee),.13) 0%, transparent 70%);
       pointer-events:none;
     }
 
@@ -346,53 +392,54 @@
       display:inline-flex; align-items:center; gap:7px;
       font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:500;
       text-transform:uppercase; letter-spacing:.17em;
-      color:rgb(var(--gold)); border:1px solid rgba(var(--gold),.28);
-      background:rgba(var(--gold),.06); padding:6px 14px; margin-bottom:20px;
+      color:rgb(var(--coffee)); border:1px solid rgba(var(--coffee),.24);
+      background:rgba(var(--coffee),.06); padding:6px 14px;
+      border-radius: 4px; margin-bottom:22px;
     }
 
     .final h2 {
-      font-family:'Fraunces',serif; font-weight:300;
-      font-size:clamp(1.5rem,5vw,2.1rem); line-height:1.2;
-      letter-spacing:-.02em; color:rgb(var(--paper)); margin-bottom:8px;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(2rem,8vw,3.2rem); line-height:.95;
+      letter-spacing:.05em; color:rgb(var(--cream)); margin-bottom:10px;
     }
-    .final h2 em { font-style:italic; color:rgb(var(--gold)); }
-    .final p { font-size:.85rem; color:rgba(var(--paper-dim),.9); margin-bottom:24px; line-height:1.6; }
+    .final h2 em { font-style:normal; color:rgb(var(--coffee)); }
+
+    .final p {
+      font-size:.875rem; color:rgba(var(--cream-dim),.85);
+      margin-bottom:26px; line-height:1.65;
+    }
 
     .final-btn {
       display:inline-flex; align-items:center; gap:10px;
-      font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
-      text-transform:uppercase; letter-spacing:.14em;
-      background:rgb(var(--green)); color:#fff;
-      padding:16px 32px; text-decoration:none;
-      width:100%; max-width:380px; justify-content:center;
-      box-shadow:0 0 40px rgba(37,211,102,.25);
+      font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:.12em;
+      background:rgb(var(--coffee)); color:rgb(var(--ink));
+      padding:16px 36px; text-decoration:none;
+      width:100%; max-width:360px; justify-content:center;
+      border-radius:4px;
+      box-shadow:0 0 40px rgba(var(--coffee),.22);
       transition: transform .35s var(--ease), box-shadow .35s;
     }
-    .final-btn:hover { transform:translateY(-3px); box-shadow:0 0 60px rgba(37,211,102,.42),0 20px 40px rgba(0,0,0,.5); }
+    .final-btn:hover { transform:translateY(-3px); box-shadow:0 0 60px rgba(var(--coffee),.42),0 20px 40px rgba(0,0,0,.5); }
     .final-btn:active { transform:translateY(0); }
 
     footer {
-      margin-top:36px; font-family:'JetBrains Mono',monospace;
+      margin-top:38px;
+      font-family:'JetBrains Mono',monospace;
       font-size:9px; letter-spacing:.18em; text-transform:uppercase;
-      color:rgba(var(--paper-soft),.28); text-align:center;
+      color:rgba(var(--cream-soft),.22); text-align:center;
       display:flex; flex-direction:column; align-items:center; gap:10px;
     }
 
     .credit {
       font-family:'JetBrains Mono',monospace;
       font-size:9px; letter-spacing:.18em; text-transform:uppercase;
-      color:rgba(var(--paper-soft),.22);
+      color:rgba(var(--cream-soft),.18);
       display:flex; align-items:center; gap:7px;
     }
+    .credit a { color:rgba(var(--coffee),.45); text-decoration:none; transition:color .25s; }
+    .credit a:hover { color:rgba(var(--coffee),.85); }
 
-    .credit a {
-      color:rgba(var(--green),.55);
-      text-decoration:none;
-      transition: color .25s;
-    }
-    .credit a:hover { color:rgba(var(--green),.9); }
-
-    /* ── Reveal ── */
+    /* Reveal */
     .r { opacity:0; transform:translateY(22px); animation:up .7s var(--ease) forwards; }
     @keyframes up { to { opacity:1; transform:translateY(0); } }
     .r1{animation-delay:.04s} .r2{animation-delay:.12s} .r3{animation-delay:.20s}
@@ -411,244 +458,256 @@
 
   <!-- ═══ HERO ═══ -->
   <header class="hero r r1">
-    <h1>Green<em>Life</em></h1>
-    <p class="hero-sub">Suplementos naturales premium para tu bienestar.<br>+5.000 venezolanas ya transformaron su vida.</p>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Streetwear · Feito no Brasil</span>
+      <h1>CREVALLY<br><span class="slash">/</span>BLACK</h1>
+      <p class="hero-sub">Peças premium para quem não segue tendências — cria as suas.</p>
 
-    <div class="badge">
-      <span class="dot"></span>
-      Envíos a toda Venezuela · Pago en efectivo
-    </div>
+      <div class="badge">
+        <span class="dot"></span>
+        Novas peças disponíveis
+      </div>
 
-    <div class="cta-row">
-      <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20información%20sobre%20los%20productos%20GreenLife."
-         target="_blank" rel="noopener noreferrer" class="btn btn-gold">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        Pedir por WhatsApp
-      </a>
-      <a href="https://greenlife0.com/" target="_blank" rel="noopener noreferrer" class="btn btn-w">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/>
-        </svg>
-        @somosgreenlife
-      </a>
+      <div class="cta-row">
+        <a href="https://crevallyblack.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-coffee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          Ver Loja
+        </a>
+        <a href="https://wa.me/584128590616?text=Oi!%20Vi%20o%20perfil%20da%20Crevally%20Black%20e%20quero%20saber%20mais%20sobre%20as%20pe%C3%A7as."
+           target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          WhatsApp
+        </a>
+      </div>
     </div>
   </header>
 
   <!-- ═══ SOBRE ═══ -->
-  <div class="sec r r2">Sobre nosotras</div>
-  <div class="about r r2">
-    <div class="about-img">
-      <img src="images/hero.png" alt="GreenLife Venezuela" loading="lazy">
-    </div>
-    <p class="about-title">Bienestar natural, resultados reales.</p>
-    <p class="about-text">
-      GreenLife es una marca venezolana de suplementos naturales premium. Nacimos con una misión clara: ayudar a miles de venezolanas a transformar su bienestar con productos de calidad, formulados para dar resultados reales. Sin químicos, sin conservantes. Solo naturaleza en su máxima expresión.
-    </p>
-    <div class="about-stats">
-      <div class="stat">
-        <span class="stat-num">+5.000</span>
-        <span class="stat-label">clientas felices</span>
+  <div class="pad r r2" style="margin-bottom:40px">
+    <div class="sec">A marca</div>
+    <div class="about">
+      <div class="about-img">
+        <img src="images/www.jpeg" alt="Crevally Black — família" loading="lazy">
       </div>
-      <div class="stat">
-        <span class="stat-num">+30</span>
-        <span class="stat-label">productos naturales</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">100%</span>
-        <span class="stat-label">natural y seguro</span>
+      <p class="about-title">Streetwear com alma brasileira</p>
+      <p class="about-text">
+        A Crevally Black nasceu para quem usa a roupa como expressão. Peças premium com identidade própria — algodão de alto gramado, estampas exclusivas e acabamento que você sente quando veste. Para quem não passa despercebido.
+      </p>
+      <div class="about-stats">
+        <div class="stat">
+          <span class="stat-num">+2.000</span>
+          <span class="stat-label">clientes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">+50</span>
+          <span class="stat-label">modelos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">brasileiro</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ PRODUCTOS ═══ -->
-  <div class="sec r r3">Productos</div>
-  <div class="services r r3">
+  <!-- ═══ LINKS ═══ -->
+  <div class="pad r r3" style="margin-bottom:40px">
+    <div class="sec">Links</div>
+    <div class="links">
 
-    <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20información%20sobre%20Regu%20Fine%20para%20adelgazar."
-       target="_blank" rel="noopener noreferrer" class="svc featured">
-      <div class="svc-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgb(212,184,106)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-          <path d="M8 12h8M12 8v8"/>
-        </svg>
-      </div>
-      <div class="svc-body">
-        <div class="svc-name">Regu Fine / Maxx</div>
-        <div class="svc-desc">Adelgazamiento natural. Inhibe el apetito y acelera el metabolismo.</div>
-      </div>
-      <span class="svc-tag">+ pedido</span>
-      <div class="svc-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m7 7 10 10M17 7v10H7"/>
-        </svg>
-      </div>
-    </a>
-
-    <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20información%20sobre%20los%20tés%20Regu%20Life."
-       target="_blank" rel="noopener noreferrer" class="svc">
-      <div class="svc-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>
-        </svg>
-      </div>
-      <div class="svc-body">
-        <div class="svc-name">Chá Regu Life</div>
-        <div class="svc-desc">Tés detox naturales. Reduce la hinchazón y aumenta tu energía.</div>
-      </div>
-      <span class="svc-tag">Detox</span>
-      <div class="svc-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m7 7 10 10M17 7v10H7"/>
-        </svg>
-      </div>
-    </a>
-
-    <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20información%20sobre%20Colágeno%20Verisol."
-       target="_blank" rel="noopener noreferrer" class="svc">
-      <div class="svc-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/>
-        </svg>
-      </div>
-      <div class="svc-body">
-        <div class="svc-name">Colágeno Verisol</div>
-        <div class="svc-desc">Piel firme y radiante. Resultados visibles en menos de 2 meses.</div>
-      </div>
-      <span class="svc-tag">Belleza</span>
-      <div class="svc-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m7 7 10 10M17 7v10H7"/>
-        </svg>
-      </div>
-    </a>
-
-    <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20ver%20el%20catálogo%20completo%20de%20GreenLife."
-       target="_blank" rel="noopener noreferrer" class="svc">
-      <div class="svc-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
-        </svg>
-      </div>
-      <div class="svc-body">
-        <div class="svc-name">Ver catálogo completo</div>
-        <div class="svc-desc">+30 productos. Vitaminas, Omega 3, Whey, Magnesio y más.</div>
-      </div>
-      <span class="svc-tag">+30 items</span>
-      <div class="svc-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m7 7 10 10M17 7v10H7"/>
-        </svg>
-      </div>
-    </a>
-
-  </div>
-
-  <!-- ═══ GALERÍA ═══ -->
-  <div class="sec r r4">Galería</div>
-  <div class="portfolio r r4">
-    <div class="proj-grid">
-
-      <a href="https://wa.me/584128590616?text=¡Hola!%20Vi%20la%20foto%20de%20Regu%20Fine%20y%20quiero%20más%20info." target="_blank" rel="noopener noreferrer" class="proj">
-        <img src="images/product-p1.jpg" alt="Regu Fine" loading="lazy">
-        <div class="proj-overlay">
-          <div class="proj-result">Más vendido</div>
-          <div class="proj-name">Regu Fine 30 Caps</div>
+      <a href="https://crevallyblack.vercel.app" target="_blank" rel="noopener noreferrer" class="lnk hi">
+        <div class="lnk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgb(184,123,82)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+        </div>
+        <div class="lnk-body">
+          <div class="lnk-name">Loja Oficial</div>
+          <div class="lnk-desc">Catálogo completo no site</div>
+        </div>
+        <span class="lnk-tag">Site</span>
+        <div class="lnk-arr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
         </div>
       </a>
 
-      <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20más%20info%20sobre%20el%20Detox." target="_blank" rel="noopener noreferrer" class="proj">
-        <img src="images/product-p4.jpg" alt="Green Energy Detox" loading="lazy">
-        <div class="proj-overlay">
-          <div class="proj-result">Resultados en 7 días</div>
-          <div class="proj-name">Green Energy Detox</div>
+      <a href="https://crevallyblack.vercel.app/loja" target="_blank" rel="noopener noreferrer" class="lnk mid">
+        <div class="lnk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/>
+          </svg>
+        </div>
+        <div class="lnk-body">
+          <div class="lnk-name">Camisetas & Estampas</div>
+          <div class="lnk-desc">Designs exclusivos, algodão premium</div>
+        </div>
+        <span class="lnk-tag">Ver peças</span>
+        <div class="lnk-arr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
         </div>
       </a>
 
-      <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20más%20info%20sobre%20el%20Colágeno." target="_blank" rel="noopener noreferrer" class="proj">
-        <img src="images/product-p5.jpg" alt="Colágeno Verisol" loading="lazy">
-        <div class="proj-overlay">
-          <div class="proj-result">Piel firme</div>
-          <div class="proj-name">Colágeno Verisol</div>
+      <a href="https://crevallyblack.vercel.app/loja" target="_blank" rel="noopener noreferrer" class="lnk mid">
+        <div class="lnk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <div class="lnk-body">
+          <div class="lnk-name">Moletons & Conjuntos</div>
+          <div class="lnk-desc">Looks completos para o dia a dia</div>
+        </div>
+        <span class="lnk-tag">Ver peças</span>
+        <div class="lnk-arr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
         </div>
       </a>
 
-      <a href="https://wa.me/584128590616?text=¡Hola!%20Quiero%20más%20info%20sobre%20el%20Omega%203." target="_blank" rel="noopener noreferrer" class="proj">
-        <img src="images/product-p6.jpg" alt="Omega 3 Gold" loading="lazy">
-        <div class="proj-overlay">
-          <div class="proj-result">Concentración y fuerza</div>
-          <div class="proj-name">Omega 3 Gold</div>
+      <a href="https://instagram.com/crevallyblack_oficial" target="_blank" rel="noopener noreferrer" class="lnk mid">
+        <div class="lnk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgb(250,248,243)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="rgb(250,248,243)" stroke="none"/>
+          </svg>
+        </div>
+        <div class="lnk-body">
+          <div class="lnk-name">Instagram</div>
+          <div class="lnk-desc">@crevallyblack_oficial</div>
+        </div>
+        <span class="lnk-tag">Seguir</span>
+        <div class="lnk-arr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
+        </div>
+      </a>
+
+      <a href="https://wa.me/584128590616?text=Oi!%20Vim%20pelo%20linktree%20da%20Crevally%20Black%20e%20quero%20saber%20mais%20sobre%20as%20pe%C3%A7as."
+         target="_blank" rel="noopener noreferrer" class="lnk wa">
+        <div class="lnk-icon">
+          <svg viewBox="0 0 24 24" fill="rgb(37,211,102)" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </div>
+        <div class="lnk-body">
+          <div class="lnk-name">Falar pelo WhatsApp</div>
+          <div class="lnk-desc">Tire dúvidas sobre tamanhos e pedidos</div>
+        </div>
+        <span class="lnk-tag">Direto</span>
+        <div class="lnk-arr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
         </div>
       </a>
 
     </div>
   </div>
 
-  <!-- ═══ CONTACTO ═══ -->
-  <div class="sec r r5">Contacto</div>
-  <div class="contacts r r5">
+  <!-- ═══ GALERIA ═══ -->
+  <div class="pad r r4" style="margin-bottom:40px">
+    <div class="sec">Galeria</div>
+    <div class="gallery">
+      <div class="gal-grid">
 
-    <a href="https://wa.me/584128590616?text=¡Hola!%20Vine%20desde%20el%20linktree%20de%20GreenLife." target="_blank" rel="noopener noreferrer" class="contact">
-      <svg viewBox="0 0 24 24" fill="rgb(37,211,102)" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
-      <span>WhatsApp · +58 412 859 0616</span>
-      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
-    </a>
+        <a href="https://crevallyblack.vercel.app/loja" target="_blank" rel="noopener noreferrer" class="gal">
+          <img src="images/gorila.jpeg" alt="Camiseta Gorila CB" loading="lazy">
+          <div class="gal-ov">
+            <div class="gal-tag">Destaque</div>
+            <div class="gal-name">Camiseta Gorila CB</div>
+          </div>
+        </a>
 
-    <a href="https://greenlife0.com/" target="_blank" rel="noopener noreferrer" class="contact">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5"/>
-        <circle cx="12" cy="12" r="4"/>
-        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-      </svg>
-      <span>Instagram · @somosgreenlife</span>
-      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
-    </a>
+        <a href="https://crevallyblack.vercel.app/loja" target="_blank" rel="noopener noreferrer" class="gal">
+          <img src="images/w.jpeg" alt="Looks Crevally" loading="lazy" style="object-position: center 20%">
+          <div class="gal-ov">
+            <div class="gal-tag">Novo</div>
+            <div class="gal-name">Looks de Casal</div>
+          </div>
+        </a>
 
-    <a href="https://somosgreenlife.vercel.app/" target="_blank" rel="noopener noreferrer" class="contact">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-      </svg>
-      <span>Sitio web GreenLife</span>
-      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
-    </a>
+        <a href="https://crevallyblack.vercel.app/loja" target="_blank" rel="noopener noreferrer" class="gal wide">
+          <img src="images/www.jpeg" alt="Para toda a família" loading="lazy" style="object-position: center 30%">
+          <div class="gal-ov">
+            <div class="gal-tag">Coleção</div>
+            <div class="gal-name">Para toda a família</div>
+          </div>
+        </a>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTATO ═══ -->
+  <div class="pad r r5" style="margin-bottom:40px">
+    <div class="sec">Contato</div>
+    <div class="contacts">
+
+      <a href="https://wa.me/584128590616?text=Oi!%20Vim%20pelo%20linktree%20da%20Crevally%20Black." target="_blank" rel="noopener noreferrer" class="ct">
+        <svg viewBox="0 0 24 24" fill="rgb(37,211,102)" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        <span>WhatsApp · Crevally Black</span>
+        <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
+      </a>
+
+      <a href="https://instagram.com/crevallyblack_oficial" target="_blank" rel="noopener noreferrer" class="ct">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Instagram · @crevallyblack_oficial</span>
+        <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
+      </a>
+
+      <a href="https://crevallyblack.vercel.app" target="_blank" rel="noopener noreferrer" class="ct">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>Site oficial · crevallyblack.vercel.app</span>
+        <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M17 7v10H7"/></svg>
+      </a>
+
+    </div>
   </div>
 
   <!-- ═══ FINAL CTA ═══ -->
-  <div class="final r r6">
-    <div class="final-glow"></div>
-    <div class="final-badge">
-      <span class="dot"></span>
-      Resultados reales · 100% natural
+  <div class="pad r r6">
+    <div class="final">
+      <div class="final-glow"></div>
+      <div class="final-badge">
+        <span class="dot"></span>
+        Entrega para todo o Brasil
+      </div>
+      <h2>SEU ESTILO<br><em>COMEÇA AQUI</em></h2>
+      <p>Acesse a loja e encontre a peça perfeita.<br>Pix · Cartão · Transferência.</p>
+      <a href="https://crevallyblack.vercel.app" target="_blank" rel="noopener noreferrer" class="final-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m5 12 7-7 7 7"/><path d="M12 5v14"/>
+        </svg>
+        Acessar a loja
+      </a>
     </div>
-    <h2>¿Lista para transformar<br><em>tu bienestar?</em></h2>
-    <p>Escríbeme directo por WhatsApp.<br>Te respondo personalmente y te asesoro sin compromiso.</p>
-    <a href="https://wa.me/584128590616?text=¡Hola%20Jennifer!%20Quiero%20empezar%20mi%20transformación%20con%20GreenLife."
-       target="_blank" rel="noopener noreferrer" class="final-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
-      Hablar ahora con Jennifer
-    </a>
   </div>
 
   <footer class="r r7">
-    <span>&copy; <span id="yr"></span> GreenLife Venezuela · Todos los derechos reservados</span>
+    <span>&copy; <span id="yr"></span> Crevally Black · Todos os direitos reservados</span>
     <span class="credit">
-      Hecho por
-      <a href="https://es.arvexagency.online/" target="_blank" rel="noopener noreferrer">Arvex Agency</a>
+      Desenvolvido por
+      <a href="https://arvexagency.online/" target="_blank" rel="noopener noreferrer">Arvex Agency</a>
     </span>
   </footer>
 
 </main>
 
-<!-- ═══ WEBGL — fundo animado verde/dourado ═══ -->
+<!-- WebGL fundo animado — tons café/âmbar escuro -->
 <script type="module">
   import { Renderer, Program, Mesh, Triangle } from 'https://esm.sh/ogl@1.0.11';
 
@@ -702,24 +761,24 @@
 
   const mouse = new Float32Array([.5,.5]);
   let target = [.5,.5];
-  const DEG = -45 * Math.PI / 180;
+  const DEG = -30 * Math.PI / 180;
 
   const prog = new Program(gl, {
     vertex: vert, fragment: frag, uniforms: {
       uTime:   { value: 0 },
       uRes:    { value: [0,0,1] },
-      uSpeed:  { value: .25 },
-      uIn:     { value: 32 }, uOut: { value: 36 },
-      uWarp:   { value: 1 },
+      uSpeed:  { value: .20 },
+      uIn:     { value: 30 }, uOut: { value: 34 },
+      uWarp:   { value: .85 },
       uRot:    { value: DEG },
       uEdge:   { value: 0 },
       uCycle:  { value: 1 },
-      uBright: { value: .16 },
-      uC1: { value: h2v('#1a3c0a') },
-      uC2: { value: h2v('#D4B86A') },
-      uC3: { value: h2v('#2d5c12') },
+      uBright: { value: .13 },
+      uC1: { value: h2v('#3a1f08') },
+      uC2: { value: h2v('#b87b52') },
+      uC3: { value: h2v('#1a0c04') },
       uMouse:  { value: mouse },
-      uMInf:   { value: 1.5 },
+      uMInf:   { value: 1.2 },
     }
   });
 

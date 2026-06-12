@@ -15,23 +15,23 @@
   }
 
   body {
-    @apply bg-forest-950 text-cream-100 font-sans;
+    @apply bg-white text-ink-900 font-sans;
     overflow-x: hidden;
   }
 
   ::selection {
-    @apply bg-gold-400/30 text-gold-300;
+    @apply bg-coffee-400/25 text-coffee-900;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-gold-400;
+    @apply outline-2 outline-offset-2 outline-coffee-500;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Fraunces', Georgia, serif;
-    font-optical-sizing: auto;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    letter-spacing: 0.02em;
   }
 
   .text-balance {
@@ -47,7 +47,7 @@
     inset: 0;
     z-index: 999;
     pointer-events: none;
-    opacity: 0.03;
+    opacity: 0.025;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-size: 256px 256px;
   }
@@ -83,58 +83,55 @@
     display: none;
   }
 
-  /* Custom scrollbar — matches forest/gold palette */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #0A1A0A;
+    background: #F5F4F0;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1a3c0a;
+    background: #DDB898;
     border-radius: 999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #D4B86A;
+    background: #B87B52;
   }
 
-  /* Gold shimmer sweep — used on hero headline accent */
-  .text-shimmer-gold {
+  .text-shimmer-coffee {
     background-image: linear-gradient(
       105deg,
-      #C9A961 20%,
-      #F0DFA0 45%,
-      #E5CC85 55%,
-      #C9A961 80%
+      #B87B52 20%,
+      #E8C9A8 45%,
+      #CA9872 55%,
+      #B87B52 80%
     );
     background-size: 250% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: shimmer-gold 5s linear 1.8s infinite;
+    animation: shimmer-coffee 5s linear 1.8s infinite;
   }
 
-  @keyframes shimmer-gold {
+  @keyframes shimmer-coffee {
     0%   { background-position: -200% center; }
     100% { background-position: 200% center; }
   }
 
-  /* Respect reduced-motion preference */
   @media (prefers-reduced-motion: reduce) {
     .marquee-track,
     .marquee-reverse {
       animation: none;
     }
 
-    .text-shimmer-gold {
+    .text-shimmer-coffee {
       animation: none;
       background-image: none;
-      -webkit-text-fill-color: #D4B86A;
-      color: #D4B86A;
+      -webkit-text-fill-color: #B87B52;
+      color: #B87B52;
     }
   }
 
@@ -155,27 +152,39 @@
 
 @layer components {
   .section-eyebrow {
-    @apply font-mono text-[11px] uppercase tracking-[0.2em] text-gold-400;
+    @apply font-mono text-[11px] uppercase tracking-[0.2em] text-coffee-500;
   }
 
   .btn-primary {
-    @apply relative overflow-hidden inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-400 text-forest-950 font-sans font-semibold text-sm tracking-wide transition-all duration-300;
+    @apply relative overflow-hidden inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink-900 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300;
   }
 
   .btn-primary:hover {
-    @apply bg-gold-300 scale-[1.02];
+    @apply bg-ink-700 scale-[1.02];
   }
 
   .btn-primary:active {
     @apply scale-[0.98];
   }
 
+  .btn-coffee {
+    @apply relative overflow-hidden inline-flex items-center gap-2 px-6 py-3 rounded-full bg-coffee-400 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300;
+  }
+
+  .btn-coffee:hover {
+    @apply bg-coffee-500 scale-[1.02];
+  }
+
+  .btn-coffee:active {
+    @apply scale-[0.98];
+  }
+
   .btn-ghost {
-    @apply relative overflow-hidden inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-cream-100 font-sans font-medium text-sm tracking-wide transition-all duration-300;
+    @apply relative overflow-hidden inline-flex items-center gap-2 px-6 py-3 rounded-full border border-ink-900/20 text-ink-900 font-sans font-medium text-sm tracking-wide transition-all duration-300;
   }
 
   .btn-ghost:hover {
-    @apply border-white/40 bg-white/5;
+    @apply border-ink-900/40 bg-ink-900/5;
   }
 
   .btn-ghost:active {
@@ -183,10 +192,10 @@
   }
 
   .card-dark {
-    @apply rounded-2xl border border-white/10 bg-forest-900/60;
+    @apply rounded-2xl border border-ink-900/10 bg-ink-900/5;
   }
 
   .card-light {
-    @apply rounded-2xl border border-ink-900/10 bg-white;
+    @apply rounded-2xl border border-neutral-200 bg-white;
   }
 }

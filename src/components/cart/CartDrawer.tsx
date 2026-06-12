@@ -38,23 +38,23 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-md bg-forest-900 border-l border-white/10 flex flex-col h-full overflow-hidden"
+            className="relative w-full max-w-md bg-ink-900 border-l border-white/10 flex flex-col h-full overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <ShoppingBag size={18} strokeWidth={1.5} className="text-gold-400" />
+                <ShoppingBag size={18} strokeWidth={1.5} className="text-coffee-400" />
                 <h2 className="font-display text-lg font-semibold text-cream-50">
-                  Tu carrito
+                  Seu carrinho
                 </h2>
                 {count > 0 && (
-                  <span className="font-mono text-xs text-ink-500">({count} ítems)</span>
+                  <span className="font-mono text-xs text-ink-500">({count} {count === 1 ? 'item' : 'itens'})</span>
                 )}
               </div>
               <button
                 onClick={handleClose}
                 className="p-2 rounded-full hover:bg-white/10 transition-colors text-cream-200"
-                aria-label="Cerrar carrito"
+                aria-label="Fechar carrinho"
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -68,10 +68,10 @@ export function CartDrawer() {
                     <ShoppingBag size={24} strokeWidth={1} className="text-ink-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-cream-200 mb-1">Tu carrito está vacío</p>
-                    <p className="text-xs text-ink-500">Explora el catálogo y añade productos</p>
+                    <p className="text-sm font-medium text-cream-200 mb-1">Seu carrinho está vazio</p>
+                    <p className="text-xs text-ink-500">Explore o catálogo e adicione produtos</p>
                   </div>
-                  <Button onClick={handleClose} as="a" href="/tienda" variant="ghost" size="sm">
+                  <Button onClick={handleClose} as="a" href="/loja" variant="ghost" size="sm">
                     Ver catálogo
                     <ArrowRight size={14} />
                   </Button>
@@ -95,7 +95,7 @@ export function CartDrawer() {
               <div className="p-5 border-t border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-ink-500">Total</span>
-                  <span className="font-mono text-xl font-medium text-gold-400 tabular-nums">
+                  <span className="font-mono text-xl font-medium text-coffee-400 tabular-nums">
                     {formatPrice(totalAmount)}
                   </span>
                 </div>
@@ -109,7 +109,7 @@ export function CartDrawer() {
                   <ArrowRight size={16} />
                 </Button>
                 <p className="text-center text-xs text-ink-500">
-                  Pago en efectivo · Envíos a toda Venezuela
+                  Pix · Cartão · Transferência · Envios para todo o Brasil
                 </p>
               </div>
             )}

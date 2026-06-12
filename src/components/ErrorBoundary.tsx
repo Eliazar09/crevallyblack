@@ -21,18 +21,18 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-[100dvh] bg-forest-950 flex flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="min-h-[100dvh] bg-ink-900 flex flex-col items-center justify-center gap-6 px-4 text-center">
           <p className="font-display text-2xl font-light text-cream-50">
-            Algo salió mal
+            Algo deu errado
           </p>
           <p className="text-sm text-ink-500 max-w-[36ch] leading-relaxed">
-            Ocurrió un error inesperado. Por favor recarga la página o escríbenos por WhatsApp.
+            Ocorreu um erro inesperado. Por favor recarregue a página ou entre em contato pelo WhatsApp.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 rounded-full bg-gold-400 text-forest-950 font-semibold text-sm hover:bg-gold-300 transition-colors"
+            className="px-6 py-3 rounded-full bg-coffee-400 text-ink-900 font-semibold text-sm hover:bg-coffee-300 transition-colors"
           >
-            Recargar página
+            Recarregar página
           </button>
         </div>
       )

@@ -12,7 +12,7 @@ export function CartItem({ item }: CartItemProps) {
 
   return (
     <div className="flex items-start gap-3 p-4">
-      <div className="w-16 h-16 rounded-xl overflow-hidden bg-forest-800/30 flex-shrink-0">
+      <div className="w-16 h-16 rounded-xl overflow-hidden bg-ink-800/30 flex-shrink-0">
         <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
       </div>
 
@@ -41,7 +41,7 @@ export function CartItem({ item }: CartItemProps) {
               +
             </button>
           </div>
-          <span className="font-mono text-sm font-medium text-gold-400 tabular-nums">
+          <span className="font-mono text-sm font-medium text-coffee-400 tabular-nums">
             {formatPrice(item.price * item.quantity)}
           </span>
         </div>
@@ -50,7 +50,7 @@ export function CartItem({ item }: CartItemProps) {
       <button
         onClick={() => removeItem(item.id)}
         className="p-1.5 rounded-lg text-ink-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
-        aria-label="Eliminar"
+        aria-label="Remover"
       >
         <Trash2 size={14} strokeWidth={1.5} />
       </button>

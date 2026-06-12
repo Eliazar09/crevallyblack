@@ -2,18 +2,18 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Package, ShoppingCart, Users,
-  Boxes, BarChart2, LogOut, Leaf, X, CalendarDays
+  Boxes, BarChart2, LogOut, X, CalendarDays, Shirt
 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
 import { cn } from '../../../lib/cn'
 
 const nav = [
   { to: '/admin',           icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/productos', icon: Package,          label: 'Productos' },
-  { to: '/admin/ventas',    icon: ShoppingCart,     label: 'Ventas' },
+  { to: '/admin/produtos',  icon: Package,          label: 'Produtos' },
+  { to: '/admin/vendas',    icon: ShoppingCart,     label: 'Vendas' },
   { to: '/admin/clientes',  icon: Users,            label: 'Clientes' },
-  { to: '/admin/inventario',icon: Boxes,            label: 'Inventario' },
-  { to: '/admin/finanzas',  icon: BarChart2,        label: 'Finanzas' },
+  { to: '/admin/estoque',   icon: Boxes,            label: 'Estoque' },
+  { to: '/admin/financas',  icon: BarChart2,        label: 'Finanças' },
   { to: '/admin/agenda',    icon: CalendarDays,     label: 'Agenda' },
 ]
 
@@ -32,8 +32,8 @@ function NavItem({ to, icon: Icon, label, onClick }: typeof nav[0] & { onClick?:
       className={cn(
         'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
         active
-          ? 'bg-white/8 text-gold-400 border-l-2 border-gold-400'
-          : 'text-ink-500 hover:text-cream-200 hover:bg-white/5 border-l-2 border-transparent'
+          ? 'bg-white/8 text-coffee-300 border-l-2 border-coffee-400'
+          : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-l-2 border-transparent'
       )}
     >
       <Icon size={16} strokeWidth={active ? 2 : 1.6} />
@@ -48,15 +48,15 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     <div className="flex flex-col h-full py-6">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 mb-8">
-        <div className="w-7 h-7 rounded-full bg-gold-400/15 border border-gold-400/30 flex items-center justify-center">
-          <Leaf size={13} className="text-gold-400" strokeWidth={1.8} />
+        <div className="w-7 h-7 rounded-full bg-coffee-400/15 border border-coffee-400/30 flex items-center justify-center">
+          <Shirt size={13} className="text-coffee-400" strokeWidth={1.8} />
         </div>
         <div>
-          <span className="font-display text-sm font-medium text-cream-100">GreenLife</span>
-          <span className="block font-mono text-[9px] text-ink-500 uppercase tracking-widest">Admin</span>
+          <span className="font-display text-base text-neutral-100 tracking-wide">CREVALLY BLACK</span>
+          <span className="block font-mono text-[9px] text-neutral-500 uppercase tracking-widest">Admin</span>
         </div>
         {onClose && (
-          <button onClick={onClose} className="ml-auto text-ink-500 hover:text-cream-200 lg:hidden">
+          <button onClick={onClose} className="ml-auto text-neutral-500 hover:text-neutral-200 lg:hidden">
             <X size={18} />
           </button>
         )}
@@ -73,10 +73,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       <div className="px-3 pt-4 border-t border-white/5">
         <button
           onClick={() => signOut()}
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-ink-500 hover:text-red-400 hover:bg-red-400/5 transition-all w-full"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-neutral-500 hover:text-red-400 hover:bg-red-400/5 transition-all w-full"
         >
           <LogOut size={15} strokeWidth={1.6} />
-          Cerrar sesión
+          Sair
         </button>
       </div>
     </div>
@@ -87,7 +87,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-56 flex-col bg-forest-900 border-r border-white/5 flex-shrink-0">
+      <aside className="hidden lg:flex w-56 flex-col bg-neutral-900 border-r border-white/5 flex-shrink-0">
         <SidebarContent />
       </aside>
 
@@ -99,7 +99,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-forest-950/80 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
               onClick={onClose}
             />
             <motion.aside
@@ -107,7 +107,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               animate={{ x: 0 }}
               exit={{ x: -240 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed left-0 top-0 h-full w-56 z-50 bg-forest-900 border-r border-white/5 lg:hidden"
+              className="fixed left-0 top-0 h-full w-56 z-50 bg-neutral-900 border-r border-white/5 lg:hidden"
             >
               <SidebarContent onClose={onClose} />
             </motion.aside>

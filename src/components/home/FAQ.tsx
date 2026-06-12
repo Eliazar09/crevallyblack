@@ -4,74 +4,74 @@ import { Plus, Minus } from 'lucide-react'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 import { cn } from '../../lib/cn'
 
-type TabKey = 'producto' | 'uso' | 'ingredientes'
+type TabKey = 'produto' | 'entrega' | 'cuidados'
 
 const tabs: { key: TabKey; label: string }[] = [
-  { key: 'producto', label: 'Info del Producto' },
-  { key: 'uso', label: 'Cómo Usarlo' },
-  { key: 'ingredientes', label: 'Ingredientes' },
+  { key: 'produto', label: 'Produto' },
+  { key: 'entrega', label: 'Entrega & Troca' },
+  { key: 'cuidados', label: 'Cuidados' },
 ]
 
 const faqs: Record<TabKey, { q: string; a: string }[]> = {
-  producto: [
+  produto: [
     {
-      q: '¿Para quién están diseñados estos suplementos?',
-      a: 'Nuestros suplementos están diseñados para hombres y mujeres que buscan mejorar su bienestar diario, ya sea adelgazar, desintoxicar el cuerpo, ganar energía o fortalecer su salud en general.',
+      q: 'Quais tamanhos estão disponíveis?',
+      a: 'A maioria das peças vai de PP a XGG. Cada produto indica na página os tamanhos disponíveis. Se tiver dúvida sobre qual pedir, manda mensagem no WhatsApp com suas medidas.',
     },
     {
-      q: '¿Son seguros para el consumo diario?',
-      a: 'Sí. Todos nuestros productos están formulados con ingredientes 100% naturales, sin conservantes artificiales ni colorantes. Son seguros para el consumo diario siguiendo las dosis recomendadas.',
+      q: 'O tecido encolhe depois de lavar?',
+      a: 'Usamos algodão pré-lavado e tecidos de alto gramado que não encolhem. Seguindo as instruções de lavagem na etiqueta, a peça mantém o caimento original.',
     },
     {
-      q: '¿Cuándo empezaré a ver resultados?',
-      a: 'Los resultados varían según cada persona y el producto. En general, nuestros clientes reportan cambios visibles entre 2 y 4 semanas de uso constante, especialmente en energía y bienestar general.',
+      q: 'As cores são as mesmas das fotos?',
+      a: 'Fazemos o máximo para que as fotos representem fielmente as cores. Pode haver pequena variação dependendo da tela. Em caso de dúvida, envie uma mensagem antes de comprar.',
     },
     {
-      q: '¿Puedo combinarlo con otros suplementos?',
-      a: 'En la mayoría de los casos sí. Sin embargo, si estás tomando medicamentos recetados, te recomendamos consultar con tu médico antes de combinar cualquier suplemento.',
-    },
-  ],
-  uso: [
-    {
-      q: '¿Cómo debo tomar los suplementos?',
-      a: 'Cada producto incluye sus instrucciones específicas. En general, se recomienda tomar con agua al momento de una de las comidas principales para una mejor absorción.',
-    },
-    {
-      q: '¿Puedo tomarlo en ayunas?',
-      a: 'Depende del producto. Los suplementos de detox y algunos de adelgazamiento funcionan mejor en ayunas. Los de vitaminas y proteínas se recomiendan con alimentos.',
-    },
-    {
-      q: '¿Qué pasa si olvido una dosis?',
-      a: 'No hay problema. Simplemente continúa con tu dosis habitual en el siguiente horario. No tomes doble dosis para compensar.',
-    },
-    {
-      q: '¿Cuánto tiempo debo tomar el producto?',
-      a: 'Recomendamos ciclos mínimos de 30 días para notar resultados sólidos. Muchos de nuestros clientes mantienen el uso de forma continua como parte de su rutina de bienestar.',
+      q: 'Vocês fazem peças personalizadas?',
+      a: 'Para compras em volume (atacado), podemos discutir personalização de bordado ou estampa. Entre em contato pelo WhatsApp para mais detalhes sobre essa opção.',
     },
   ],
-  ingredientes: [
+  entrega: [
     {
-      q: '¿Contienen aditivos o conservantes artificiales?',
-      a: 'No. Todos los productos GreenLife están formulados sin conservantes artificiales, sin colorantes sintéticos y sin gluten. Ingredientes limpios, resultados reales.',
+      q: 'Qual é o prazo de entrega?',
+      a: 'Enviamos para todo o Brasil. O prazo varia de 3 a 10 dias úteis dependendo da sua região. Você recebe o código de rastreio por WhatsApp após a confirmação do pagamento.',
     },
     {
-      q: '¿Son aptos para veganos?',
-      a: 'La mayoría de nuestros productos son aptos para veganos. Te recomendamos revisar la etiqueta de cada producto o consultarnos directamente por WhatsApp para confirmar.',
+      q: 'Como faço para trocar de tamanho?',
+      a: 'Aceitamos troca em até 7 dias após o recebimento. A peça deve estar sem uso e com a etiqueta. O frete de retorno é por conta do cliente, e nós arcamos com o envio da nova peça.',
     },
     {
-      q: '¿De dónde provienen los ingredientes?',
-      a: 'Utilizamos ingredientes de origen natural, seleccionados por su calidad y concentración activa. Priorizamos materias primas certificadas para garantizar la eficacia de cada fórmula.',
+      q: 'E se a peça chegar com defeito?',
+      a: 'Nesse caso, a troca é 100% por nossa conta. Documente o defeito com fotos ao abrir o pacote e entre em contato pelo WhatsApp. Resolvemos em até 48 horas.',
     },
     {
-      q: '¿Contienen azúcar añadida?',
-      a: 'No. Nuestras fórmulas no contienen azúcar añadida. Algunos productos tienen edulcorantes naturales como stevia para mejorar su sabor sin impacto glucémico.',
+      q: 'Vocês enviam para fora do Brasil?',
+      a: 'No momento atendemos apenas território nacional. Acompanhe nossas redes para novidades sobre envios internacionais.',
+    },
+  ],
+  cuidados: [
+    {
+      q: 'Como lavar as camisetas sem desbotarem?',
+      a: 'Lave sempre ao avesso em água fria ou morna. Use sabão neutro e evite alvejante. A estampa e a cor se preservam muito mais quando você não usa ciclo quente.',
+    },
+    {
+      q: 'Posso usar secadora?',
+      a: 'Prefira secar à sombra para preservar o tecido e a estampa. Se precisar da secadora, use temperatura baixa. Evite exposição prolongada ao sol direto.',
+    },
+    {
+      q: 'Como cuidar do moletom para durar mais?',
+      a: 'Lave ao avesso em ciclo delicado. Evite torcer ou espremer o tecido. Seque estendido ou pendurado para manter o caimento. Não use secadora em temperatura alta.',
+    },
+    {
+      q: 'Com que frequência devo lavar?',
+      a: 'Depende do uso. Para peças do dia a dia, a cada 2 ou 3 usos é o ideal para preservar o tecido. Lavar com muita frequência desnecessária desgasta o algodão mais rápido.',
     },
   ],
 }
 
 export function FAQ() {
   const { ref, isInView } = useScrollReveal()
-  const [activeTab, setActiveTab] = useState<TabKey>('producto')
+  const [activeTab, setActiveTab] = useState<TabKey>('produto')
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   const items = faqs[activeTab]
@@ -84,9 +84,9 @@ export function FAQ() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
-            className="font-mono text-[11px] uppercase tracking-[0.2em] text-moss-500 mb-3"
+            className="font-mono text-[11px] uppercase tracking-[0.2em] text-coffee-500 mb-3"
           >
-            Preguntas frecuentes
+            Perguntas frequentes
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 24 }}
@@ -94,9 +94,9 @@ export function FAQ() {
             transition={{ delay: 0.1 }}
             className="font-display text-[clamp(2rem,4vw,3rem)] font-medium text-ink-900 tracking-tight"
           >
-            Todo lo que necesitas
+            Tudo que você precisa
             <br />
-            <em className="text-forest-800">saber</em>
+            <em className="text-coffee-600">saber</em>
           </motion.h2>
 
           {/* Tabs */}
@@ -113,8 +113,8 @@ export function FAQ() {
                 className={cn(
                   'px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
                   activeTab === tab.key
-                    ? 'bg-forest-800 text-cream-50 border-forest-800'
-                    : 'bg-white text-ink-500 border-ink-900/10 hover:border-forest-800/20 hover:text-ink-900'
+                    ? 'bg-ink-900 text-cream-50 border-ink-900'
+                    : 'bg-white text-ink-500 border-ink-900/10 hover:border-ink-900/30 hover:text-ink-900'
                 )}
               >
                 {tab.label}
@@ -131,23 +131,22 @@ export function FAQ() {
           className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
         >
           {/* Left: photo */}
-          <div className="relative rounded-3xl overflow-hidden bg-forest-100 aspect-[4/5] lg:aspect-auto lg:h-[540px]">
+          <div className="relative rounded-3xl overflow-hidden bg-ink-100 aspect-[4/5] lg:aspect-auto lg:h-[540px]">
             <img
-              src="/images/fotos de parte do site/footer.png"
-              alt="Suplementos GreenLife — bienestar natural"
+              src="/images/fotos%20de%20parte%20do%20site/w.jpeg"
+              alt="Crevally Black — streetwear premium"
               className="w-full h-full object-cover object-center"
               loading="lazy"
             />
-            {/* Subtle overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-950/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-900/20 to-transparent" />
             {/* Floating stat card */}
             <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur rounded-2xl p-4 flex items-center gap-4 shadow-lg">
-              <div className="w-10 h-10 rounded-full bg-forest-800/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">🌿</span>
+              <div className="w-10 h-10 rounded-full bg-coffee-400/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🖤</span>
               </div>
               <div>
-                <p className="text-sm font-semibold text-ink-900">+5.000 clientes satisfechos</p>
-                <p className="text-xs text-ink-500">Resultados reales en toda Venezuela</p>
+                <p className="text-sm font-semibold text-ink-900">+2.000 clientes satisfeitos</p>
+                <p className="text-xs text-ink-500">Qualidade comprovada em todo o Brasil</p>
               </div>
             </div>
           </div>
@@ -171,8 +170,8 @@ export function FAQ() {
                       className={cn(
                         'rounded-2xl border transition-all duration-200 overflow-hidden',
                         isOpen
-                          ? 'border-forest-800/20 bg-white shadow-sm shadow-forest-800/5'
-                          : 'border-ink-900/8 bg-white hover:border-forest-800/15'
+                          ? 'border-coffee-400/30 bg-white shadow-sm shadow-coffee-400/5'
+                          : 'border-ink-900/8 bg-white hover:border-coffee-400/20'
                       )}
                     >
                       <button
@@ -181,14 +180,14 @@ export function FAQ() {
                       >
                         <span className={cn(
                           'text-sm font-semibold leading-snug transition-colors',
-                          isOpen ? 'text-forest-800' : 'text-ink-900'
+                          isOpen ? 'text-coffee-600' : 'text-ink-900'
                         )}>
                           {item.q}
                         </span>
                         <span className={cn(
                           'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200',
                           isOpen
-                            ? 'bg-forest-800 text-cream-50'
+                            ? 'bg-coffee-400 text-white'
                             : 'bg-ink-900/6 text-ink-500'
                         )}>
                           {isOpen

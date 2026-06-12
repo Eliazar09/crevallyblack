@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'w-full px-4 py-3 rounded-xl bg-white/5 border text-cream-100 placeholder:text-ink-500 font-sans text-sm transition-colors focus:outline-none',
             error
               ? 'border-red-500/60 focus:border-red-400'
-              : 'border-white/10 focus:border-gold-400/60',
+              : 'border-white/10 focus:border-coffee-400/60',
             className
           )}
           {...props}
@@ -61,7 +61,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             'w-full px-4 py-3 rounded-xl bg-white/5 border text-cream-100 placeholder:text-ink-500 font-sans text-sm resize-none transition-colors focus:outline-none',
             error
               ? 'border-red-500/60 focus:border-red-400'
-              : 'border-white/10 focus:border-gold-400/60',
+              : 'border-white/10 focus:border-coffee-400/60',
             className
           )}
           {...props}

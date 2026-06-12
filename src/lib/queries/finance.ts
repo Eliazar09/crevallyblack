@@ -2,7 +2,7 @@ import { supabase } from '../supabase'
 
 export interface Transaction {
   id: string
-  type: 'ingreso' | 'egreso'
+  type: 'receita' | 'despesa'
   category: string
   amount: number
   description: string | null
@@ -12,9 +12,9 @@ export interface Transaction {
 
 export interface MonthlyFinance {
   month: string
-  ingresos: number
-  egresos: number
-  ganancia: number
+  receitas: number
+  despesas: number
+  lucro: number
 }
 
 export async function getTransactions(filters?: { type?: string; from?: string; to?: string }) {
@@ -32,14 +32,14 @@ export async function getMonthlyFinance(): Promise<MonthlyFinance[]> {
   if (error) throw error
   return (data ?? []).map((r: any) => ({
     month: r.month,
-    ingresos: Number(r.ingresos ?? 0),
-    egresos: Number(r.egresos ?? 0),
-    ganancia: Number(r.ganancia ?? 0),
+    receitas: Number(r.receitas ?? r.ingresos ?? 0),
+    despesas: Number(r.despesas ?? r.egresos ?? 0),
+    lucro: Number(r.lucro ?? r.ganancia ?? 0),
   }))
 }
 
 export async function createTransaction(payload: {
-  type: 'ingreso' | 'egreso'
+  type: 'receita' | 'despesa'
   category: string
   amount: number
   description: string
@@ -62,7 +62,7 @@ export async function getFinanceSummary() {
 
   const { data } = await supabase.from('transactions').select('type,amount').gte('date', from.slice(0,10))
   const rows = data ?? []
-  const ingresos = rows.filter((r) => r.type === 'ingreso').reduce((s, r) => s + r.amount, 0)
-  const egresos  = rows.filter((r) => r.type === 'egreso').reduce((s, r) => s + r.amount, 0)
-  return { ingresos, egresos, ganancia: ingresos - egresos }
+  const receitas = rows.filter((r) => r.type === 'receita').reduce((s, r) => s + r.amount, 0)
+  const despesas = rows.filter((r) => r.type === 'despesa').reduce((s, r) => s + r.amount, 0)
+  return { receitas, despesas, lucro: receitas - despesas }
 }

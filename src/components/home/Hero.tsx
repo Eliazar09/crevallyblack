@@ -9,10 +9,10 @@ import { buildDirectWhatsAppLink } from '../../lib/whatsapp'
 const EASE_EXPO: [number, number, number, number] = [0.33, 1, 0.68, 1]
 
 const avatars = [
-  'https://randomuser.me/api/portraits/women/1.jpg',
-  'https://randomuser.me/api/portraits/women/2.jpg',
-  'https://randomuser.me/api/portraits/women/3.jpg',
-  'https://randomuser.me/api/portraits/women/4.jpg',
+  'https://randomuser.me/api/portraits/men/1.jpg',
+  'https://randomuser.me/api/portraits/men/2.jpg',
+  'https://randomuser.me/api/portraits/men/3.jpg',
+  'https://randomuser.me/api/portraits/men/4.jpg',
 ]
 
 export function Hero() {
@@ -26,7 +26,7 @@ export function Hero() {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-    glowRef.current.style.background = `radial-gradient(600px circle at ${x}px ${y}px, rgba(212,184,106,0.07), transparent 65%)`
+    glowRef.current.style.background = `radial-gradient(600px circle at ${x}px ${y}px, rgba(184,123,82,0.08), transparent 65%)`
   }, [])
 
   const handleMouseLeave = useCallback(() => {
@@ -49,13 +49,13 @@ export function Hero() {
         <picture>
           <source
             media="(max-width: 639px)"
-            srcSet="/images/fotos de parte do site/herosoparateelfone.png"
+            srcSet="/images/fotos%20de%20parte%20do%20site/WhatsApp%20Image%202026-06-09%20at%208.35.53%20PM.jpeg"
           />
           <img
-            src="/images/fotos de parte do site/hero.png"
+            src="/images/fotos%20de%20parte%20do%20site/w.jpeg"
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-top"
             loading="eager"
             fetchPriority="high"
           />
@@ -63,8 +63,8 @@ export function Hero() {
       </motion.div>
 
       {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-forest-950/95 via-forest-950/75 to-forest-950/30 sm:from-forest-950/92 sm:via-forest-950/55 sm:to-forest-950/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-forest-950/95 via-forest-950/20 to-forest-950/50 sm:from-forest-950/90 sm:via-transparent sm:to-forest-950/35" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink-900/95 via-ink-900/75 to-ink-900/30 sm:from-ink-900/92 sm:via-ink-900/55 sm:to-ink-900/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink-900/95 via-ink-900/20 to-ink-900/50 sm:from-ink-900/90 sm:via-transparent sm:to-ink-900/35" />
 
       {/* Cursor glow */}
       <div
@@ -80,22 +80,6 @@ export function Hero() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-24 sm:pt-28 pb-6 sm:pb-10">
           <div className="max-w-[580px] space-y-5 sm:space-y-8">
 
-            {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.05 }}
-              className="hidden sm:flex items-center gap-3"
-            >
-              <motion.div
-                className="h-px bg-gold-400/60"
-                initial={{ width: 0 }}
-                animate={{ width: 24 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              />
-              <span className="section-eyebrow">Bienestar Natural · Desde Venezuela</span>
-            </motion.div>
-
             {/* Headline clip-reveal */}
             <h1 className="font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] font-light text-cream-50 tracking-tight">
               <span className="block overflow-hidden pb-1">
@@ -105,7 +89,7 @@ export function Hero() {
                   animate={{ y: 0 }}
                   transition={{ duration: 0.75, delay: 0.2, ease: EASE_EXPO }}
                 >
-                  El arte de
+                  A arte de
                 </motion.span>
               </span>
               <span className="block overflow-hidden pb-1">
@@ -115,8 +99,8 @@ export function Hero() {
                   animate={{ y: 0 }}
                   transition={{ duration: 0.75, delay: 0.38, ease: EASE_EXPO }}
                 >
-                  vivir{' '}
-                  <em className="text-shimmer-gold not-italic font-light">bien</em>
+                  vestir{' '}
+                  <em className="text-shimmer-coffee not-italic font-light">bem</em>
                 </motion.span>
               </span>
             </h1>
@@ -128,8 +112,8 @@ export function Hero() {
               transition={{ duration: 0.6, delay: 0.55 }}
               className="text-[15px] sm:text-[17px] text-cream-200/75 leading-relaxed max-w-[38ch]"
             >
-              Suplementos naturales premium para resultados reales.
-              Más de 5.000 venezolanas ya transformaron su bienestar.
+              Streetwear premium para quem não segue tendências — cria as suas.
+              Mais de 2.000 brasileiros já vestem Crevally Black.
             </motion.p>
 
             {/* CTAs */}
@@ -140,7 +124,7 @@ export function Hero() {
               className="flex flex-col sm:flex-row gap-3"
             >
               <MagneticButton>
-                <Button as="a" href="/tienda" size="lg" variant="primary">
+                <Button as="a" href="/loja" size="lg" variant="primary">
                   Ver catálogo
                   <ArrowRight size={16} strokeWidth={2} />
                 </Button>
@@ -155,7 +139,7 @@ export function Hero() {
                   variant="ghost"
                 >
                   <MessageCircle size={16} strokeWidth={1.5} />
-                  Hablar por WhatsApp
+                  Falar pelo WhatsApp
                 </Button>
               </MagneticButton>
             </motion.div>
@@ -168,9 +152,9 @@ export function Hero() {
               className="flex items-center gap-6 sm:gap-8 pt-1 sm:pt-2"
             >
               {[
-                { value: '+5.000', label: 'clientas' },
-                { value: '+30', label: 'productos' },
-                { value: '3', label: 'años' },
+                { value: '+2.000', label: 'clientes' },
+                { value: '+50', label: 'modelos' },
+                { value: '3', label: 'anos' },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -179,7 +163,7 @@ export function Hero() {
                   transition={{ delay: 0.88 + i * 0.1 }}
                   className="flex flex-col"
                 >
-                  <span className="font-mono text-xl font-medium text-gold-400 tabular-nums">
+                  <span className="font-mono text-xl font-medium text-coffee-400 tabular-nums">
                     {stat.value}
                   </span>
                   <span className="text-xs text-cream-200/45 uppercase tracking-wider">{stat.label}</span>
@@ -210,7 +194,7 @@ export function Hero() {
                     src={src}
                     alt=""
                     aria-hidden="true"
-                    className="w-7 h-7 rounded-full border-2 border-forest-950 object-cover"
+                    className="w-7 h-7 rounded-full border-2 border-ink-900 object-cover"
                     loading="lazy"
                   />
                 ))}
@@ -218,29 +202,29 @@ export function Hero() {
               <div>
                 <div className="flex items-center gap-1 mb-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} size={10} className="fill-gold-400 text-gold-400" />
+                    <Star key={i} size={10} className="fill-coffee-400 text-coffee-400" />
                   ))}
                 </div>
                 <p className="text-xs text-cream-200/70 leading-tight">
-                  <span className="font-semibold text-cream-50">+5.000</span> clientas satisfechas
+                  <span className="font-semibold text-cream-50">+2.000</span> clientes satisfeitos
                 </p>
               </div>
             </motion.div>
 
-            {/* 100% Natural badge */}
+            {/* 100% BR badge */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.15 }}
               className="hidden sm:flex items-center gap-3"
             >
-              <div className="w-8 h-8 rounded-full border border-gold-400/40 bg-gold-400/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-gold-400 text-[10px] font-bold">✓</span>
+              <div className="w-8 h-8 rounded-full border border-coffee-400/40 bg-coffee-400/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-coffee-400 text-[10px] font-bold">✓</span>
               </div>
               <div>
-                <p className="font-display text-lg font-medium text-cream-50 leading-tight">100% Natural</p>
-                <Link to="/tienda" className="text-xs text-moss-400 hover:text-gold-400 uppercase tracking-widest transition-colors font-mono">
-                  VER TIENDA →
+                <p className="font-display text-lg font-medium text-cream-50 leading-tight">100% Brasileiro</p>
+                <Link to="/loja" className="text-xs text-coffee-400 hover:text-coffee-300 uppercase tracking-widest transition-colors font-mono">
+                  VER LOJA →
                 </Link>
               </div>
             </motion.div>
@@ -254,8 +238,8 @@ export function Hero() {
             >
               <div className="w-px h-8 bg-white/10" />
               <p className="text-xs text-cream-200/50 leading-relaxed font-mono uppercase tracking-wider">
-                Envíos a toda Venezuela<br />
-                <span className="text-cream-200/35">Pago en efectivo · digital</span>
+                Envios para todo o Brasil<br />
+                <span className="text-cream-200/35">Pix · Cartão · Transferência</span>
               </p>
             </motion.div>
           </div>

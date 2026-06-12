@@ -6,8 +6,9 @@ export interface DbProduct {
   name: string
   short: string
   description: string
-  benefits: string[]
-  how_to_use: string
+  composition: string
+  care: string
+  model_info: string
   image: string
   images: string[]
   options: Array<{ label: string; value: string; price?: number }> | null
@@ -16,9 +17,11 @@ export interface DbProduct {
   category: ProductCategory
   sku: string | null
   featured: boolean
-  status: 'activo' | 'inactivo' | 'borrador'
+  status: 'ativo' | 'inativo' | 'rascunho'
   stock_quantity: number
   min_stock: number
+  sizes: string[]
+  colors: string[]
   created_at: string
   updated_at: string
 }
@@ -47,7 +50,7 @@ export async function getActiveProducts() {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .eq('status', 'activo')
+    .eq('status', 'ativo')
     .order('featured', { ascending: false })
   if (error) throw error
   return data as DbProduct[]

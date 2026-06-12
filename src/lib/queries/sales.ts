@@ -1,11 +1,16 @@
 import { supabase } from '../supabase'
 
-export type PaymentMethod = 'pago_movil' | 'divisas' | 'zelle' | 'transferencia' | 'binance' | 'punto' | 'otro'
-export type PaymentStatus = 'pagado' | 'pendiente' | 'parcial'
+export type PaymentMethod = 'pix' | 'cartao_credito' | 'cartao_debito' | 'dinheiro' | 'transferencia' | 'boleto' | 'outro'
+export type PaymentStatus = 'pago' | 'pendente' | 'parcial'
 
 export const methodLabels: Record<PaymentMethod, string> = {
-  pago_movil: 'Pago Móvil', divisas: 'Divisas (USD)', zelle: 'Zelle',
-  transferencia: 'Transferencia', binance: 'Binance/USDT', punto: 'Punto de venta', otro: 'Otro',
+  pix:            'Pix',
+  cartao_credito: 'Cartão de Crédito',
+  cartao_debito:  'Cartão de Débito',
+  dinheiro:       'Dinheiro',
+  transferencia:  'Transferência',
+  boleto:         'Boleto',
+  outro:          'Outro',
 }
 
 export interface SaleItem {
@@ -25,8 +30,6 @@ export interface SalePayload {
   total: number
   payment_method: PaymentMethod
   payment_status: PaymentStatus
-  exchange_rate: number | null
-  total_bs: number | null
   notes: string | null
 }
 
@@ -39,15 +42,12 @@ export interface DbSale {
   total: number
   payment_method: PaymentMethod
   payment_status: PaymentStatus
-  exchange_rate: number | null
-  total_bs: number | null
   notes: string | null
   created_at: string
   sale_items?: Array<{ product_name: string; quantity: number; unit_price: number; subtotal: number }>
 }
 
 export async function createSale(payload: SalePayload): Promise<string> {
-  // Insert sale
   const { data: sale, error: saleErr } = await supabase
     .from('sales')
     .insert({
@@ -58,8 +58,6 @@ export async function createSale(payload: SalePayload): Promise<string> {
       total: payload.total,
       payment_method: payload.payment_method,
       payment_status: payload.payment_status,
-      exchange_rate: payload.exchange_rate,
-      total_bs: payload.total_bs,
       notes: payload.notes,
     })
     .select('id')
@@ -68,7 +66,6 @@ export async function createSale(payload: SalePayload): Promise<string> {
 
   const saleId = sale.id
 
-  // Insert sale items
   const items = payload.items.map((i) => ({
     sale_id: saleId,
     product_id: i.product_id,
@@ -80,18 +77,16 @@ export async function createSale(payload: SalePayload): Promise<string> {
   const { error: itemsErr } = await supabase.from('sale_items').insert(items)
   if (itemsErr) throw itemsErr
 
-  // Inventory movements (salida)
   const movements = payload.items.map((i) => ({
     product_id: i.product_id,
-    type: 'salida',
+    type: 'saida',
     quantity: -Math.abs(i.quantity),
-    reason: 'Venta',
+    reason: 'Venda',
     related_sale_id: saleId,
   }))
   const { error: movErr } = await supabase.from('inventory_movements').insert(movements)
   if (movErr) throw movErr
 
-  // Decrement stock_quantity for each sold product
   for (const item of payload.items) {
     const { data: prod } = await supabase.from('products').select('stock_quantity').eq('id', item.product_id).single()
     if (prod) {
@@ -101,12 +96,11 @@ export async function createSale(payload: SalePayload): Promise<string> {
     }
   }
 
-  // Financial transaction (ingreso)
   const { error: txErr } = await supabase.from('transactions').insert({
-    type: 'ingreso',
-    category: 'Venta',
+    type: 'receita',
+    category: 'Venda',
     amount: payload.total,
-    description: `Venta #${saleId.slice(-6)} — ${payload.client_name}`,
+    description: `Venda #${saleId.slice(-6)} — ${payload.client_name}`,
     related_sale_id: saleId,
     date: new Date().toISOString().slice(0, 10),
   })
@@ -128,9 +122,4 @@ export async function getSales(filters?: { from?: string; to?: string }) {
 export async function deleteSale(id: string) {
   const { error } = await supabase.from('sales').delete().eq('id', id)
   if (error) throw error
-}
-
-export async function getExchangeRate(): Promise<number> {
-  const { data } = await supabase.from('settings').select('exchange_rate').eq('id', 1).single()
-  return Number(data?.exchange_rate) || 40
 }

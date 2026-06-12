@@ -21,30 +21,30 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const cartLabel = count > 0 ? `CARRITO ${String(count).padStart(2, '0')}` : 'CARRITO'
+  const cartLabel = count > 0 ? `CARRINHO ${String(count).padStart(2, '0')}` : 'CARRINHO'
 
   return (
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-forest-950 border-b border-white/8',
-          scrolled && 'shadow-lg shadow-black/30'
+          'fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white border-b border-neutral-200',
+          scrolled && 'shadow-sm shadow-neutral-200/80'
         )}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between h-14">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-gold-400/30 group-hover:border-gold-400/60 transition-colors flex-shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-ink-900/15 group-hover:border-coffee-400/50 transition-colors flex-shrink-0 bg-ink-900">
               <img
-                src="/logo.jpg"
-                alt="GreenLife"
+                src="/logo.jpeg"
+                alt="Crevally Black"
                 className="w-full h-full object-cover"
-                style={{ objectPosition: 'center 22%' }}
+                style={{ objectPosition: 'center 10%' }}
               />
             </div>
-            <span className="font-display text-base font-semibold text-cream-50 tracking-tight">
-              Green<span className="text-gold-400">Life</span>
+            <span className="font-display text-xl text-ink-900 tracking-wide">
+              CREVALLY<span className="text-coffee-500"> BLACK</span>
             </span>
           </Link>
 
@@ -55,21 +55,21 @@ export function Navbar() {
               return (
                 <div key={link.href} className="flex items-center">
                   {i > 0 && (
-                    <span className="w-1 h-1 rounded-full bg-white/20 mx-4 flex-shrink-0" />
+                    <span className="w-1 h-1 rounded-full bg-neutral-300 mx-4 flex-shrink-0" />
                   )}
                   <Link
                     to={link.href}
                     className={cn(
                       'relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-200',
                       isActive
-                        ? 'text-cream-50 font-bold'
-                        : 'text-cream-200/50 hover:text-cream-100'
+                        ? 'text-ink-900 font-bold'
+                        : 'text-ink-500 hover:text-ink-900'
                     )}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="nav-underline"
-                        className="absolute -bottom-0.5 left-0 right-0 h-px bg-gold-400/70"
+                        className="absolute -bottom-0.5 left-0 right-0 h-px bg-coffee-400"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -86,8 +86,8 @@ export function Navbar() {
             {/* Cart */}
             <button
               onClick={openCart}
-              className="relative flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream-200/60 hover:text-cream-50 transition-colors"
-              aria-label="Abrir carrito"
+              className="relative flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-500 hover:text-ink-900 transition-colors"
+              aria-label="Abrir carrinho"
             >
               <ShoppingBag size={15} strokeWidth={1.5} className="flex-shrink-0" />
               <span className="hidden sm:inline">{cartLabel}</span>
@@ -98,7 +98,7 @@ export function Navbar() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
-                    className="sm:hidden absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center rounded-full bg-gold-400 text-forest-950 text-[9px] font-mono font-bold leading-none"
+                    className="sm:hidden absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center rounded-full bg-coffee-400 text-white text-[9px] font-mono font-bold leading-none"
                   >
                     {count}
                   </motion.span>
@@ -120,10 +120,10 @@ export function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen(true)}
-              className="md:hidden p-1.5 rounded-md hover:bg-white/8 transition-colors"
-              aria-label="Abrir menú"
+              className="md:hidden p-1.5 rounded-md hover:bg-neutral-100 transition-colors"
+              aria-label="Abrir menu"
             >
-              <Menu size={18} className="text-cream-200" strokeWidth={1.5} />
+              <Menu size={18} className="text-ink-700" strokeWidth={1.5} />
             </button>
           </div>
 

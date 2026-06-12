@@ -2,33 +2,33 @@ import { cn } from '../../lib/cn'
 import type { ProductCategory } from '../../data/products'
 
 const categoryLabels: Record<ProductCategory, string> = {
-  adelgazamiento: 'Adelgazamiento',
-  detox: 'Detox',
-  fitness: 'Fitness',
-  belleza: 'Belleza',
-  descanso: 'Descanso',
-  vitaminas: 'Vitaminas',
-  masculino: 'Masculino',
+  camisetas: 'Camisetas',
+  moletons: 'Moletons',
+  calcas: 'Calças',
+  shorts: 'Shorts',
+  bones: 'Bonés',
+  conjuntos: 'Conjuntos',
+  acessorios: 'Acessórios',
 }
 
 const categoryColors: Record<ProductCategory, string> = {
-  adelgazamiento: 'bg-amber-500 text-amber-950 border-transparent',
-  detox: 'bg-emerald-500 text-emerald-950 border-transparent',
-  fitness: 'bg-sky-500 text-sky-950 border-transparent',
-  belleza: 'bg-rose-400 text-rose-950 border-transparent',
-  descanso: 'bg-violet-500 text-violet-950 border-transparent',
-  vitaminas: 'bg-lime-500 text-lime-950 border-transparent',
-  masculino: 'bg-slate-400 text-slate-950 border-transparent',
+  camisetas:   'bg-ink-900 text-cream-50 border-transparent',
+  moletons:    'bg-coffee-700 text-cream-50 border-transparent',
+  calcas:      'bg-stone-700 text-cream-50 border-transparent',
+  shorts:      'bg-amber-600 text-amber-950 border-transparent',
+  bones:       'bg-zinc-600 text-cream-50 border-transparent',
+  conjuntos:   'bg-coffee-500 text-ink-900 border-transparent',
+  acessorios:  'bg-slate-500 text-cream-50 border-transparent',
 }
 
 const lightCategoryColors: Record<ProductCategory, string> = {
-  adelgazamiento: 'bg-amber-100 text-amber-800 border-amber-200',
-  detox: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  fitness: 'bg-blue-100 text-blue-800 border-blue-200',
-  belleza: 'bg-rose-100 text-rose-800 border-rose-200',
-  descanso: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  vitaminas: 'bg-green-100 text-green-800 border-green-200',
-  masculino: 'bg-slate-100 text-slate-800 border-slate-200',
+  camisetas:   'bg-ink-900/10 text-ink-800 border-ink-900/20',
+  moletons:    'bg-coffee-100 text-coffee-800 border-coffee-200',
+  calcas:      'bg-stone-100 text-stone-800 border-stone-200',
+  shorts:      'bg-amber-100 text-amber-800 border-amber-200',
+  bones:       'bg-zinc-100 text-zinc-800 border-zinc-200',
+  conjuntos:   'bg-coffee-50 text-coffee-700 border-coffee-200',
+  acessorios:  'bg-slate-100 text-slate-800 border-slate-200',
 }
 
 interface BadgeProps {

@@ -3,35 +3,35 @@ import type { CartItem } from '../hooks/useCart'
 const WHATSAPP_NUMBER = '584128590616'
 
 export interface CustomerData {
-  nombre: string
-  telefono: string
-  ciudad: string
+  nome: string
+  telefone: string
+  cidade: string
 }
 
 export function buildWhatsAppLink(items: CartItem[], customer: CustomerData): string {
   const lines: string[] = []
 
-  lines.push('*🌿 PEDIDO GREENLIFE*')
+  lines.push('*🖤 PEDIDO CREVALLY BLACK*')
   lines.push('─────────────────')
-  lines.push(`*Cliente:* ${customer.nombre}`)
-  lines.push(`*Teléfono:* ${customer.telefono}`)
-  lines.push(`*Ciudad:* ${customer.ciudad}`)
+  lines.push(`*Cliente:* ${customer.nome}`)
+  lines.push(`*Telefone:* ${customer.telefone}`)
+  lines.push(`*Cidade:* ${customer.cidade}`)
   lines.push('─────────────────')
-  lines.push('*PRODUCTOS:*')
+  lines.push('*PRODUTOS:*')
 
   let total = 0
   items.forEach((item) => {
     const subtotal = item.price * item.quantity
     total += subtotal
     const optionLabel = item.selectedOption ? ` (${item.selectedOption})` : ''
-    lines.push(`• ${item.name}${optionLabel} x${item.quantity} = $${subtotal}`)
+    lines.push(`• ${item.name}${optionLabel} x${item.quantity} = R$${subtotal.toFixed(2)}`)
   })
 
   lines.push('─────────────────')
-  lines.push(`*TOTAL: $${total}*`)
+  lines.push(`*TOTAL: R$${total.toFixed(2)}*`)
   lines.push('')
-  const appUrl = (import.meta.env.VITE_APP_URL as string | undefined) ?? 'greenlife.com.ve'
-  lines.push(`_Enviado desde ${appUrl.replace('https://', '')}_`)
+  const appUrl = (import.meta.env.VITE_APP_URL as string | undefined) ?? 'crevallyblack.com.br'
+  lines.push(`_Enviado pelo site ${appUrl.replace('https://', '')}_`)
 
   const message = lines.join('\n')
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
@@ -40,20 +40,20 @@ export function buildWhatsAppLink(items: CartItem[], customer: CustomerData): st
 export function buildKitWhatsAppLink(tierName: string, quantity: number, pricePerUnit: number): string {
   const total = quantity * pricePerUnit
   const message = [
-    '*🌿 CONSULTA MAYORISTA GREENLIFE*',
+    '*🖤 CONSULTA ATACADO CREVALLY BLACK*',
     '─────────────────',
     `*Tier:* ${tierName}`,
-    `*Cantidad:* ${quantity} kits`,
-    `*Precio por unidad:* $${pricePerUnit}`,
-    `*Total estimado:* $${total}`,
+    `*Quantidade:* ${quantity} peças`,
+    `*Preço por unidade:* R$${pricePerUnit.toFixed(2)}`,
+    `*Total estimado:* R$${total.toFixed(2)}`,
     '─────────────────',
-    'Quiero información para comenzar como distribuidor GreenLife.',
+    'Quero informações para me tornar revendedor Crevally Black.',
   ].join('\n')
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 }
 
 export function buildDirectWhatsAppLink(message?: string): string {
-  const defaultMsg = '¡Hola! Quiero información sobre los productos GreenLife.'
+  const defaultMsg = 'Olá! Quero informações sobre os produtos Crevally Black.'
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message ?? defaultMsg)}`
 }

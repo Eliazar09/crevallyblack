@@ -17,15 +17,15 @@ import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 import Login from './pages/admin/Login'
 
-// Admin pages — lazy loaded
+// Páginas admin — carregamento lazy
 const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
-const Productos    = lazy(() => import('./pages/admin/Productos'))
-const ProductoForm = lazy(() => import('./pages/admin/ProductoForm'))
-const Ventas       = lazy(() => import('./pages/admin/Ventas'))
-const VentaNueva   = lazy(() => import('./pages/admin/VentaNueva'))
+const Produtos     = lazy(() => import('./pages/admin/Productos'))
+const ProdutoForm  = lazy(() => import('./pages/admin/ProductoForm'))
+const Vendas       = lazy(() => import('./pages/admin/Ventas'))
+const VendaNova    = lazy(() => import('./pages/admin/VentaNueva'))
 const Clientes     = lazy(() => import('./pages/admin/Clientes'))
-const Inventario   = lazy(() => import('./pages/admin/Inventario'))
-const Finanzas     = lazy(() => import('./pages/admin/Finanzas'))
+const Estoque      = lazy(() => import('./pages/admin/Inventario'))
+const Financas     = lazy(() => import('./pages/admin/Finanzas'))
 const Agenda       = lazy(() => import('./pages/admin/Agenda'))
 
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -57,11 +57,11 @@ function AppLayout() {
         <PageTransition>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
-            <Route path="/tienda" element={<Shop />} />
-            <Route path="/producto/:id" element={<Product />} />
+            <Route path="/loja" element={<Shop />} />
+            <Route path="/produto/:id" element={<Product />} />
             <Route path="/kits" element={<Kits />} />
-            <Route path="/acerca" element={<About />} />
-            <Route path="/contacto" element={<Contact />} />
+            <Route path="/sobre" element={<About />} />
+            <Route path="/contato" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>
@@ -74,7 +74,7 @@ function AppLayout() {
 
 const AdminSuspense = () => (
   <div className="flex items-center justify-center h-64">
-    <div className="w-6 h-6 rounded-full border-2 border-forest-700 border-t-transparent animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-coffee-600 border-t-transparent animate-spin" />
   </div>
 )
 
@@ -82,7 +82,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Admin login — público */}
+        {/* Login admin — público */}
         <Route path="/admin/login" element={<Login />} />
 
         {/* Admin — protegido */}
@@ -91,29 +91,29 @@ export default function App() {
             <Route path="/admin" element={
               <Suspense fallback={<AdminSuspense />}><Dashboard /></Suspense>
             } />
-            <Route path="/admin/productos" element={
-              <Suspense fallback={<AdminSuspense />}><Productos /></Suspense>
+            <Route path="/admin/produtos" element={
+              <Suspense fallback={<AdminSuspense />}><Produtos /></Suspense>
             } />
-            <Route path="/admin/productos/nuevo" element={
-              <Suspense fallback={<AdminSuspense />}><ProductoForm /></Suspense>
+            <Route path="/admin/produtos/novo" element={
+              <Suspense fallback={<AdminSuspense />}><ProdutoForm /></Suspense>
             } />
-            <Route path="/admin/productos/:id" element={
-              <Suspense fallback={<AdminSuspense />}><ProductoForm /></Suspense>
+            <Route path="/admin/produtos/:id" element={
+              <Suspense fallback={<AdminSuspense />}><ProdutoForm /></Suspense>
             } />
-            <Route path="/admin/ventas" element={
-              <Suspense fallback={<AdminSuspense />}><Ventas /></Suspense>
+            <Route path="/admin/vendas" element={
+              <Suspense fallback={<AdminSuspense />}><Vendas /></Suspense>
             } />
-            <Route path="/admin/ventas/nueva" element={
-              <Suspense fallback={<AdminSuspense />}><VentaNueva /></Suspense>
+            <Route path="/admin/vendas/nova" element={
+              <Suspense fallback={<AdminSuspense />}><VendaNova /></Suspense>
             } />
             <Route path="/admin/clientes" element={
               <Suspense fallback={<AdminSuspense />}><Clientes /></Suspense>
             } />
-            <Route path="/admin/inventario" element={
-              <Suspense fallback={<AdminSuspense />}><Inventario /></Suspense>
+            <Route path="/admin/estoque" element={
+              <Suspense fallback={<AdminSuspense />}><Estoque /></Suspense>
             } />
-            <Route path="/admin/finanzas" element={
-              <Suspense fallback={<AdminSuspense />}><Finanzas /></Suspense>
+            <Route path="/admin/financas" element={
+              <Suspense fallback={<AdminSuspense />}><Financas /></Suspense>
             } />
             <Route path="/admin/agenda" element={
               <Suspense fallback={<AdminSuspense />}><Agenda /></Suspense>

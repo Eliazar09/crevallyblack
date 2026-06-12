@@ -1,43 +1,48 @@
-# GreenLife — Bienestar Natural desde Venezuela
+# Crevally Black — Streetwear Premium
 
-Redesign completo del sitio GreenLife. Stack moderno con identidad visual "Botanical Tech": verde-floresta + detalles dorados + tipografía editorial.
+Loja de roupas Crevally Black. Stack moderno com identidade visual forte e urbana: branco + preto + marrom coffee.
 
 ## Stack
 
-- **Vite** + **React 18** + **TypeScript**
-- **Tailwind CSS v3** con tokens de color customizados
-- **Framer Motion** — animaciones, scroll reveal, page transitions
-- **React Router v6** — navegación SPA
-- **Zustand** — carrito persistido en localStorage
-- **Lucide React** — íconos
-- **jsPDF** — generación de factura PDF al finalizar pedido
+- **Vite** + **React 19** + **TypeScript**
+- **Tailwind CSS v3** com tokens de cor customizados (coffee, neutral)
+- **Framer Motion** — animações, scroll reveal, page transitions
+- **React Router v7** — navegação SPA
+- **Zustand** — carrinho persistido no localStorage
+- **Supabase** — banco de dados e autenticação
+- **Lucide React** — ícones
+- **jsPDF** — geração de fatura PDF ao finalizar pedido
 
-## Cómo correr
+## Como rodar
 
 ```bash
-# Instalar dependencias
 npm install
-
-# Desarrollo
 npm run dev
-
-# Build para producción
 npm run build
-
-# Preview del build
 npm run preview
 ```
 
-El sitio corre en `http://localhost:5173` por defecto.
+O site roda em `http://localhost:5173` por padrão.
 
-## Estructura
+## Variáveis de ambiente
+
+Crie um `.env` na raiz:
+
+```env
+VITE_SUPABASE_URL=sua_url_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima
+SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key
+VITE_APP_URL=https://crevallyblack.com.br
+```
+
+## Estrutura
 
 ```
 src/
 ├── components/
 │   ├── layout/      Navbar, Footer, MobileMenu
 │   ├── ui/          Button, Badge, Modal, Input
-│   ├── home/        Hero, BenefitsMarquee, Categories, Featured, HowItWorks, Testimonials, InstagramGrid, CTASection
+│   ├── home/        Hero, BenefitsMarquee, Categories, Featured, Testimonials, CTASection
 │   ├── shop/        ProductCard, Filters, ProductQuickView
 │   ├── cart/        CartDrawer, CartItem, CheckoutForm
 │   └── kits/        KitTiers, ProfitCalculator
@@ -48,35 +53,38 @@ src/
 └── styles/          globals.css
 ```
 
-## Rutas
+## Rotas
 
-| Ruta | Página |
+| Rota | Página |
 |------|--------|
 | `/` | Home |
-| `/tienda` | Catálogo completo |
-| `/producto/:id` | Detalle de producto |
-| `/kits` | Programa mayorista |
-| `/acerca` | Historia de la marca |
-| `/contacto` | Contacto y FAQ |
+| `/loja` | Catálogo completo |
+| `/produto/:id` | Detalhe do produto |
+| `/kits` | Programa atacado |
+| `/sobre` | História da marca |
+| `/contato` | Contato e FAQ |
 
-## Flujo de carrito
+## Fluxo do carrinho
 
-1. Usuario agrega productos desde `/tienda` o cualquier ProductCard
-2. Cart Drawer se abre (desliza desde la derecha)
-3. Al finalizar, muestra form de datos (nombre, cédula, dirección, etc.)
-4. Genera PDF de factura con jsPDF
-5. Abre WhatsApp con mensaje pre-completado al +584128590616
+1. Usuário adiciona produtos na `/loja` ou via ProductCard
+2. Cart Drawer abre (desliza da direita)
+3. Ao finalizar, exibe formulário de dados (nome, telefone, endereço)
+4. Gera PDF da fatura com jsPDF
+5. Abre WhatsApp com mensagem pré-preenchida
 
-## Deploy en Vercel
+## Deploy na Vercel
 
-1. Push al repositorio GitHub
-2. Importar en Vercel
+1. Push para o repositório GitHub
+2. Importar na Vercel
 3. Build command: `npm run build`
 4. Output directory: `dist`
-5. No requiere variables de entorno
+5. Configurar as variáveis de ambiente no painel da Vercel
 
-## Assets
+## Supabase — Schema
 
-- Imágenes en `public/images/products/` — product-p{id}.jpg
-- Logo: `public/logo.jpg`
-- Fuentes: Google Fonts (Fraunces + Inter + JetBrains Mono)
+Rode o SQL em `scripts/schema.sql` no Supabase SQL Editor para criar as tabelas.
+Para popular com produtos de exemplo:
+
+```bash
+node scripts/seed.mjs
+```

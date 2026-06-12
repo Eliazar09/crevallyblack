@@ -16,25 +16,22 @@ interface ProductQuickViewProps {
 
 export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
   const [quantity, setQuantity] = useState(1)
-  const [selectedOption, setSelectedOption] = useState<string | undefined>(
-    product?.options?.[0]?.value
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(
+    product?.sizes?.[0]
   )
   const [added, setAdded] = useState(false)
   const { addItem } = useCart()
 
   if (!product) return null
 
-  const activeOption = product.options?.find((o) => o.value === selectedOption)
-  const price = activeOption?.price ?? product.price
-
   function handleAdd() {
     addItem({
       productId: product!.id,
       name: product!.name,
       image: product!.image,
-      price,
+      price: product!.price,
       quantity,
-      selectedOption: activeOption?.label,
+      selectedOption: selectedSize,
     })
     setAdded(true)
     setTimeout(() => {
@@ -47,7 +44,7 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
     <Modal isOpen={!!product} onClose={onClose} size="lg">
       <div className="grid grid-cols-1 sm:grid-cols-2">
         {/* Image */}
-        <div className="aspect-square bg-forest-800/30 rounded-tl-3xl rounded-bl-none sm:rounded-bl-3xl rounded-tr-3xl sm:rounded-tr-none overflow-hidden">
+        <div className="aspect-square bg-ink-800/30 rounded-tl-3xl rounded-bl-none sm:rounded-bl-3xl rounded-tr-3xl sm:rounded-tr-none overflow-hidden">
           <img
             src={product.image}
             alt={product.name}
@@ -66,24 +63,23 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
             {product.short}
           </p>
 
-          {/* Options */}
-          {product.options && product.options.length > 0 && (
+          {/* Sizes */}
+          {product.sizes && product.sizes.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-mono uppercase tracking-wider text-ink-500">Opción</p>
+              <p className="text-xs font-mono uppercase tracking-wider text-ink-500">Tamanho</p>
               <div className="flex flex-wrap gap-2">
-                {product.options.map((opt) => (
+                {product.sizes.map((size) => (
                   <button
-                    key={opt.value}
-                    onClick={() => setSelectedOption(opt.value)}
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
-                      selectedOption === opt.value
-                        ? 'border-gold-400 bg-gold-400/10 text-gold-400'
+                      'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all',
+                      selectedSize === size
+                        ? 'border-coffee-400 bg-coffee-400/10 text-coffee-400'
                         : 'border-white/10 text-cream-200/70 hover:border-white/20'
                     )}
                   >
-                    {opt.label}
-                    {opt.price && <span className="ml-1.5 font-mono">${opt.price}</span>}
+                    {size}
                   </button>
                 ))}
               </div>
@@ -92,8 +88,8 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
 
           {/* Price + qty */}
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-            <span className="font-mono text-2xl font-medium text-gold-400 tabular-nums">
-              {formatPrice(price)}
+            <span className="font-mono text-2xl font-medium text-coffee-400 tabular-nums">
+              {formatPrice(product.price)}
             </span>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 border border-white/10 rounded-full px-1 py-1">
@@ -120,18 +116,18 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
             {added ? (
               <>
                 <Check size={16} />
-                Añadido al carrito
+                Adicionado ao carrinho
               </>
             ) : (
               <>
                 <ShoppingBag size={16} strokeWidth={1.5} />
-                Añadir al carrito
+                Adicionar ao carrinho
               </>
             )}
           </Button>
 
           <Link
-            to={`/producto/${product.id}`}
+            to={`/produto/${product.id}`}
             onClick={onClose}
             className="text-center text-xs text-ink-500 hover:text-cream-200 transition-colors flex items-center justify-center gap-1"
           >

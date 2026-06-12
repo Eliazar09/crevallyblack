@@ -1,11 +1,11 @@
 export function formatPrice(amount: number): string {
-  return `$${amount.toFixed(0)}`
+  return `R$ ${amount.toFixed(0)}`
 }
 
 export function formatPriceDetailed(amount: number): string {
-  return new Intl.NumberFormat('es-VE', {
+  return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
+    currency: 'BRL',
+    minimumFractionDigits: 2,
   }).format(amount)
 }

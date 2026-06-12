@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://greenlife.com.ve/sitemap.xml
+Sitemap: https://crevallyblack.com.br/sitemap.xml

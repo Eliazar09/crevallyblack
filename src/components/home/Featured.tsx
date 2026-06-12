@@ -22,8 +22,8 @@ export function Featured() {
 
   function handleAddToCart(e: React.MouseEvent, product: (typeof featured)[0]) {
     e.preventDefault()
-    if (product.options && product.options.length > 0) {
-      navigate(`/producto/${product.id}`)
+    if (product.sizes && product.sizes.length > 0) {
+      navigate(`/produto/${product.id}`)
       return
     }
     addItem({
@@ -44,9 +44,9 @@ export function Featured() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
-              className="font-mono text-[11px] uppercase tracking-[0.2em] text-moss-500 mb-3"
+              className="font-mono text-[11px] uppercase tracking-[0.2em] text-coffee-500 mb-3"
             >
-              Productos destacados
+              Produtos em destaque
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
@@ -54,7 +54,7 @@ export function Featured() {
               transition={{ delay: 0.1 }}
               className="font-display text-[clamp(1.8rem,3.5vw,2.8rem)] font-medium text-ink-900 tracking-tight"
             >
-              Los más elegidos
+              Os mais pedidos
             </motion.h2>
           </div>
 
@@ -65,17 +65,16 @@ export function Featured() {
             className="flex items-center gap-3"
           >
             <Link
-              to="/tienda"
-              className="hidden sm:inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-forest-800 transition-colors group mr-2"
+              to="/loja"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-coffee-600 transition-colors group mr-2"
             >
-              Ver todo el catálogo
+              Ver catálogo completo
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            {/* Nav arrows */}
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="w-9 h-9 rounded-full border border-ink-900/12 bg-white flex items-center justify-center text-ink-500 hover:border-forest-800/30 hover:text-forest-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-9 h-9 rounded-full border border-ink-900/12 bg-white flex items-center justify-center text-ink-500 hover:border-coffee-400/40 hover:text-coffee-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               aria-label="Anterior"
             >
               <ChevronLeft size={16} strokeWidth={1.5} />
@@ -83,8 +82,8 @@ export function Featured() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={page === totalPages - 1}
-              className="w-9 h-9 rounded-full border border-ink-900/12 bg-white flex items-center justify-center text-ink-500 hover:border-forest-800/30 hover:text-forest-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              aria-label="Siguiente"
+              className="w-9 h-9 rounded-full border border-ink-900/12 bg-white flex items-center justify-center text-ink-500 hover:border-coffee-400/40 hover:text-coffee-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Próximo"
             >
               <ChevronRight size={16} strokeWidth={1.5} />
             </button>
@@ -101,52 +100,49 @@ export function Featured() {
             transition={{ duration: 0.25 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4"
           >
-            {visible.map((product, i) => {
-              const price = product.options?.[0]?.price ?? product.price
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.07 }}
+            {visible.map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 }}
+              >
+                <Link
+                  to={`/produto/${product.id}`}
+                  className="group flex flex-col rounded-2xl border border-ink-900/8 bg-white hover:border-coffee-400/30 hover:shadow-lg hover:shadow-ink-900/5 overflow-hidden transition-all duration-300"
                 >
-                  <Link
-                    to={`/producto/${product.id}`}
-                    className="group flex flex-col rounded-2xl border border-ink-900/8 bg-white hover:border-forest-800/20 hover:shadow-lg hover:shadow-forest-800/5 overflow-hidden transition-all duration-300"
-                  >
-                    {/* Image */}
-                    <div className="relative bg-cream-100 aspect-square overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                      />
+                  {/* Image */}
+                  <div className="relative bg-cream-100 aspect-square overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold text-ink-900 leading-snug line-clamp-2">
+                        {product.name}
+                      </p>
+                      <span className="font-mono text-sm font-semibold text-coffee-600 whitespace-nowrap flex-shrink-0">
+                        {formatPrice(product.price)}
+                      </span>
                     </div>
 
-                    {/* Info */}
-                    <div className="p-4 flex flex-col gap-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-semibold text-ink-900 leading-snug line-clamp-2">
-                          {product.name}
-                        </p>
-                        <span className="font-mono text-sm font-semibold text-forest-800 whitespace-nowrap flex-shrink-0">
-                          {formatPrice(price)}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={(e) => handleAddToCart(e, product)}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-ink-900/12 bg-white text-xs font-semibold text-ink-700 hover:bg-forest-800 hover:text-cream-50 hover:border-forest-800 transition-all duration-200 active:scale-[0.97]"
-                      >
-                        <ShoppingCart size={13} strokeWidth={1.5} />
-                        Añadir al carrito
-                      </button>
-                    </div>
-                  </Link>
-                </motion.div>
-              )
-            })}
+                    <button
+                      onClick={(e) => handleAddToCart(e, product)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-ink-900/12 bg-white text-xs font-semibold text-ink-700 hover:bg-ink-900 hover:text-cream-50 hover:border-ink-900 transition-all duration-200 active:scale-[0.97]"
+                    >
+                      <ShoppingCart size={13} strokeWidth={1.5} />
+                      Adicionar ao carrinho
+                    </button>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
         </AnimatePresence>
       </div>

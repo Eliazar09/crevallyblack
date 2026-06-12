@@ -57,18 +57,18 @@ export default function Shop() {
   return (
     <div className="min-h-[100dvh] bg-cream-50">
       <Helmet>
-        <title>Tienda — GreenLife</title>
-        <meta name="description" content={`Catálogo completo de ${products.length} suplementos naturales GreenLife. Emagrecedores, detox, vitaminas, fitness, belleza y más. Envíos a toda Venezuela.`} />
+        <title>Loja — Crevally Black</title>
+        <meta name="description" content={`Catálogo completo com ${products.length} peças Crevally Black. Camisetas, moletons, calças, shorts, bonés e mais. Streetwear premium do Brasil.`} />
       </Helmet>
       {/* Page header */}
-      <div className="bg-forest-950 pt-28 pb-16">
+      <div className="bg-ink-900 pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-eyebrow mb-3">Tienda</p>
+          <p className="section-eyebrow mb-3">Loja</p>
           <h1 className="font-display text-[clamp(2.5rem,5vw,4rem)] font-light text-cream-50 tracking-tight">
-            Catálogo <em className="text-gold-400">completo</em>
+            Catálogo <em className="text-coffee-400">completo</em>
           </h1>
-          <p className="text-ink-500 mt-3 text-base max-w-[40ch]">
-            {products.length} suplementos naturales para cada objetivo de bienestar
+          <p className="text-ink-400 mt-3 text-base max-w-[40ch]">
+            {products.length} peças de streetwear para cada estilo
           </p>
         </div>
       </div>
@@ -82,24 +82,24 @@ export default function Shop() {
         onSortChange={setSort}
       />
 
-<div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-            <p className="text-lg font-display text-ink-700">Sin resultados</p>
+            <p className="text-lg font-display text-ink-700">Sem resultados</p>
             <p className="text-sm text-ink-500">
-              Intenta con otro término o selecciona otra categoría.
+              Tente outro termo ou selecione outra categoria.
             </p>
             <button
               onClick={() => { setSearch(''); setCategory('all') }}
-              className="text-sm text-forest-800 hover:underline"
+              className="text-sm text-coffee-600 hover:underline"
             >
-              Ver todos los productos
+              Ver todos os produtos
             </button>
           </div>
         ) : (
           <>
             <p className="text-xs font-mono text-ink-500 mb-6">
-              {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
+              {filtered.length} peça{filtered.length !== 1 ? 's' : ''}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map((product, i) => (

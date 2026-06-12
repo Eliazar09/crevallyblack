@@ -11,11 +11,11 @@ import { StatCard } from '../../components/admin/ui/StatCard'
 import { cn } from '../../lib/cn'
 import { useToast } from '../../hooks/useToast'
 
-const statusLabel: Record<string, string> = { pagado:'Pagado', pendiente:'Pendiente', parcial:'Parcial' }
+const statusLabel: Record<string, string> = { pago:'Pago', pendente:'Pendente', parcial:'Parcial' }
 const statusColor: Record<string, string> = {
-  pagado:    'text-emerald-700 bg-emerald-50 border-emerald-200',
-  pendiente: 'text-amber-700 bg-amber-50 border-amber-200',
-  parcial:   'text-blue-700 bg-blue-50 border-blue-200',
+  pago:     'text-emerald-700 bg-emerald-50 border-emerald-200',
+  pendente: 'text-amber-700 bg-amber-50 border-amber-200',
+  parcial:  'text-blue-700 bg-blue-50 border-blue-200',
 }
 
 function monthRange() {
@@ -25,7 +25,7 @@ function monthRange() {
   return { from, to }
 }
 
-export default function Ventas() {
+export default function Vendas() {
   const [sales, setSales] = useState<DbSale[]>([])
   const [loading, setLoading] = useState(true)
   const [toDelete, setToDelete] = useState<DbSale | null>(null)
@@ -40,10 +40,10 @@ export default function Ventas() {
     setDeleting(true)
     try {
       await deleteSale(toDelete.id)
-      push('Venta eliminada')
+      push('Venda excluída')
       setToDelete(null)
       load()
-    } catch { push('Error al eliminar', 'error') }
+    } catch { push('Erro ao excluir', 'error') }
     finally { setDeleting(false) }
   }
 
@@ -56,32 +56,32 @@ export default function Ventas() {
     <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-gray-900">Ventas</h1>
-          <p className="text-sm text-gray-500">{sales.length} ventas registradas</p>
+          <h1 className="font-display text-2xl text-gray-900 tracking-wide">VENDAS</h1>
+          <p className="text-sm text-gray-500">{sales.length} vendas registradas</p>
         </div>
-        <Link to="/admin/ventas/nueva"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-forest-700 text-white font-semibold text-sm hover:bg-forest-600 transition-colors">
-          <Plus size={15} />Nueva venta
+        <Link to="/admin/vendas/nova"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-ink-900 text-white font-semibold text-sm hover:bg-ink-700 transition-colors">
+          <Plus size={15} />Nova venda
         </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <StatCard title="Ingresos del mes" value={formatPrice(monthTotal)} icon={DollarSign} accent="green" delay={0} />
-        <StatCard title="Ventas del mes"   value={String(monthlySales.length)} icon={ShoppingCart} accent="gold" delay={0.05} />
-        <StatCard title="Ticket promedio"  value={formatPrice(avgTicket)} icon={TrendingUp} accent="blue" delay={0.1} />
+        <StatCard title="Receita do mês" value={formatPrice(monthTotal)}    icon={DollarSign}  accent="green" delay={0} />
+        <StatCard title="Vendas do mês"  value={String(monthlySales.length)} icon={ShoppingCart} accent="gold"  delay={0.05} />
+        <StatCard title="Ticket médio"   value={formatPrice(avgTicket)}      icon={TrendingUp}   accent="blue"  delay={0.1} />
       </div>
 
       {loading ? (
         <div className="space-y-2">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-14 w-full"/>)}</div>
       ) : sales.length === 0 ? (
-        <EmptyState icon={ShoppingCart} title="Sin ventas" description="Registra tu primera venta."
-          action={<Link to="/admin/ventas/nueva" className="text-sm text-forest-700 font-medium">+ Nueva venta</Link>} />
+        <EmptyState icon={ShoppingCart} title="Sem vendas" description="Registre sua primeira venda."
+          action={<Link to="/admin/vendas/nova" className="text-sm text-coffee-600 font-medium">+ Nova venda</Link>} />
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                {['#','Cliente','Método','Total','Estado','Fecha',''].map((h)=>(
+                {['#','Cliente','Método','Total','Status','Data',''].map((h)=>(
                   <th key={h} className="px-4 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                 ))}
               </tr>
@@ -103,7 +103,7 @@ export default function Ventas() {
                       {statusLabel[s.payment_status]}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{new Date(s.created_at).toLocaleDateString('es-VE')}</td>
+                  <td className="px-4 py-3 text-gray-400 text-xs">{new Date(s.created_at).toLocaleDateString('pt-BR')}</td>
                   <td className="px-4 py-3">
                     <button onClick={() => setToDelete(s)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
                       <Trash2 size={13} />
@@ -115,8 +115,8 @@ export default function Ventas() {
           </table>
         </div>
       )}
-      <ConfirmDialog open={!!toDelete} title="¿Eliminar venta?"
-        description={`La venta de ${toDelete?.client_name} por ${toDelete ? '$' + toDelete.total : ''} será eliminada.`}
+      <ConfirmDialog open={!!toDelete} title="Excluir venda?"
+        description={`A venda de ${toDelete?.client_name} no valor de ${toDelete ? formatPrice(toDelete.total) : ''} será excluída.`}
         onConfirm={handleDelete} onCancel={() => setToDelete(null)} loading={deleting} />
     </div>
   )

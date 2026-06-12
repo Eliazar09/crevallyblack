@@ -28,7 +28,7 @@ export function ToastContainer() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.96 }}
               transition={{ duration: 0.2 }}
-              className="flex items-start gap-3 bg-forest-900 border border-white/10 rounded-2xl px-4 py-3 shadow-xl"
+              className="flex items-start gap-3 bg-ink-900 border border-white/10 rounded-2xl px-4 py-3 shadow-xl"
             >
               <Icon size={16} className={cn('mt-0.5 flex-shrink-0', colors[t.type])} />
               <p className="text-sm text-cream-100 flex-1">{t.message}</p>

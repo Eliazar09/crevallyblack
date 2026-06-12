@@ -4,41 +4,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        forest: {
-          50:  '#f1f7ee',
-          100: '#ddecd5',
-          200: '#bbd9aa',
-          400: '#6a9e3a',
-          600: '#3d5e1f',
-          700: '#2a4c13',
-          800: '#1a3c0a',
-          900: '#0F2410',
-          950: '#0A1A0A',
-        },
-        moss: {
-          500: '#5b6838',
-          400: '#8fa255',
-          300: '#a8b878',
-        },
-        gold: {
-          500: '#C9A961',
-          400: '#D4B86A',
-          300: '#E5CC85',
-        },
-        cream: {
-          50: '#FAF8F3',
-          100: '#F6F5EF',
-          200: '#EDEAE0',
+        coffee: {
+          50:  '#F8EFE4',
+          100: '#EDD4B8',
+          200: '#DDB898',
+          300: '#CA9872',
+          400: '#B87B52',
+          500: '#9B6240',
+          600: '#7A4A2C',
+          700: '#5C3620',
+          800: '#3E2410',
+          900: '#2D1A0E',
+          950: '#1C0F08',
         },
         ink: {
-          900: '#0F0F0F',
+          900: '#0A0A0A',
+          800: '#171717',
           700: '#2A2A2A',
+          600: '#3D3D3D',
           500: '#6A6A6A',
+          400: '#8A8A8A',
+          300: '#B0B0B0',
+        },
+        cream: {
+          50: '#FAFAF8',
+          100: '#F5F4F0',
+          200: '#EDEAE2',
         },
       },
       fontFamily: {
-        display: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Bebas Neue', 'Impact', 'sans-serif'],
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
       borderRadius: {

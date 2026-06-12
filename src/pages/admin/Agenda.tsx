@@ -4,23 +4,23 @@ import { ChevronLeft, ChevronRight, Plus, Trash2, Briefcase, User, Building2, Sh
 import { cn } from '../../lib/cn'
 import { getSales } from '../../lib/queries/sales'
 
-const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+const DAYS_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
 
-const STORAGE_KEY = 'gl_agenda_notes'
+const STORAGE_KEY = 'cb_agenda_notas'
 
 interface Note {
   id: string
   content: string
-  type: 'personal' | 'trabajo' | 'empresa'
+  type: 'pessoal' | 'trabalho' | 'empresa'
   createdAt: string
 }
 
 type Store = Record<string, Note[]>
 
 const TYPE_META = {
-  personal: { label: 'Personal', icon: User,      color: 'text-violet-700 bg-violet-50 border-violet-200' },
-  trabajo:  { label: 'Trabajo',  icon: Briefcase,  color: 'text-blue-700 bg-blue-50 border-blue-200' },
+  pessoal:  { label: 'Pessoal',  icon: User,      color: 'text-violet-700 bg-violet-50 border-violet-200' },
+  trabalho: { label: 'Trabalho', icon: Briefcase,  color: 'text-blue-700 bg-blue-50 border-blue-200' },
   empresa:  { label: 'Empresa',  icon: Building2,  color: 'text-amber-700 bg-amber-50 border-amber-200' },
 }
 
@@ -50,7 +50,7 @@ function getCalendarDays(year: number, month: number): (number | null)[] {
 }
 
 function formatFullDate(y: number, m: number, d: number) {
-  return new Date(y, m, d).toLocaleDateString('es-VE', { weekday:'long', day:'numeric', month:'long' })
+  return new Date(y, m, d).toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' })
 }
 
 export default function Agenda() {
@@ -60,7 +60,7 @@ export default function Agenda() {
   const [selectedDay, setSelectedDay] = useState(now.getDate())
   const [store, setStore] = useState<Store>(loadStore)
   const [text, setText] = useState('')
-  const [noteType, setNoteType] = useState<Note['type']>('trabajo')
+  const [noteType, setNoteType] = useState<Note['type']>('trabalho')
   const [salesByDate, setSalesByDate] = useState<Record<string, number>>({})
 
   useEffect(() => { saveStore(store) }, [store])
@@ -111,14 +111,14 @@ export default function Agenda() {
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-gray-900">Agenda</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Calendario y notas personales</p>
+        <h1 className="font-display text-2xl font-semibold text-gray-900">AGENDA</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Calendário e notas pessoais</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        {/* Calendario */}
+        {/* Calendário */}
         <div className="lg:col-span-2 bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
-          {/* Nav mes */}
+          {/* Nav mês */}
           <div className="flex items-center justify-between">
             <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
               <ChevronLeft size={16} />
@@ -129,14 +129,14 @@ export default function Agenda() {
             </button>
           </div>
 
-          {/* Cabecera días */}
+          {/* Cabeçalho dias */}
           <div className="grid grid-cols-7 text-center">
             {DAYS_SHORT.map(d => (
               <div key={d} className="text-[10px] font-semibold text-gray-400 uppercase py-1">{d}</div>
             ))}
           </div>
 
-          {/* Días */}
+          {/* Dias */}
           <div className="grid grid-cols-7 gap-0.5">
             {days.map((d, i) => {
               if (!d) return <div key={`e${i}`} />
@@ -148,13 +148,13 @@ export default function Agenda() {
               return (
                 <button key={d} onClick={() => setSelectedDay(d)}
                   className={cn('relative h-9 w-full rounded-xl text-sm font-medium transition-all',
-                    isSel ? 'bg-forest-700 text-white' :
-                    isToday ? 'bg-forest-100 text-forest-700 font-bold' :
+                    isSel ? 'bg-ink-900 text-white' :
+                    isToday ? 'bg-coffee-100 text-coffee-700 font-bold' :
                     'text-gray-700 hover:bg-gray-100')}>
                   {d}
                   {!isSel && (hasNotes || hasSales) && (
                     <span className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-                      {hasNotes && <span className="w-1 h-1 rounded-full bg-forest-500" />}
+                      {hasNotes && <span className="w-1 h-1 rounded-full bg-coffee-500" />}
                       {hasSales && <span className="w-1 h-1 rounded-full bg-blue-500" />}
                     </span>
                   )}
@@ -166,19 +166,19 @@ export default function Agenda() {
           {/* Legenda */}
           <div className="flex items-center gap-4 pt-1">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-forest-500" />
+              <span className="w-2 h-2 rounded-full bg-coffee-500" />
               <span className="text-[10px] text-gray-400">Nota</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-blue-500" />
-              <span className="text-[10px] text-gray-400">Venta</span>
+              <span className="text-[10px] text-gray-400">Venda</span>
             </div>
           </div>
         </div>
 
-        {/* Panel notas del día */}
+        {/* Painel notas do dia */}
         <div className="lg:col-span-3 space-y-4">
-          {/* Indicador de ventas del día */}
+          {/* Indicador de vendas do dia */}
           {selDaySales > 0 && (
             <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3">
               <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -186,9 +186,9 @@ export default function Agenda() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-blue-800">
-                  {selDaySales} {selDaySales === 1 ? 'venta realizada' : 'ventas realizadas'}
+                  {selDaySales} {selDaySales === 1 ? 'venda realizada' : 'vendas realizadas'}
                 </p>
-                <p className="text-xs text-blue-600">Ver detalles en la sección de Ventas</p>
+                <p className="text-xs text-blue-600">Ver detalhes na seção de Vendas</p>
               </div>
             </div>
           )}
@@ -216,21 +216,21 @@ export default function Agenda() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNote() } }}
-                placeholder="Escribe una nota… (Enter para guardar)"
+                placeholder="Escreva uma nota… (Enter para salvar)"
                 rows={2}
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-forest-600/40 resize-none transition-colors"
+                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-coffee-500/40 resize-none transition-colors"
               />
               <button onClick={addNote} disabled={!text.trim()}
-                className="px-4 py-2 rounded-xl bg-forest-700 text-white text-sm font-semibold hover:bg-forest-600 disabled:opacity-40 transition-colors self-start mt-0.5 flex items-center gap-1">
+                className="px-4 py-2 rounded-xl bg-ink-900 text-white text-sm font-semibold hover:bg-ink-700 disabled:opacity-40 transition-colors self-start mt-0.5 flex items-center gap-1">
                 <Plus size={14} />
               </button>
             </div>
 
-            {/* Notas del día */}
+            {/* Notas do dia */}
             <div className="space-y-2">
               <AnimatePresence>
                 {selNotes.length === 0 ? (
-                  <p className="text-xs text-gray-400 text-center py-4">Sin notas para este día</p>
+                  <p className="text-xs text-gray-400 text-center py-4">Sem notas para este dia</p>
                 ) : (
                   selNotes.map((n) => {
                     const meta = TYPE_META[n.type]
@@ -255,10 +255,10 @@ export default function Agenda() {
         </div>
       </div>
 
-      {/* Todas las notas recientes */}
+      {/* Todas as notas recentes */}
       {allNotes.length > 0 && (
         <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 space-y-3">
-          <p className="text-sm font-semibold text-gray-900">Notas recientes</p>
+          <p className="text-sm font-semibold text-gray-900">Notas recentes</p>
           <div className="space-y-2">
             {allNotes.map((n) => {
               const meta = TYPE_META[n.type]
@@ -270,7 +270,7 @@ export default function Agenda() {
                   </span>
                   <p className="text-sm text-gray-800 flex-1 truncate">{n.content}</p>
                   <span className="text-xs text-gray-400 flex-shrink-0">
-                    {new Date(y, mo-1, d).toLocaleDateString('es-VE', { day:'numeric', month:'short' })}
+                    {new Date(y, mo-1, d).toLocaleDateString('pt-BR', { day:'numeric', month:'short' })}
                   </span>
                   <button onClick={() => deleteNote(n.dateKey, n.id)}
                     className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { DollarSign, ShoppingCart, Users, Package, ArrowRight, TrendingUp } from 'lucide-react'
+import { DollarSign, ShoppingCart, Users, Package, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { StatCard } from '../../components/admin/ui/StatCard'
 import { StatCardSkeleton } from '../../components/admin/ui/Skeleton'
@@ -9,10 +9,10 @@ import { formatPrice } from '../../lib/currency'
 import { useAuth } from '../../hooks/useAuth'
 
 interface DashStats {
-  ingresos: number
-  ventas: number
+  receitas: number
+  vendas: number
   clientes: number
-  stockBajo: number
+  estoqueBaixo: number
 }
 
 interface RecentSale {
@@ -24,14 +24,14 @@ interface RecentSale {
 }
 
 const methodLabels: Record<string, string> = {
-  pago_movil: 'Pago Móvil', divisas: 'Divisas', zelle: 'Zelle',
-  transferencia: 'Transf.', binance: 'Binance', punto: 'Punto', otro: 'Otro',
+  pix: 'Pix', cartao_credito: 'Cartão Créd.', cartao_debito: 'Cartão Déb.',
+  dinheiro: 'Dinheiro', transferencia: 'Transf.', boleto: 'Boleto', outro: 'Outro',
 }
 
 const quickLinks = [
-  { to: '/admin/ventas/nueva', label: 'Nueva venta',    icon: ShoppingCart, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
-  { to: '/admin/productos/nuevo', label: 'Nuevo producto', icon: Package,      color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
-  { to: '/admin/clientes',    label: 'Ver clientes',    icon: Users,         color: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100' },
+  { to: '/admin/vendas/nova',    label: 'Nova venda',     icon: ShoppingCart, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
+  { to: '/admin/produtos/novo',  label: 'Novo produto',   icon: Package,      color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+  { to: '/admin/clientes',       label: 'Ver clientes',   icon: Users,        color: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100' },
 ]
 
 export default function Dashboard() {
@@ -54,12 +54,12 @@ export default function Dashboard() {
           .order('created_at', { ascending: false }).limit(5),
       ])
 
-      const ingresos = (salesRes.data ?? []).reduce((s, r) => s + (r.total ?? 0), 0)
+      const receitas = (salesRes.data ?? []).reduce((s, r) => s + (r.total ?? 0), 0)
       setStats({
-        ingresos,
-        ventas: salesRes.data?.length ?? 0,
+        receitas,
+        vendas: salesRes.data?.length ?? 0,
         clientes: clientsRes.count ?? 0,
-        stockBajo: stockRes.count ?? 0,
+        estoqueBaixo: stockRes.count ?? 0,
       })
       setRecent(recentRes.data ?? [])
       setLoading(false)
@@ -73,14 +73,14 @@ export default function Dashboard() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-forest-700 flex items-center justify-center flex-shrink-0">
-          <TrendingUp size={20} className="text-white" strokeWidth={1.8} />
+        <div className="w-12 h-12 rounded-xl bg-ink-900 overflow-hidden border border-white/10 flex-shrink-0">
+          <img src="/logo.jpeg" alt="Crevally Black" className="w-full h-full object-cover object-center" />
         </div>
         <div>
-          <h1 className="font-display text-xl font-semibold text-gray-900">
-            Bienvenida, <span className="text-forest-700 capitalize">{name}</span>
+          <h1 className="font-display text-2xl text-gray-900 tracking-wide">
+            BEM-VINDO, <span className="text-coffee-600 uppercase">{name}</span>
           </h1>
-          <p className="text-sm text-gray-400 mt-0.5">Resumen del mes actual · GreenLife Venezuela</p>
+          <p className="text-sm text-gray-400 mt-0.5">Resumo do mês atual · Crevally Black</p>
         </div>
       </motion.div>
 
@@ -90,10 +90,10 @@ export default function Dashboard() {
           Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
           <>
-            <StatCard title="Ingresos del mes" value={formatPrice(stats?.ingresos ?? 0)} icon={DollarSign} accent="green" delay={0} />
-            <StatCard title="Ventas del mes"   value={String(stats?.ventas ?? 0)}         icon={ShoppingCart} accent="gold"  delay={0.05} />
-            <StatCard title="Clientes"          value={String(stats?.clientes ?? 0)}       icon={Users}        accent="blue"  delay={0.1} />
-            <StatCard title="Stock bajo"        value={String(stats?.stockBajo ?? 0)}      icon={Package}      accent="red"   delay={0.15} subtitle="productos con alerta" />
+            <StatCard title="Receita do mês"  value={formatPrice(stats?.receitas ?? 0)}    icon={DollarSign}  accent="green" delay={0} />
+            <StatCard title="Vendas do mês"   value={String(stats?.vendas ?? 0)}            icon={ShoppingCart} accent="gold"  delay={0.05} />
+            <StatCard title="Clientes"         value={String(stats?.clientes ?? 0)}          icon={Users}        accent="blue"  delay={0.1} />
+            <StatCard title="Estoque baixo"    value={String(stats?.estoqueBaixo ?? 0)}      icon={Package}      accent="red"   delay={0.15} subtitle="produtos com alerta" />
           </>
         )}
       </div>
@@ -115,11 +115,11 @@ export default function Dashboard() {
         className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
-            <p className="text-sm font-semibold text-gray-900">Últimas ventas</p>
-            <p className="text-xs text-gray-400 mt-0.5">Actividad reciente</p>
+            <p className="text-sm font-semibold text-gray-900">Últimas vendas</p>
+            <p className="text-xs text-gray-400 mt-0.5">Atividade recente</p>
           </div>
-          <Link to="/admin/ventas"
-            className="flex items-center gap-1.5 text-xs font-medium text-forest-700 hover:text-forest-600 transition-colors bg-forest-50 px-3 py-1.5 rounded-full border border-forest-200">
+          <Link to="/admin/vendas"
+            className="flex items-center gap-1.5 text-xs font-medium text-coffee-600 hover:text-coffee-500 transition-colors bg-coffee-50 px-3 py-1.5 rounded-full border border-coffee-200">
             Ver todas <ArrowRight size={11} />
           </Link>
         </div>
@@ -129,9 +129,9 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center">
               <ShoppingCart size={20} className="text-gray-400" strokeWidth={1.5} />
             </div>
-            <p className="text-sm text-gray-500">Sin ventas este mes</p>
-            <Link to="/admin/ventas/nueva" className="text-xs text-forest-700 hover:underline font-medium">
-              Registrar primera venta →
+            <p className="text-sm text-gray-500">Sem vendas este mês</p>
+            <Link to="/admin/vendas/nova" className="text-xs text-coffee-600 hover:underline font-medium">
+              Registrar primeira venda →
             </Link>
           </div>
         ) : (
@@ -139,7 +139,7 @@ export default function Dashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  {['Cliente', 'Método', 'Total', 'Fecha'].map((h) => (
+                  {['Cliente', 'Método', 'Total', 'Data'].map((h) => (
                     <th key={h} className="px-5 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                   ))}
                 </tr>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                     </td>
                     <td className="px-5 py-3.5 font-mono font-semibold text-emerald-600">{formatPrice(s.total)}</td>
                     <td className="px-5 py-3.5 text-gray-400 text-xs">
-                      {new Date(s.created_at).toLocaleDateString('es-VE')}
+                      {new Date(s.created_at).toLocaleDateString('pt-BR')}
                     </td>
                   </motion.tr>
                 ))}

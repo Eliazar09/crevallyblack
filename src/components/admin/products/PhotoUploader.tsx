@@ -13,14 +13,14 @@ export function PhotoUploader({ value, onChange }: PhotoUploaderProps) {
   const [error, setError] = useState<string | null>(null)
 
   async function handleFile(file: File) {
-    if (!file.type.startsWith('image/')) { setError('Solo se permiten imágenes.'); return }
+    if (!file.type.startsWith('image/')) { setError('Apenas imagens são permitidas.'); return }
     setError(null)
     setUploading(true)
     try {
       const url = await uploadProductPhoto(file)
       onChange(url)
     } catch {
-      setError('Error al subir la imagen. Intenta de nuevo.')
+      setError('Erro ao enviar a imagem. Tente novamente.')
     } finally {
       setUploading(false)
     }
@@ -32,7 +32,7 @@ export function PhotoUploader({ value, onChange }: PhotoUploaderProps) {
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
         onClick={() => inputRef.current?.click()}
-        className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-forest-400 hover:bg-forest-50/30 transition-colors"
+        className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-coffee-400 hover:bg-coffee-50/30 transition-colors"
         style={{ minHeight: 160 }}
       >
         {value ? (
@@ -49,12 +49,12 @@ export function PhotoUploader({ value, onChange }: PhotoUploaderProps) {
         ) : (
           <div className="flex flex-col items-center justify-center h-40 gap-2.5 text-gray-400">
             {uploading
-              ? <Loader size={22} className="animate-spin text-forest-700" />
+              ? <Loader size={22} className="animate-spin text-coffee-600" />
               : <>
                   <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                     <Upload size={18} />
                   </div>
-                  <p className="text-sm">Arrastra o haz clic para subir foto</p>
+                  <p className="text-sm">Arraste ou clique para enviar foto</p>
                   <p className="text-xs text-gray-300">PNG, JPG, WEBP</p>
                 </>
             }

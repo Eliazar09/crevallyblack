@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, MessageCircle, Leaf } from 'lucide-react'
+import { X, MessageCircle, Shirt } from 'lucide-react'
 import { buildDirectWhatsAppLink } from '../../lib/whatsapp'
 import { cn } from '../../lib/cn'
 
@@ -29,21 +29,21 @@ export function MobileMenu({ isOpen, onClose, links }: MobileMenuProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-72 bg-forest-900 border-l border-white/10 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 z-50 w-72 bg-ink-900 border-l border-white/10 flex flex-col"
           >
             <div className="flex items-center justify-between p-5 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gold-400/10 border border-gold-400/30 flex items-center justify-center">
-                  <Leaf size={12} className="text-gold-400" strokeWidth={1.5} />
+                <div className="w-7 h-7 rounded-full bg-coffee-400/10 border border-coffee-400/30 flex items-center justify-center">
+                  <Shirt size={12} className="text-coffee-400" strokeWidth={1.5} />
                 </div>
-                <span className="font-display text-base font-semibold text-cream-50">
-                  Green<span className="text-gold-400">Life</span>
+                <span className="font-display text-base font-semibold text-cream-50 tracking-wider">
+                  CREVALLY <span className="text-coffee-400">BLACK</span>
                 </span>
               </div>
               <button
                 onClick={onClose}
                 className="p-2 rounded-full hover:bg-white/10 transition-colors text-cream-200"
-                aria-label="Cerrar menú"
+                aria-label="Fechar menu"
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -65,7 +65,7 @@ export function MobileMenu({ isOpen, onClose, links }: MobileMenuProps) {
                       className={cn(
                         'flex items-center px-4 py-3 rounded-xl text-base font-medium transition-colors',
                         isActive
-                          ? 'text-gold-400 bg-gold-400/10'
+                          ? 'text-coffee-400 bg-coffee-400/10'
                           : 'text-cream-200/80 hover:text-cream-100 hover:bg-white/5'
                       )}
                     >
@@ -84,7 +84,7 @@ export function MobileMenu({ isOpen, onClose, links }: MobileMenuProps) {
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1fb855] transition-colors"
               >
                 <MessageCircle size={16} strokeWidth={2} />
-                Hablar por WhatsApp
+                Falar pelo WhatsApp
               </a>
             </div>
           </motion.div>
