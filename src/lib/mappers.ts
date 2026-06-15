@@ -13,6 +13,7 @@ export function dbProductToPublic(p: DbProduct): Product {
     sizes: p.sizes ?? [],
     colors: p.colors ?? [],
     image: p.image,
+    images: p.images ?? [],
     price: p.price,
     category: p.category,
     featured: p.featured,
