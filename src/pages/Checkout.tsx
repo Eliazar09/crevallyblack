@@ -126,7 +126,7 @@ export default function Checkout() {
         .select('id')
         .single()
 
-      if (saleErr) throw saleErr
+      if (saleErr) throw new Error(`[sales] ${saleErr.message} (code: ${saleErr.code})`)
 
       await supabase.from('sale_items').insert(
         items.map((item) => ({
@@ -217,7 +217,8 @@ export default function Checkout() {
 
     } catch (err: unknown) {
       console.error('[checkout] Erro:', err)
-      setSaveError('Não foi possível registrar o pedido. Tente novamente.')
+      const msg = err instanceof Error ? err.message : JSON.stringify(err)
+      setSaveError(msg)
     } finally {
       setSaving(false)
     }
