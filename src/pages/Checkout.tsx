@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Copy, Check, Loader, CreditCard, QrCode, AlertCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Loader, CreditCard, QrCode, ExternalLink } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
-import { buildPixPayload, pixQrUrl } from '../lib/pix'
 
-type Screen = 'form' | 'pix' | 'confirmed'
+type Screen = 'form' | 'redirecting' | 'fallback'
 type PayMethod = 'pix' | 'card'
 
 type FormData = {
@@ -43,10 +42,6 @@ function fmtPhone(v: string) {
 const inp = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-100 placeholder:text-ink-600 focus:outline-none focus:border-coffee-500/50 focus:bg-white/7 transition-all'
 const lbl = 'block text-[10px] font-mono uppercase tracking-[0.2em] text-ink-500 mb-1.5'
 
-const PIX_KEY      = import.meta.env.VITE_PIX_KEY      as string | undefined
-const PIX_MERCHANT = (import.meta.env.VITE_PIX_MERCHANT as string | undefined) ?? 'Crevally Black'
-const PIX_CITY     = (import.meta.env.VITE_PIX_CITY     as string | undefined) ?? 'Sao Paulo'
-
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
   const navigate = useNavigate()
@@ -59,13 +54,8 @@ export default function Checkout() {
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
   const [orderTotal, setOrderTotal] = useState(0)
-  const [pixPayload, setPixPayload] = useState<string | null>(null)
-  const [qrImage, setQrImage] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  // true quando o PIX falhou e estamos na tela 'confirmed' sem QR
-  const [pixFailed, setPixFailed] = useState(false)
+  const [pgUrl, setPgUrl] = useState<string | null>(null)
 
-  // Só redireciona se ainda não finalizou (sem orderId)
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
     return null
@@ -121,7 +111,7 @@ export default function Checkout() {
     try {
       const subtotal = total()
 
-      // 1. Salva pedido no Supabase
+      // 1. Salva o pedido no Supabase
       const { data: sale, error: saleErr } = await supabase
         .from('sales')
         .insert({
@@ -129,7 +119,7 @@ export default function Checkout() {
           subtotal,
           discount: 0,
           total: subtotal,
-          payment_method: payMethod, // usa a escolha real do usuário
+          payment_method: payMethod,
           payment_status: 'pendente',
           notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
         })
@@ -168,123 +158,92 @@ export default function Checkout() {
         date: new Date().toISOString().slice(0, 10),
       })
 
-      // Salva valores ANTES de limpar carrinho
       setOrderId(sale.id)
       setOrderTotal(subtotal)
 
-      const apiItems = items.map((item) => ({
-        productId: item.productId,
-        name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
-        quantity: item.quantity,
-        unit_price: item.price,
-      }))
-      const apiAddress = {
-        street: form.rua, number: form.numero, complement: form.complemento,
-        neighborhood: form.bairro, city: form.cidade, state: form.estado, cep: form.cep,
-      }
-      const apiCustomer = {
-        name: form.nome.trim(), email: form.email.trim(), cpf: form.cpf, phone: form.telefone,
-      }
+      // 2. Cria checkout hospedado no PagBank
+      const pgRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: sale.id,
+          paymentMethod: payMethod,
+          customer: {
+            name: form.nome.trim(),
+            email: form.email.trim(),
+            cpf: form.cpf,
+            phone: form.telefone,
+          },
+          items: items.map((item) => ({
+            productId: item.productId,
+            name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
+            quantity: item.quantity,
+            unit_price: item.price,
+          })),
+          total: subtotal,
+          address: {
+            street: form.rua,
+            number: form.numero,
+            complement: form.complemento,
+            neighborhood: form.bairro,
+            city: form.cidade,
+            state: form.estado,
+            cep: form.cep,
+          },
+        }),
+      })
 
-      // ── PIX: tenta PagSeguro, cai no frontend se falhar ────
-      if (payMethod === 'pix') {
-        let gotQr = false
-        try {
-          const pgRes = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: sale.id,
-              paymentMethod: 'pix',
-              customer: apiCustomer,
-              items: apiItems,
-              total: subtotal,
-              address: apiAddress,
-            }),
-          })
-          const pgData = await pgRes.json()
-          if (!pgRes.ok) {
-            console.error('[checkout] PagSeguro PIX falhou:', pgRes.status, JSON.stringify(pgData))
-          } else {
-            const pixText: string | null = pgData.pix_key ?? null
-            if (pixText) {
-              setPixPayload(pixText)
-              setQrImage(pgData.qr_image ?? pixQrUrl(pixText))
-              setScreen('pix')
-              gotQr = true
-            } else {
-              console.error('[checkout] PagSeguro retornou OK mas sem pix_key:', JSON.stringify(pgData))
-            }
-          }
-        } catch (err) {
-          console.error('[checkout] Erro de rede ao chamar /api/create-order:', err)
-        }
+      const pgData = await pgRes.json()
 
-        // Fallback: gera QR no frontend com chave PIX do .env
-        if (!gotQr) {
-          if (PIX_KEY && PIX_KEY !== 'SUA_CHAVE_PIX_AQUI') {
-            const payload = buildPixPayload(PIX_KEY, PIX_MERCHANT, PIX_CITY, subtotal, sale.id.slice(-6))
-            setPixPayload(payload)
-            setQrImage(pixQrUrl(payload))
-            setScreen('pix')
-          } else {
-            console.error('[checkout] PIX indisponível: token PagSeguro inválido e VITE_PIX_KEY não configurado')
-            setPixFailed(true)
-            setScreen('confirmed')
-          }
-        }
+      if (!pgRes.ok) {
+        console.error('[checkout] PagSeguro error:', pgRes.status, JSON.stringify(pgData))
+        // Pedido salvo mas sem link de pagamento — mostra fallback
         clearCart()
+        setPgUrl(null)
+        setScreen('fallback')
         return
       }
 
-      // ── CARTÃO: redireciona para PagSeguro hospedado ───────
-      if (payMethod === 'card') {
-        setScreen('confirmed')
+      if (pgData.redirect_url) {
         clearCart()
-        try {
-          const pgRes = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: sale.id,
-              paymentMethod: 'card',
-              customer: apiCustomer,
-              items: apiItems,
-              total: subtotal,
-              address: apiAddress,
-            }),
-          })
-          const pgData = await pgRes.json()
-          if (!pgRes.ok) {
-            console.error('[checkout] PagSeguro Cartão falhou:', pgRes.status, JSON.stringify(pgData))
-          } else if (pgData.redirect_url) {
-            window.location.href = pgData.redirect_url
-            return
-          } else {
-            console.error('[checkout] PagSeguro Cartão sem redirect_url:', JSON.stringify(pgData))
-          }
-        } catch (err) {
-          console.error('[checkout] Erro de rede ao chamar /api/create-order (cartão):', err)
-        }
+        setScreen('redirecting')
+        // Pequena pausa para o usuário ver a transição
+        setTimeout(() => { window.location.href = pgData.redirect_url }, 800)
+      } else {
+        console.error('[checkout] PagBank sem redirect_url:', JSON.stringify(pgData))
+        clearCart()
+        setScreen('fallback')
       }
 
     } catch (err: unknown) {
-      console.error('[checkout] Erro ao salvar pedido:', err)
+      console.error('[checkout] Erro:', err)
       setSaveError('Não foi possível registrar o pedido. Tente novamente.')
     } finally {
       setSaving(false)
     }
   }
 
-  async function copyPix() {
-    if (!pixPayload) return
-    await navigator.clipboard.writeText(pixPayload)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2500)
+  // ── Redirecionando para o PagBank ─────────────────────────
+  if (screen === 'redirecting') {
+    return (
+      <div className="min-h-[100dvh] bg-[#0a0a0c] flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-6 text-center"
+        >
+          <div className="w-16 h-16 rounded-full border-2 border-coffee-500/50 border-t-coffee-500 animate-spin" />
+          <div>
+            <p className="font-display text-2xl text-cream-50 tracking-wider mb-2">REDIRECIONANDO</p>
+            <p className="text-sm text-ink-400">Levando você para o pagamento seguro via PagBank…</p>
+          </div>
+        </motion.div>
+      </div>
+    )
   }
 
-  // ── Tela pós-checkout ─────────────────────────────────────
-  if (screen === 'pix' || screen === 'confirmed') {
+  // ── Fallback: pedido salvo mas sem link de pagamento ──────
+  if (screen === 'fallback') {
     return (
       <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24 flex items-center justify-center px-4">
         <motion.div
@@ -293,32 +252,19 @@ export default function Checkout() {
           className="w-full max-w-md"
         >
           <div className="flex flex-col items-center text-center gap-6">
-
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
-              className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                pixFailed
-                  ? 'bg-amber-500/15 border border-amber-500/25'
-                  : 'bg-coffee-500/15 border border-coffee-500/25'
-              }`}
+              className="w-16 h-16 rounded-full bg-coffee-500/15 border border-coffee-500/25 flex items-center justify-center"
             >
-              {pixFailed
-                ? <AlertCircle size={28} className="text-amber-400" strokeWidth={1.5} />
-                : <CheckCircle2 size={28} className="text-coffee-400" strokeWidth={1.5} />
-              }
+              <CheckCircle2 size={28} className="text-coffee-400" strokeWidth={1.5} />
             </motion.div>
 
             <div>
               <p className="font-display text-3xl text-cream-50 tracking-widest mb-2">PEDIDO REGISTRADO</p>
               <p className="text-sm text-ink-400 leading-relaxed">
-                {screen === 'pix'
-                  ? 'Escaneie o QR code ou copie a chave para pagar via PIX.'
-                  : pixFailed
-                    ? 'Seu pedido foi salvo. Entre em contato via WhatsApp com o número abaixo para receber o link de pagamento.'
-                    : 'Você será redirecionado para o pagamento. Se não acontecer, entre em contato via WhatsApp.'
-                }
+                Seu pedido foi salvo com sucesso. Entraremos em contato pelo WhatsApp com o link de pagamento.
               </p>
             </div>
 
@@ -330,53 +276,14 @@ export default function Checkout() {
               <p className="text-xs text-ink-600 mt-1.5 font-mono">{formatPrice(orderTotal)}</p>
             </div>
 
-            {/* QR Code PIX */}
-            {screen === 'pix' && qrImage && (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-3xl p-4 shadow-2xl shadow-black/50"
+            {pgUrl && (
+              <a
+                href={pgUrl}
+                className="inline-flex items-center gap-2 py-4 px-8 bg-coffee-500 hover:bg-coffee-400 text-white font-display text-sm tracking-[0.15em] rounded-2xl transition-all"
               >
-                <img
-                  src={qrImage}
-                  alt="QR Code PIX"
-                  className="w-52 h-52 object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                />
-              </motion.div>
-            )}
-
-            {/* Copia e cola */}
-            {screen === 'pix' && pixPayload && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="w-full space-y-3"
-              >
-                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-500 text-center">
-                  PIX Copia e Cola
-                </p>
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
-                  <p className="text-[9px] font-mono text-ink-400 break-all leading-relaxed select-all">
-                    {pixPayload}
-                  </p>
-                </div>
-                <button
-                  onClick={copyPix}
-                  className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-coffee-500 hover:bg-coffee-400 active:scale-[0.98] text-white font-display text-sm tracking-[0.15em] transition-all"
-                >
-                  {copied
-                    ? <><Check size={16} /> COPIADO — COLE NO SEU BANCO</>
-                    : <><Copy size={16} /> COPIAR CHAVE PIX</>
-                  }
-                </button>
-                <p className="text-[11px] text-ink-600 text-center leading-relaxed">
-                  Abra o app do seu banco, escolha PIX Copia e Cola e cole o código acima.
-                  Você receberá confirmação pelo WhatsApp.
-                </p>
-              </motion.div>
+                <ExternalLink size={16} />
+                ABRIR LINK DE PAGAMENTO
+              </a>
             )}
 
             <button
@@ -447,11 +354,11 @@ export default function Checkout() {
                   </button>
                 ))}
               </div>
-              {payMethod === 'card' && (
-                <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
-                  Você será redirecionado para o ambiente seguro do PagSeguro para inserir os dados do cartão.
-                </p>
-              )}
+              <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
+                {payMethod === 'pix'
+                  ? 'Você será redirecionado para a página de pagamento do PagBank onde o QR PIX será exibido.'
+                  : 'Você será redirecionado para o ambiente seguro do PagBank para inserir os dados do cartão.'}
+              </p>
             </div>
 
             {/* Dados pessoais */}
@@ -496,8 +403,14 @@ export default function Checkout() {
                 <div className="relative">
                   <input
                     value={form.cep}
-                    onChange={(e) => { const v = fmtCEP(e.target.value); set('cep', v); if (v.replace(/\D/g, '').length === 8) fetchCEP(v) }}
-                    className={inp} placeholder="00000-000" inputMode="numeric"
+                    onChange={(e) => {
+                      const v = fmtCEP(e.target.value)
+                      set('cep', v)
+                      if (v.replace(/\D/g, '').length === 8) fetchCEP(v)
+                    }}
+                    className={inp}
+                    placeholder="00000-000"
+                    inputMode="numeric"
                   />
                   {cepLoading && <Loader size={13} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-coffee-400" />}
                 </div>
@@ -593,12 +506,14 @@ export default function Checkout() {
               >
                 {saving
                   ? <><Loader size={15} className="animate-spin" /> PROCESSANDO…</>
-                  : payMethod === 'pix' ? 'GERAR PIX E CONFIRMAR' : 'PAGAR COM CARTÃO'
+                  : payMethod === 'pix'
+                    ? <><QrCode size={16} /> IR PARA PIX</>
+                    : <><CreditCard size={16} /> IR PARA CARTÃO</>
                 }
               </button>
 
               <p className="text-center text-[11px] font-mono text-ink-600 uppercase tracking-wider">
-                Pagamento 100% seguro
+                Pagamento via PagBank — 100% seguro
               </p>
             </div>
           </motion.div>
