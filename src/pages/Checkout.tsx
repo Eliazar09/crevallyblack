@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Copy, Check, Loader } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Copy, Check, Loader, CreditCard, QrCode } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
 
 type Screen = 'form' | 'pix' | 'confirmed'
+type PayMethod = 'pix' | 'card'
 
 type FormData = {
   nome: string; cpf: string; email: string; telefone: string
@@ -38,24 +39,27 @@ function fmtPhone(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
 }
 
-const input = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-100 placeholder:text-ink-600 focus:outline-none focus:border-coffee-500/50 focus:bg-white/7 transition-all'
+const inp = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-100 placeholder:text-ink-600 focus:outline-none focus:border-coffee-500/50 focus:bg-white/7 transition-all'
 const lbl = 'block text-[10px] font-mono uppercase tracking-[0.2em] text-ink-500 mb-1.5'
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(empty)
+  const [payMethod, setPayMethod] = useState<PayMethod>('pix')
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
   const [cepLoading, setCepLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
+  const [orderTotal, setOrderTotal] = useState(0)
   const [pixKey, setPixKey] = useState<string | null>(null)
   const [qrImage, setQrImage] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
-  if (items.length === 0 && screen === 'form') {
+  // Só redireciona se carrinho vazio E ainda não finalizamos (sem orderId)
+  if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
     return null
   }
@@ -107,6 +111,7 @@ export default function Checkout() {
     try {
       const subtotal = total()
 
+      // 1. Salva pedido no Supabase
       const { data: sale, error: saleErr } = await supabase
         .from('sales')
         .insert({
@@ -144,7 +149,6 @@ export default function Checkout() {
         }))
       )
 
-      // transações financeiras — não bloqueia pedido se falhar
       void supabase.from('transactions').insert({
         type: 'receita',
         category: 'Venda Online',
@@ -154,16 +158,20 @@ export default function Checkout() {
         date: new Date().toISOString().slice(0, 10),
       })
 
+      // IMPORTANTE: salva orderId e total ANTES de limpar carrinho
       setOrderId(sale.id)
+      setOrderTotal(subtotal)
+      setScreen('confirmed') // tela de fallback primeiro, evita redirect para /carrinho
       clearCart()
 
-      // Gera PIX via PagSeguro
+      // 2. Chama PagSeguro
       try {
         const pgRes = await fetch('/api/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             orderId: sale.id,
+            paymentMethod: payMethod,
             customer: { name: form.nome.trim(), email: form.email.trim(), cpf: form.cpf, phone: form.telefone },
             items: items.map((item) => ({
               name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
@@ -177,17 +185,21 @@ export default function Checkout() {
             },
           }),
         })
+
         if (pgRes.ok) {
           const pgData = await pgRes.json()
-          setPixKey(pgData.pix_key ?? null)
-          setQrImage(pgData.qr_image ?? null)
-          setScreen('pix')
-        } else {
-          setScreen('confirmed')
+          if (pgData.type === 'pix' && pgData.pix_key) {
+            setPixKey(pgData.pix_key)
+            setQrImage(pgData.qr_image ?? null)
+            setScreen('pix')
+          } else if (pgData.type === 'card' && pgData.redirect_url) {
+            // Redireciona para o checkout hospedado do PagSeguro
+            window.location.href = pgData.redirect_url
+          }
         }
-      } catch {
-        setScreen('confirmed')
-      }
+        // Se falhar, já está em 'confirmed' com número do pedido
+      } catch { /* mantém tela confirmed */ }
+
     } catch (err: unknown) {
       setSaveError('Não foi possível registrar o pedido. Tente novamente.')
       console.error(err)
@@ -203,7 +215,7 @@ export default function Checkout() {
     setTimeout(() => setCopied(false), 2500)
   }
 
-  // ── Tela PIX ──────────────────────────────────────────────
+  // ── Tela PIX / Confirmação ────────────────────────────────
   if (screen === 'pix' || screen === 'confirmed') {
     return (
       <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24 flex items-center justify-center px-4">
@@ -236,7 +248,7 @@ export default function Checkout() {
               <p className="font-mono text-3xl font-bold text-coffee-400 tracking-widest">
                 #{orderId.slice(-6).toUpperCase()}
               </p>
-              <p className="text-xs text-ink-600 mt-1.5 font-mono">{formatPrice(total())}</p>
+              <p className="text-xs text-ink-600 mt-1.5 font-mono">{formatPrice(orderTotal)}</p>
             </div>
 
             {screen === 'pix' && qrImage && (
@@ -265,13 +277,10 @@ export default function Checkout() {
                   onClick={copyPix}
                   className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-coffee-500 hover:bg-coffee-400 active:scale-[0.98] text-white font-display text-sm tracking-[0.15em] transition-all"
                 >
-                  {copied
-                    ? <><Check size={15} /> COPIADO</>
-                    : <><Copy size={15} /> COPIAR CHAVE PIX</>
-                  }
+                  {copied ? <><Check size={15} /> COPIADO</> : <><Copy size={15} /> COPIAR CHAVE PIX</>}
                 </button>
                 <p className="text-[11px] text-ink-600 text-center">
-                  O QR code expira em 3 horas · Após o pagamento, você será contatado pelo WhatsApp
+                  QR code expira em 3 horas · Você receberá confirmação pelo WhatsApp
                 </p>
               </motion.div>
             )}
@@ -293,12 +302,7 @@ export default function Checkout() {
     <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
-        >
+        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <Link
             to="/carrinho"
             className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-ink-600 hover:text-cream-300 transition-colors mb-7 group"
@@ -314,13 +318,57 @@ export default function Checkout() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
 
-          {/* Form */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             className="space-y-6"
           >
+            {/* Forma de pagamento */}
+            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-4">
+              <div>
+                <p className="font-display text-lg text-cream-100 tracking-wider">PAGAMENTO</p>
+                <p className="text-xs text-ink-500 mt-0.5">Escolha como deseja pagar</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPayMethod('pix')}
+                  className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
+                    payMethod === 'pix'
+                      ? 'border-coffee-500/60 bg-coffee-500/10 text-cream-100'
+                      : 'border-white/10 bg-white/3 text-ink-500 hover:border-white/20'
+                  }`}
+                >
+                  <QrCode size={20} strokeWidth={1.5} className={payMethod === 'pix' ? 'text-coffee-400' : ''} />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold leading-tight">PIX</p>
+                    <p className="text-[10px] font-mono opacity-60">Instantâneo</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPayMethod('card')}
+                  className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
+                    payMethod === 'card'
+                      ? 'border-coffee-500/60 bg-coffee-500/10 text-cream-100'
+                      : 'border-white/10 bg-white/3 text-ink-500 hover:border-white/20'
+                  }`}
+                >
+                  <CreditCard size={20} strokeWidth={1.5} className={payMethod === 'card' ? 'text-coffee-400' : ''} />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold leading-tight">Cartão</p>
+                    <p className="text-[10px] font-mono opacity-60">Créd. / Déb.</p>
+                  </div>
+                </button>
+              </div>
+              {payMethod === 'card' && (
+                <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
+                  Você sera redirecionado para o ambiente seguro do PagSeguro para inserir os dados do cartão.
+                </p>
+              )}
+            </div>
+
             {/* Dados pessoais */}
             <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-5">
               <div>
@@ -330,26 +378,26 @@ export default function Checkout() {
 
               <div className="space-y-1.5">
                 <label className={lbl}>Nome completo</label>
-                <input value={form.nome} onChange={(e) => set('nome', e.target.value)} className={input} placeholder="Seu nome completo" />
+                <input value={form.nome} onChange={(e) => set('nome', e.target.value)} className={inp} placeholder="Seu nome completo" />
                 {errors.nome && <p className="text-[10px] text-red-400 font-mono">{errors.nome}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>CPF</label>
-                  <input value={form.cpf} onChange={(e) => set('cpf', fmtCPF(e.target.value))} className={input} placeholder="000.000.000-00" inputMode="numeric" />
+                  <input value={form.cpf} onChange={(e) => set('cpf', fmtCPF(e.target.value))} className={inp} placeholder="000.000.000-00" inputMode="numeric" />
                   {errors.cpf && <p className="text-[10px] text-red-400 font-mono">{errors.cpf}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>WhatsApp</label>
-                  <input value={form.telefone} onChange={(e) => set('telefone', fmtPhone(e.target.value))} className={input} placeholder="(11) 99999-9999" inputMode="tel" />
+                  <input value={form.telefone} onChange={(e) => set('telefone', fmtPhone(e.target.value))} className={inp} placeholder="(11) 99999-9999" inputMode="tel" />
                   {errors.telefone && <p className="text-[10px] text-red-400 font-mono">{errors.telefone}</p>}
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>E-mail</label>
-                <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={input} placeholder="seu@email.com" />
+                <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={inp} placeholder="seu@email.com" />
                 {errors.email && <p className="text-[10px] text-red-400 font-mono">{errors.email}</p>}
               </div>
             </div>
@@ -366,54 +414,46 @@ export default function Checkout() {
                 <div className="relative">
                   <input
                     value={form.cep}
-                    onChange={(e) => {
-                      const v = fmtCEP(e.target.value)
-                      set('cep', v)
-                      if (v.replace(/\D/g, '').length === 8) fetchCEP(v)
-                    }}
-                    className={input}
-                    placeholder="00000-000"
-                    inputMode="numeric"
+                    onChange={(e) => { const v = fmtCEP(e.target.value); set('cep', v); if (v.replace(/\D/g, '').length === 8) fetchCEP(v) }}
+                    className={inp} placeholder="00000-000" inputMode="numeric"
                   />
-                  {cepLoading && (
-                    <Loader size={13} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-coffee-400" />
-                  )}
+                  {cepLoading && <Loader size={13} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-coffee-400" />}
                 </div>
                 {errors.cep && <p className="text-[10px] text-red-400 font-mono">{errors.cep}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>Rua / Avenida</label>
-                <input value={form.rua} onChange={(e) => set('rua', e.target.value)} className={input} placeholder="Rua das Flores" />
+                <input value={form.rua} onChange={(e) => set('rua', e.target.value)} className={inp} placeholder="Rua das Flores" />
                 {errors.rua && <p className="text-[10px] text-red-400 font-mono">{errors.rua}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>Número</label>
-                  <input value={form.numero} onChange={(e) => set('numero', e.target.value)} className={input} placeholder="123" />
+                  <input value={form.numero} onChange={(e) => set('numero', e.target.value)} className={inp} placeholder="123" />
                   {errors.numero && <p className="text-[10px] text-red-400 font-mono">{errors.numero}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>Complemento</label>
-                  <input value={form.complemento} onChange={(e) => set('complemento', e.target.value)} className={input} placeholder="Apto, bloco…" />
+                  <input value={form.complemento} onChange={(e) => set('complemento', e.target.value)} className={inp} placeholder="Apto, bloco…" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>Bairro</label>
-                <input value={form.bairro} onChange={(e) => set('bairro', e.target.value)} className={input} placeholder="Centro" />
+                <input value={form.bairro} onChange={(e) => set('bairro', e.target.value)} className={inp} placeholder="Centro" />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-1.5">
                   <label className={lbl}>Cidade</label>
-                  <input value={form.cidade} onChange={(e) => set('cidade', e.target.value)} className={input} placeholder="São Paulo" />
+                  <input value={form.cidade} onChange={(e) => set('cidade', e.target.value)} className={inp} placeholder="São Paulo" />
                   {errors.cidade && <p className="text-[10px] text-red-400 font-mono">{errors.cidade}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>Estado</label>
-                  <input value={form.estado} onChange={(e) => set('estado', e.target.value.toUpperCase().slice(0, 2))} className={input} placeholder="SP" maxLength={2} />
+                  <input value={form.estado} onChange={(e) => set('estado', e.target.value.toUpperCase().slice(0, 2))} className={inp} placeholder="SP" maxLength={2} />
                   {errors.estado && <p className="text-[10px] text-red-400 font-mono">{errors.estado}</p>}
                 </div>
               </div>
@@ -470,8 +510,8 @@ export default function Checkout() {
                 className="w-full py-4 bg-coffee-500 hover:bg-coffee-400 disabled:opacity-60 active:scale-[0.98] text-white font-display text-sm tracking-[0.18em] rounded-2xl transition-all flex items-center justify-center gap-3"
               >
                 {saving
-                  ? <><Loader size={15} className="animate-spin" /> GERANDO PIX…</>
-                  : 'GERAR PIX E CONFIRMAR'}
+                  ? <><Loader size={15} className="animate-spin" /> PROCESSANDO…</>
+                  : payMethod === 'pix' ? 'GERAR PIX E CONFIRMAR' : 'PAGAR COM CARTÃO'}
               </button>
 
               <p className="text-center text-[11px] font-mono text-ink-600 uppercase tracking-wider">
