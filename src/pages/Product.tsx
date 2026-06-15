@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ShoppingBag, Check, ChevronDown, ChevronUp, Shirt, Droplets, Ruler } from 'lucide-react'
 import { usePublicProducts } from '../hooks/useProducts'
 import { CategoryBadge } from '../components/ui/Badge'
@@ -39,6 +39,7 @@ export default function Product() {
   const product = id ? products.find((p) => p.id === id) : undefined
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined)
+  const [activeImg, setActiveImg] = useState<string | undefined>(undefined)
   const [added, setAdded] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [quickViewProduct, setQuickViewProduct] = useState<ProductType | null>(null)
@@ -49,9 +50,8 @@ export default function Product() {
   }, [id])
 
   useEffect(() => {
-    if (product?.sizes?.[0]) {
-      setSelectedSize(product.sizes[0])
-    }
+    if (product?.sizes?.[0]) setSelectedSize(product.sizes[0])
+    if (product) setActiveImg(product.image)
   }, [product])
 
   if (productsLoading) {
@@ -115,20 +115,49 @@ export default function Product() {
 
         {/* Main layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Image */}
+          {/* Gallery */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-3xl overflow-hidden bg-cream-200 flex items-center justify-center p-6"
-            style={{ minHeight: '420px' }}
+            className="flex flex-col gap-3"
           >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-contain max-h-[520px]"
-              loading="eager"
-            />
+            {/* Imagem principal */}
+            <div className="rounded-3xl overflow-hidden bg-cream-200 flex items-center justify-center p-6" style={{ minHeight: '420px' }}>
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeImg ?? product.image}
+                  src={activeImg ?? product.image}
+                  alt={product.name}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.25 }}
+                  className="w-full h-full object-contain max-h-[520px]"
+                  loading="eager"
+                />
+              </AnimatePresence>
+            </div>
+
+            {/* Miniaturas */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(img)}
+                    className={cn(
+                      'flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all',
+                      (activeImg ?? product.image) === img
+                        ? 'border-ink-900 opacity-100'
+                        : 'border-transparent opacity-50 hover:opacity-80'
+                    )}
+                  >
+                    <img src={img} alt={`${product.name} foto ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Info */}

@@ -11,6 +11,8 @@ import { RequireAuth } from './components/admin/layout/RequireAuth'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Product from './pages/Product'
+import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
 import Kits from './pages/Kits'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -59,6 +61,8 @@ function AppLayout() {
             <Route path="/" element={<Home />} />
             <Route path="/loja" element={<Shop />} />
             <Route path="/produto/:id" element={<Product />} />
+            <Route path="/carrinho" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/kits" element={<Kits />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/contato" element={<Contact />} />

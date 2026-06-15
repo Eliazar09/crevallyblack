@@ -22,6 +22,7 @@ export interface Product {
   care: string
   model_info: string
   image: string
+  images?: string[]
   price: number
   category: ProductCategory
   featured?: boolean

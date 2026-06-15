@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ShoppingBag, Menu, MessageCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../hooks/useCart'
@@ -12,7 +12,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
-  const { itemCount, openCart } = useCart()
+  const navigate = useNavigate()
+  const { itemCount } = useCart()
   const count = itemCount()
 
   useEffect(() => {
@@ -85,7 +86,7 @@ export function Navbar() {
 
             {/* Cart */}
             <button
-              onClick={openCart}
+              onClick={() => navigate('/carrinho')}
               className="relative flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-500 hover:text-ink-900 transition-colors"
               aria-label="Abrir carrinho"
             >
