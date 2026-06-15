@@ -50,6 +50,7 @@ export default async function handler(req: any, res: any) {
         customer: customerPayload,
         items: itemsPayload,
         qr_codes: [{ amount: { value: totalCents }, expiration_date: expiration }],
+        notification_urls: [`${APP_URL}/api/webhook-pagseguro`],
         shipping: shippingPayload,
       }
 
@@ -86,6 +87,7 @@ export default async function handler(req: any, res: any) {
         ],
         redirect_url: `${APP_URL}/pedido-confirmado`,
         return_url: `${APP_URL}/pedido-confirmado`,
+        notification_urls: [`${APP_URL}/api/webhook-pagseguro`],
         expiration_date: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().replace('Z', '-03:00'),
         shipping: shippingPayload,
       }
