@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
 import { CartDrawer } from './components/cart/CartDrawer'
@@ -18,6 +18,13 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 import Login from './pages/admin/Login'
+import { useEffect } from 'react'
+
+function PedidoConfirmado() {
+  const navigate = useNavigate()
+  useEffect(() => { navigate('/', { replace: true }) }, [navigate])
+  return null
+}
 
 // Páginas admin — carregamento lazy
 const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
@@ -66,6 +73,7 @@ function AppLayout() {
             <Route path="/kits" element={<Kits />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/contato" element={<Contact />} />
+            <Route path="/pedido-confirmado" element={<PedidoConfirmado />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Copy, Check, Loader, CreditCard, QrCode } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Copy, Check, Loader, CreditCard, QrCode, AlertCircle } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
@@ -62,6 +62,8 @@ export default function Checkout() {
   const [pixPayload, setPixPayload] = useState<string | null>(null)
   const [qrImage, setQrImage] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  // true quando o PIX falhou e estamos na tela 'confirmed' sem QR
+  const [pixFailed, setPixFailed] = useState(false)
 
   // Só redireciona se ainda não finalizou (sem orderId)
   if (items.length === 0 && screen === 'form' && !orderId) {
@@ -90,8 +92,11 @@ export default function Checkout() {
           estado: data.uf ?? f.estado,
         }))
       }
-    } catch { /* ignora */ }
-    finally { setCepLoading(false) }
+    } catch (err) {
+      console.warn('[checkout] ViaCEP falhou:', err)
+    } finally {
+      setCepLoading(false)
+    }
   }
 
   function validate() {
@@ -124,7 +129,7 @@ export default function Checkout() {
           subtotal,
           discount: 0,
           total: subtotal,
-          payment_method: 'pix',
+          payment_method: payMethod, // usa a escolha real do usuário
           payment_status: 'pendente',
           notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
         })
@@ -167,6 +172,20 @@ export default function Checkout() {
       setOrderId(sale.id)
       setOrderTotal(subtotal)
 
+      const apiItems = items.map((item) => ({
+        productId: item.productId,
+        name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
+        quantity: item.quantity,
+        unit_price: item.price,
+      }))
+      const apiAddress = {
+        street: form.rua, number: form.numero, complement: form.complemento,
+        neighborhood: form.bairro, city: form.cidade, state: form.estado, cep: form.cep,
+      }
+      const apiCustomer = {
+        name: form.nome.trim(), email: form.email.trim(), cpf: form.cpf, phone: form.telefone,
+      }
+
       // ── PIX: tenta PagSeguro, cai no frontend se falhar ────
       if (payMethod === 'pix') {
         let gotQr = false
@@ -177,30 +196,29 @@ export default function Checkout() {
             body: JSON.stringify({
               orderId: sale.id,
               paymentMethod: 'pix',
-              customer: { name: form.nome.trim(), email: form.email.trim(), cpf: form.cpf, phone: form.telefone },
-              items: items.map((item) => ({
-                name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
-                quantity: item.quantity, unit_price: item.price,
-              })),
+              customer: apiCustomer,
+              items: apiItems,
               total: subtotal,
-              address: {
-                street: form.rua, number: form.numero, complement: form.complemento,
-                neighborhood: form.bairro, city: form.cidade, state: form.estado, cep: form.cep,
-              },
+              address: apiAddress,
             }),
           })
-          if (pgRes.ok) {
-            const pgData = await pgRes.json()
+          const pgData = await pgRes.json()
+          if (!pgRes.ok) {
+            console.error('[checkout] PagSeguro PIX falhou:', pgRes.status, JSON.stringify(pgData))
+          } else {
             const pixText: string | null = pgData.pix_key ?? null
-            const qrImgUrl: string | null = pgData.qr_image ?? null
             if (pixText) {
               setPixPayload(pixText)
-              setQrImage(qrImgUrl ?? pixQrUrl(pixText))
+              setQrImage(pgData.qr_image ?? pixQrUrl(pixText))
               setScreen('pix')
               gotQr = true
+            } else {
+              console.error('[checkout] PagSeguro retornou OK mas sem pix_key:', JSON.stringify(pgData))
             }
           }
-        } catch { /* segue para fallback */ }
+        } catch (err) {
+          console.error('[checkout] Erro de rede ao chamar /api/create-order:', err)
+        }
 
         // Fallback: gera QR no frontend com chave PIX do .env
         if (!gotQr) {
@@ -210,6 +228,8 @@ export default function Checkout() {
             setQrImage(pixQrUrl(payload))
             setScreen('pix')
           } else {
+            console.error('[checkout] PIX indisponível: token PagSeguro inválido e VITE_PIX_KEY não configurado')
+            setPixFailed(true)
             setScreen('confirmed')
           }
         }
@@ -219,7 +239,7 @@ export default function Checkout() {
 
       // ── CARTÃO: redireciona para PagSeguro hospedado ───────
       if (payMethod === 'card') {
-        setScreen('confirmed') // tela de fallback enquanto redireciona
+        setScreen('confirmed')
         clearCart()
         try {
           const pgRes = await fetch('/api/create-order', {
@@ -228,31 +248,29 @@ export default function Checkout() {
             body: JSON.stringify({
               orderId: sale.id,
               paymentMethod: 'card',
-              customer: { name: form.nome.trim(), email: form.email.trim(), cpf: form.cpf, phone: form.telefone },
-              items: items.map((item) => ({
-                name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
-                quantity: item.quantity, unit_price: item.price,
-              })),
+              customer: apiCustomer,
+              items: apiItems,
               total: subtotal,
-              address: {
-                street: form.rua, number: form.numero, complement: form.complemento,
-                neighborhood: form.bairro, city: form.cidade, state: form.estado, cep: form.cep,
-              },
+              address: apiAddress,
             }),
           })
-          if (pgRes.ok) {
-            const pgData = await pgRes.json()
-            if (pgData.redirect_url) {
-              window.location.href = pgData.redirect_url
-              return
-            }
+          const pgData = await pgRes.json()
+          if (!pgRes.ok) {
+            console.error('[checkout] PagSeguro Cartão falhou:', pgRes.status, JSON.stringify(pgData))
+          } else if (pgData.redirect_url) {
+            window.location.href = pgData.redirect_url
+            return
+          } else {
+            console.error('[checkout] PagSeguro Cartão sem redirect_url:', JSON.stringify(pgData))
           }
-        } catch { /* mantém tela confirmed */ }
+        } catch (err) {
+          console.error('[checkout] Erro de rede ao chamar /api/create-order (cartão):', err)
+        }
       }
 
     } catch (err: unknown) {
+      console.error('[checkout] Erro ao salvar pedido:', err)
       setSaveError('Não foi possível registrar o pedido. Tente novamente.')
-      console.error(err)
     } finally {
       setSaving(false)
     }
@@ -265,7 +283,7 @@ export default function Checkout() {
     setTimeout(() => setCopied(false), 2500)
   }
 
-  // ── Tela de sucesso ───────────────────────────────────────
+  // ── Tela pós-checkout ─────────────────────────────────────
   if (screen === 'pix' || screen === 'confirmed') {
     return (
       <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24 flex items-center justify-center px-4">
@@ -280,9 +298,16 @@ export default function Checkout() {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
-              className="w-16 h-16 rounded-full bg-coffee-500/15 border border-coffee-500/25 flex items-center justify-center"
+              className={`w-16 h-16 rounded-full flex items-center justify-center ${
+                pixFailed
+                  ? 'bg-amber-500/15 border border-amber-500/25'
+                  : 'bg-coffee-500/15 border border-coffee-500/25'
+              }`}
             >
-              <CheckCircle2 size={28} className="text-coffee-400" strokeWidth={1.5} />
+              {pixFailed
+                ? <AlertCircle size={28} className="text-amber-400" strokeWidth={1.5} />
+                : <CheckCircle2 size={28} className="text-coffee-400" strokeWidth={1.5} />
+              }
             </motion.div>
 
             <div>
@@ -290,7 +315,10 @@ export default function Checkout() {
               <p className="text-sm text-ink-400 leading-relaxed">
                 {screen === 'pix'
                   ? 'Escaneie o QR code ou copie a chave para pagar via PIX.'
-                  : 'Entraremos em contato pelo WhatsApp para confirmar o pagamento.'}
+                  : pixFailed
+                    ? 'Seu pedido foi salvo. Entre em contato via WhatsApp com o número abaixo para receber o link de pagamento.'
+                    : 'Você será redirecionado para o pagamento. Se não acontecer, entre em contato via WhatsApp.'
+                }
               </p>
             </div>
 
@@ -421,7 +449,7 @@ export default function Checkout() {
               </div>
               {payMethod === 'card' && (
                 <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
-                  Você sera redirecionado para o ambiente seguro do PagSeguro para inserir os dados do cartão.
+                  Você será redirecionado para o ambiente seguro do PagSeguro para inserir os dados do cartão.
                 </p>
               )}
             </div>
