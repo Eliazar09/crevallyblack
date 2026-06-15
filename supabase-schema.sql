@@ -336,10 +336,17 @@ create policy "clients_admin_all"
   with check (auth.role() = 'authenticated');
 
 -- ── sales ─────────────────────────────────────────────────
+-- Admin: acesso total
 create policy "sales_admin_all"
   on sales for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
+
+-- Visitante: só pode criar pedidos (sem ver dados de outros)
+create policy "sales_public_insert"
+  on sales for insert
+  to anon
+  with check (true);
 
 -- ── sale_items ────────────────────────────────────────────
 create policy "sale_items_admin_all"
@@ -347,17 +354,34 @@ create policy "sale_items_admin_all"
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
 
+create policy "sale_items_public_insert"
+  on sale_items for insert
+  to anon
+  with check (true);
+
 -- ── inventory_movements ───────────────────────────────────
 create policy "inv_mov_admin_all"
   on inventory_movements for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
 
+-- Visitante só pode registrar saída (pedido)
+create policy "inv_mov_public_insert"
+  on inventory_movements for insert
+  to anon
+  with check (type = 'saida');
+
 -- ── transactions ──────────────────────────────────────────
 create policy "transactions_admin_all"
   on transactions for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
+
+-- Visitante só pode registrar receita pendente
+create policy "transactions_public_insert"
+  on transactions for insert
+  to anon
+  with check (type = 'receita');
 
 
 -- ============================================================
