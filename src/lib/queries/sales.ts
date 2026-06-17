@@ -1,7 +1,7 @@
 import { supabase } from '../supabase'
 
 export type PaymentMethod = 'pix' | 'cartao_credito' | 'cartao_debito' | 'dinheiro' | 'transferencia' | 'boleto' | 'outro'
-export type PaymentStatus = 'pago' | 'pendente' | 'parcial'
+export type PaymentStatus = 'pago' | 'pendente' | 'parcial' | 'cancelado'
 
 export const methodLabels: Record<PaymentMethod, string> = {
   pix:            'Pix',

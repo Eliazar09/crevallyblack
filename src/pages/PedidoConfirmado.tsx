@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CheckCircle2, Clock, XCircle, ArrowRight, MessageCircle, ShoppingBag } from 'lucide-react'
 import { buildDirectWhatsAppLink } from '../lib/whatsapp'
+import { useCart } from '../hooks/useCart'
 
 // Mercado Pago adiciona esses parâmetros na URL de retorno:
 // ?collection_status=approved&external_reference=<orderId>&payment_type=pix&...
@@ -9,6 +11,7 @@ type MPStatus = 'approved' | 'pending' | 'in_process' | 'rejected' | 'cancelled'
 
 export default function PedidoConfirmado() {
   const [params] = useSearchParams()
+  const { clearCart } = useCart()
 
   const status    = (params.get('collection_status') ?? params.get('status')) as MPStatus
   const orderId   = params.get('external_reference') ?? params.get('id') ?? ''
@@ -16,6 +19,11 @@ export default function PedidoConfirmado() {
   const paymentId = params.get('collection_id') ?? params.get('payment_id') ?? ''
 
   const shortId   = orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''
+
+  // Só limpa o carrinho quando o pagamento for confirmado como aprovado
+  useEffect(() => {
+    if (status === 'approved') clearCart()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Approved ────────────────────────────────────────────────────
   if (status === 'approved') {

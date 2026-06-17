@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader, CreditCard, QrCode, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader, CreditCard, QrCode } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
 
-type Screen = 'form' | 'redirecting' | 'fallback'
+type Screen = 'form' | 'redirecting'
 type PayMethod = 'pix' | 'card'
 
 type FormData = {
@@ -53,9 +53,6 @@ export default function Checkout() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
-  const [orderTotal, setOrderTotal] = useState(0)
-  const [pgUrl] = useState<string | null>(null)
-
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
     return null
@@ -163,7 +160,6 @@ export default function Checkout() {
       })
 
       setOrderId(saleId)
-      setOrderTotal(subtotal)
 
       // 2. Cria preference no Mercado Pago (Checkout Pro)
       const pgRes = await fetch('/api/create-order', {
@@ -204,7 +200,6 @@ export default function Checkout() {
       }
 
       if (pgData.redirect_url) {
-        clearCart()
         setScreen('redirecting')
         setTimeout(() => { window.location.href = pgData.redirect_url }, 800)
       } else {
@@ -221,7 +216,7 @@ export default function Checkout() {
     }
   }
 
-  // ── Redirecionando para o PagBank ─────────────────────────
+  // ── Redirecionando para o Mercado Pago ───────────────────
   if (screen === 'redirecting') {
     return (
       <div className="min-h-[100dvh] bg-[#0a0a0c] flex items-center justify-center px-4">
@@ -234,62 +229,6 @@ export default function Checkout() {
           <div>
             <p className="font-display text-2xl text-cream-50 tracking-wider mb-2">REDIRECIONANDO</p>
             <p className="text-sm text-ink-400">Levando você para o pagamento seguro via Mercado Pago…</p>
-          </div>
-        </motion.div>
-      </div>
-    )
-  }
-
-  // ── Fallback: pedido salvo mas sem link de pagamento ──────
-  if (screen === 'fallback') {
-    return (
-      <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md"
-        >
-          <div className="flex flex-col items-center text-center gap-6">
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
-              className="w-16 h-16 rounded-full bg-coffee-500/15 border border-coffee-500/25 flex items-center justify-center"
-            >
-              <CheckCircle2 size={28} className="text-coffee-400" strokeWidth={1.5} />
-            </motion.div>
-
-            <div>
-              <p className="font-display text-3xl text-cream-50 tracking-widest mb-2">PEDIDO REGISTRADO</p>
-              <p className="text-sm text-ink-400 leading-relaxed">
-                Seu pedido foi salvo com sucesso. Entraremos em contato pelo WhatsApp com o link de pagamento.
-              </p>
-            </div>
-
-            <div className="bg-white/4 border border-white/10 rounded-2xl px-8 py-4">
-              <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-ink-600 mb-1">Número do pedido</p>
-              <p className="font-mono text-3xl font-bold text-coffee-400 tracking-widest">
-                #{orderId.slice(-6).toUpperCase()}
-              </p>
-              <p className="text-xs text-ink-600 mt-1.5 font-mono">{formatPrice(orderTotal)}</p>
-            </div>
-
-            {pgUrl && (
-              <a
-                href={pgUrl}
-                className="inline-flex items-center gap-2 py-4 px-8 bg-coffee-500 hover:bg-coffee-400 text-white font-display text-sm tracking-[0.15em] rounded-2xl transition-all"
-              >
-                <ExternalLink size={16} />
-                ABRIR LINK DE PAGAMENTO
-              </a>
-            )}
-
-            <button
-              onClick={() => navigate('/')}
-              className="text-xs font-mono text-ink-500 hover:text-ink-300 transition-colors uppercase tracking-widest"
-            >
-              Voltar ao início
-            </button>
           </div>
         </motion.div>
       </div>
