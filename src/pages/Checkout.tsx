@@ -43,7 +43,7 @@ const inp = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-
 const lbl = 'block text-[10px] font-mono uppercase tracking-[0.2em] text-ink-500 mb-1.5'
 
 export default function Checkout() {
-  const { items, total, clearCart } = useCart()
+  const { items, total } = useCart()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(empty)
   const [payMethod, setPayMethod] = useState<PayMethod>('pix')
