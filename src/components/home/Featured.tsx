@@ -33,7 +33,7 @@ export function Featured() {
       price: product.price,
       quantity: 1,
       category: product.category,
-      collection_name: product.collection_name,
+      collection_name: product.collection_name ?? undefined,
     })
   }
 

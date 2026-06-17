@@ -33,7 +33,7 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
       quantity,
       selectedOption: selectedSize,
       category: product!.category,
-      collection_name: product!.collection_name,
+      collection_name: product!.collection_name ?? undefined,
     })
     setAdded(true)
     setTimeout(() => {

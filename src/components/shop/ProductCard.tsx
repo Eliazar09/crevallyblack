@@ -58,7 +58,7 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
       price: product.price,
       quantity: 1,
       category: product.category,
-      collection_name: product.collection_name,
+      collection_name: product.collection_name ?? undefined,
     })
   }
 
