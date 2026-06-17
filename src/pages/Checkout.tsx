@@ -187,11 +187,11 @@ export default function Checkout() {
       })
 
       let pgData: any = {}
+      const rawText = await pgRes.text().catch(() => '')
       try {
-        pgData = await pgRes.json()
+        pgData = JSON.parse(rawText)
       } catch {
-        const text = await pgRes.text().catch(() => '')
-        setSaveError(`Erro ${pgRes.status}: resposta inesperada do servidor. ${text.slice(0, 120)}`)
+        setSaveError(`[${pgRes.status}] Resposta do servidor: ${rawText.slice(0, 300) || '(vazia)'}`)
         setSaving(false)
         return
       }
