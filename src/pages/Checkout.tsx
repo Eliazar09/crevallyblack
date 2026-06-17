@@ -123,7 +123,7 @@ export default function Checkout() {
           subtotal,
           discount: 0,
           total: subtotal,
-          payment_method: payMethod,
+          payment_method: 'outro', // método real definido pelo MP no webhook
           payment_status: 'pendente',
           notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
         })

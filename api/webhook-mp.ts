@@ -40,14 +40,24 @@ export default async function handler(req: any, res: any) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
 
+    // Mapeia payment_type do MP para o enum do Supabase
+    const methodMap: Record<string, string> = {
+      pix:          'pix',
+      credit_card:  'cartao_credito',
+      debit_card:   'cartao_debito',
+      bank_transfer:'transferencia',
+      ticket:       'boleto',
+    }
+    const paymentMethod = methodMap[payment.payment_type_id] ?? 'outro'
+
     if (payment.status === 'approved') {
       const { error } = await supabase
         .from('sales')
-        .update({ payment_status: 'pago' })
+        .update({ payment_status: 'pago', payment_method: paymentMethod })
         .eq('id', orderId)
 
       if (error) console.error('[webhook-mp] Supabase error:', error.message)
-      else console.log(`[webhook-mp] Pedido ${orderId} marcado como PAGO`)
+      else console.log(`[webhook-mp] Pedido ${orderId} PAGO via ${paymentMethod}`)
     }
 
     if (payment.status === 'rejected' || payment.status === 'cancelled') {
