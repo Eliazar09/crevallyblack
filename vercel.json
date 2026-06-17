@@ -1,7 +1,7 @@
 {
   "functions": {
-    "api/create-order.ts": { "maxDuration": 30, "runtime": "nodejs20.x" },
-    "api/webhook-mp.ts":   { "maxDuration": 30, "runtime": "nodejs20.x" }
+    "api/create-order.ts": { "maxDuration": 30 },
+    "api/webhook-mp.ts":   { "maxDuration": 30 }
   },
   "headers": [
     {
