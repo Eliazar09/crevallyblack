@@ -1,14 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Loader, CreditCard, QrCode } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader, CreditCard, QrCode, Lock, ShieldCheck, RefreshCw, Truck } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
 
 type Screen = 'form' | 'redirecting'
-type PayMethod = 'pix' | 'card'
-
 type FormData = {
   nome: string; cpf: string; email: string; telefone: string
   cep: string; rua: string; numero: string; complemento: string
@@ -46,7 +44,6 @@ export default function Checkout() {
   const { items, total } = useCart()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(empty)
-  const [payMethod, setPayMethod] = useState<PayMethod>('pix')
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
   const [cepLoading, setCepLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -262,38 +259,49 @@ export default function Checkout() {
             transition={{ delay: 0.1 }}
             className="space-y-6"
           >
-            {/* Seletor de pagamento */}
-            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-4">
+            {/* Pagamento seguro */}
+            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-5">
               <div>
                 <p className="font-display text-lg text-cream-100 tracking-wider">PAGAMENTO</p>
-                <p className="text-xs text-ink-500 mt-0.5">Escolha como deseja pagar</p>
+                <p className="text-xs text-ink-500 mt-0.5">Ambiente 100% seguro via Mercado Pago</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                {([
-                  { v: 'pix' as PayMethod,  icon: QrCode,     label: 'PIX',    sub: 'Instantâneo' },
-                  { v: 'card' as PayMethod, icon: CreditCard, label: 'Cartão', sub: 'Créd. / Déb.' },
-                ] as const).map(({ v, icon: Icon, label, sub }) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => setPayMethod(v)}
-                    className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
-                      payMethod === v
-                        ? 'border-coffee-500/60 bg-coffee-500/10 text-cream-100'
-                        : 'border-white/10 bg-white/3 text-ink-500 hover:border-white/20'
-                    }`}
-                  >
-                    <Icon size={20} strokeWidth={1.5} className={payMethod === v ? 'text-coffee-400' : ''} />
-                    <div className="text-left">
-                      <p className="text-sm font-semibold leading-tight">{label}</p>
-                      <p className="text-[10px] font-mono opacity-60">{sub}</p>
-                    </div>
-                  </button>
+
+              {/* Métodos aceitos */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { icon: QrCode,      label: 'PIX Instantâneo' },
+                  { icon: CreditCard,  label: 'Cartão de Crédito' },
+                  { icon: CreditCard,  label: 'Cartão de Débito' },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-ink-400 text-xs">
+                    <Icon size={11} strokeWidth={1.5} />
+                    {label}
+                  </div>
                 ))}
               </div>
-              <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
-                Você será redirecionado para o Mercado Pago, onde pode escolher pagar com PIX (QR Code instantâneo) ou cartão de crédito/débito.
-              </p>
+
+              {/* Selos de confiança */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: Lock,        text: 'Dados criptografados' },
+                  { icon: ShieldCheck, text: 'Compra garantida' },
+                  { icon: RefreshCw,   text: 'Troca em até 7 dias' },
+                  { icon: Truck,       text: 'Entrega para todo Brasil' },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-coffee-500/10 flex items-center justify-center flex-shrink-0">
+                      <Icon size={13} className="text-coffee-400" strokeWidth={1.5} />
+                    </div>
+                    <p className="text-[11px] text-ink-400 leading-tight">{text}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-white/8 pt-4">
+                <p className="text-[11px] text-ink-500 leading-relaxed">
+                  Ao clicar em <span className="text-cream-400 font-medium">IR PARA O PAGAMENTO</span>, você será redirecionado para o ambiente seguro do Mercado Pago para concluir sua compra. Seus dados pessoais são protegidos e nunca compartilhados.
+                </p>
+              </div>
             </div>
 
             {/* Dados pessoais */}

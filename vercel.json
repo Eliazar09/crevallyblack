@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "api/create-order.ts": { "maxDuration": 30 },
+    "api/webhook-mp.ts":   { "maxDuration": 30 }
+  },
   "headers": [
     {
       "source": "/(.*)",
