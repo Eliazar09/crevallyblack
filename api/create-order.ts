@@ -1,11 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const APP_URL = process.env.VITE_APP_URL ?? 'https://crevallyblack.vercel.app'
-
-function maskEmail(email: string) {
-  const [user, domain] = (email ?? '').split('@')
-  return `${(user ?? '').slice(0, 2)}***@${domain ?? ''}`
-}
+const APP_URL = process.env.APP_URL ?? process.env.VITE_APP_URL ?? 'https://crevallyblack.vercel.app'
 
 export default async function handler(req: any, res: any) {
   const route = `${req.method} /api/create-order`
@@ -15,128 +10,105 @@ export default async function handler(req: any, res: any) {
     return
   }
 
-  const token = process.env.PAGSEGURO_TOKEN
+  const token = process.env.MP_ACCESS_TOKEN
   if (!token) {
-    console.error(`[${route}] PAGSEGURO_TOKEN não configurado`)
+    console.error(`[${route}] MP_ACCESS_TOKEN não configurado`)
     res.status(500).json({ error: 'Token não configurado' })
     return
   }
 
-  const { orderId, customer, items, address, paymentMethod = 'pix' } = req.body
+  const { orderId, items } = req.body
+  console.log(`[${route}] orderId=${orderId} items=${items?.length}`)
 
-  console.log(`[${route}] orderId=${orderId} method=${paymentMethod} customer=${maskEmail(customer?.email)}`)
-
-  // ── Recalcula total no servidor — nunca confia no cliente ──
-  let totalCents = 0
+  // ── Preços vêm do banco — nunca do cliente ──────────────────────
+  let itemsPayload: any[] = []
   try {
     const admin = createClient(
       process.env.VITE_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
-    const productIds = (items as any[]).map((i) => i.productId).filter(Boolean)
-    if (productIds.length > 0) {
-      const { data: products, error } = await admin
-        .from('products')
-        .select('id, price')
-        .in('id', productIds)
-      if (error) throw error
-      const priceMap = new Map((products ?? []).map((p: any) => [p.id, p.price]))
-      totalCents = Math.round(
-        (items as any[]).reduce((sum, item) => {
-          const price = priceMap.get(item.productId) ?? item.unit_price
-          return sum + price * item.quantity
-        }, 0) * 100
-      )
-    }
+    const productIds = (items as any[]).map((i: any) => i.productId).filter(Boolean)
+    const { data: products, error } = await admin
+      .from('products')
+      .select('id, price, name')
+      .in('id', productIds)
+
+    if (error) throw error
+
+    const map = new Map((products ?? []).map((p: any) => [p.id, p]))
+
+    itemsPayload = (items as any[]).map((item: any) => {
+      const db = map.get(item.productId)
+      return {
+        id: String(item.productId),
+        title: String(db?.name ?? item.name).slice(0, 256),
+        quantity: Number(item.quantity),
+        unit_price: Number(db?.price ?? item.unit_price), // MP usa reais, não centavos
+        currency_id: 'BRL',
+      }
+    })
   } catch (err: any) {
     console.warn(`[${route}] Preço do DB falhou, usando cliente:`, err?.message)
-  }
-  if (totalCents === 0) {
-    totalCents = Math.round(
-      (items as any[]).reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0) * 100
-    )
-  }
-
-  console.log(`[${route}] totalCents=${totalCents}`)
-
-  const phoneDigits = (customer.phone ?? '').replace(/\D/g, '')
-  const customerPayload = {
-    name: customer.name,
-    email: customer.email,
-    tax_id: (customer.cpf ?? '').replace(/\D/g, ''),
-    phones: [{ country: '55', area: phoneDigits.slice(0, 2), number: phoneDigits.slice(2), type: 'MOBILE' }],
+    itemsPayload = (items as any[]).map((item: any) => ({
+      id: String(item.productId),
+      title: String(item.name).slice(0, 256),
+      quantity: Number(item.quantity),
+      unit_price: Number(item.unit_price),
+      currency_id: 'BRL',
+    }))
   }
 
-  const itemsPayload = (items as any[]).map((item, i) => ({
-    reference_id: `item_${i}`,
-    name: String(item.name).slice(0, 100),
-    quantity: item.quantity,
-    unit_amount: Math.round((item.unit_price ?? 0) * 100),
-  }))
+  const total = itemsPayload.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
+  console.log(`[${route}] total=R$${total.toFixed(2)}`)
 
-  const shippingPayload: any = {
-    address: {
-      street: address.street,
-      number: address.number,
-      locality: address.neighborhood || 'Centro',
-      city: address.city,
-      region_code: address.state.toUpperCase().slice(0, 2),
-      country: 'BRA',
-      postal_code: (address.cep ?? '').replace(/\D/g, ''),
-    },
-  }
-  if (address.complement) shippingPayload.address.complement = address.complement
-
-  // ── Checkout hospedado PagBank para PIX e Cartão ──────────
-  // O mesmo endpoint /checkouts serve os dois — PagBank monta a tela
-  const paymentMethods =
-    paymentMethod === 'pix'
-      ? [{ type: 'PIX' }]
-      : [{ type: 'CREDIT_CARD' }, { type: 'DEBIT_CARD' }, { type: 'PIX' }]
-
-  const payload = {
-    reference_id: orderId,
-    customer: customerPayload,
+  const preference = {
     items: itemsPayload,
-    payment_methods: paymentMethods,
-    redirect_url: `${APP_URL}/pedido-confirmado`,
-    return_url: `${APP_URL}/pedido-confirmado`,
-    notification_urls: [`${APP_URL}/api/webhook-pagseguro`],
-    expiration_date: new Date(Date.now() + 3 * 60 * 60 * 1000)
-      .toISOString()
-      .replace('Z', '-03:00'),
-    shipping: shippingPayload,
+    external_reference: orderId,
+    back_urls: {
+      success: `${APP_URL}/pedido-confirmado?id=${orderId}`,
+      failure: `${APP_URL}/pedido-confirmado?id=${orderId}`,
+      pending: `${APP_URL}/pedido-confirmado?id=${orderId}`,
+    },
+    auto_return: 'approved',
+    notification_url: `${APP_URL}/api/webhook-mp`,
+    expires: true,
+    expiration_date_to: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
   }
 
   try {
-    console.log(`[${route}] POST https://api.pagseguro.com/checkouts`)
+    console.log(`[${route}] POST https://api.mercadopago.com/checkout/preferences`)
 
-    const response = await fetch('https://api.pagseguro.com/checkouts', {
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(preference),
     })
 
     const data = await response.json()
-    console.log(`[${route}] status=${response.status} body=${JSON.stringify(data)}`)
+    console.log(`[${route}] status=${response.status} id=${data.id}`)
 
     if (!response.ok) {
       res.status(response.status).json({ error: data })
       return
     }
 
-    const redirectUrl = data.links?.find((l: any) => l.rel === 'PAY')?.href ?? null
+    // Token TEST-... = sandbox → usa sandbox_init_point; produção → init_point
+    const isSandbox = String(token).startsWith('TEST-')
+    const redirectUrl = isSandbox ? data.sandbox_init_point : data.init_point
+
     if (!redirectUrl) {
-      console.error(`[${route}] Checkout criado mas sem link PAY:`, JSON.stringify(data))
+      console.error(`[${route}] Preference sem init_point:`, JSON.stringify(data))
+      res.status(502).json({ error: 'Preference sem URL de pagamento', raw: data })
+      return
     }
 
-    res.status(200).json({ redirect_url: redirectUrl, pagseguro_id: data.id })
+    res.status(200).json({ preference_id: data.id, redirect_url: redirectUrl })
 
   } catch (err: any) {
-    console.error(`[${route}] Erro de fetch:`, err?.message)
-    res.status(500).json({ error: 'Erro de conexão com PagSeguro', detail: err?.message })
+    console.error(`[${route}] Erro de conexão:`, err?.message)
+    res.status(500).json({ error: 'Erro de conexão com Mercado Pago', detail: err?.message })
   }
 }

@@ -54,7 +54,7 @@ export default function Checkout() {
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
   const [orderTotal, setOrderTotal] = useState(0)
-  const [pgUrl, setPgUrl] = useState<string | null>(null)
+  const [pgUrl] = useState<string | null>(null)
 
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
@@ -112,9 +112,13 @@ export default function Checkout() {
       const subtotal = total()
 
       // 1. Salva o pedido no Supabase
-      const { data: sale, error: saleErr } = await supabase
+      // Gera UUID no cliente — evita precisar de SELECT policy no RLS
+      const saleId = crypto.randomUUID()
+
+      const { error: saleErr } = await supabase
         .from('sales')
         .insert({
+          id: saleId,
           client_name: form.nome.trim(),
           subtotal,
           discount: 0,
@@ -123,14 +127,12 @@ export default function Checkout() {
           payment_status: 'pendente',
           notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
         })
-        .select('id')
-        .single()
 
       if (saleErr) throw new Error(`[sales] ${saleErr.message} (code: ${saleErr.code})`)
 
-      await supabase.from('sale_items').insert(
+      const { error: itemsErr } = await supabase.from('sale_items').insert(
         items.map((item) => ({
-          sale_id: sale.id,
+          sale_id: saleId,
           product_id: item.productId,
           product_name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
           quantity: item.quantity,
@@ -138,68 +140,58 @@ export default function Checkout() {
           subtotal: item.price * item.quantity,
         }))
       )
+      if (itemsErr) console.error('[checkout] sale_items error:', itemsErr.message)
 
-      await supabase.from('inventory_movements').insert(
+      const { error: invErr } = await supabase.from('inventory_movements').insert(
         items.map((item) => ({
           product_id: item.productId,
           type: 'saida',
           quantity: -Math.abs(item.quantity),
           reason: 'Pedido online',
-          related_sale_id: sale.id,
+          related_sale_id: saleId,
         }))
       )
+      if (invErr) console.error('[checkout] inventory_movements error:', invErr.message)
 
       void supabase.from('transactions').insert({
         type: 'receita',
         category: 'Venda Online',
         amount: subtotal,
-        description: `Pedido #${sale.id.slice(-6).toUpperCase()} — ${form.nome.trim()}`,
-        related_sale_id: sale.id,
+        description: `Pedido #${saleId.slice(-6).toUpperCase()} — ${form.nome.trim()}`,
+        related_sale_id: saleId,
         date: new Date().toISOString().slice(0, 10),
       })
 
-      setOrderId(sale.id)
+      setOrderId(saleId)
       setOrderTotal(subtotal)
 
-      // 2. Cria checkout hospedado no PagBank
+      // 2. Cria preference no Mercado Pago (Checkout Pro)
       const pgRes = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId: sale.id,
-          paymentMethod: payMethod,
-          customer: {
-            name: form.nome.trim(),
-            email: form.email.trim(),
-            cpf: form.cpf,
-            phone: form.telefone,
-          },
+          orderId: saleId,
           items: items.map((item) => ({
             productId: item.productId,
             name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
             quantity: item.quantity,
             unit_price: item.price,
           })),
-          total: subtotal,
-          address: {
-            street: form.rua,
-            number: form.numero,
-            complement: form.complemento,
-            neighborhood: form.bairro,
-            city: form.cidade,
-            state: form.estado,
-            cep: form.cep,
-          },
         }),
       })
 
-      const pgData = await pgRes.json()
+      // Parse seguro — em dev local a rota não existe e retorna HTML 404
+      let pgData: any = {}
+      try {
+        pgData = await pgRes.json()
+      } catch {
+        const text = await pgRes.text().catch(() => '')
+        console.error('[checkout] MP resposta não-JSON:', pgRes.status, text.slice(0, 200))
+      }
 
       if (!pgRes.ok) {
-        console.error('[checkout] PagSeguro error:', pgRes.status, JSON.stringify(pgData))
-        // Pedido salvo mas sem link de pagamento — mostra fallback
+        console.error('[checkout] MP error:', pgRes.status, JSON.stringify(pgData))
         clearCart()
-        setPgUrl(null)
         setScreen('fallback')
         return
       }
@@ -207,10 +199,9 @@ export default function Checkout() {
       if (pgData.redirect_url) {
         clearCart()
         setScreen('redirecting')
-        // Pequena pausa para o usuário ver a transição
         setTimeout(() => { window.location.href = pgData.redirect_url }, 800)
       } else {
-        console.error('[checkout] PagBank sem redirect_url:', JSON.stringify(pgData))
+        console.error('[checkout] MP sem redirect_url:', JSON.stringify(pgData))
         clearCart()
         setScreen('fallback')
       }
@@ -236,7 +227,7 @@ export default function Checkout() {
           <div className="w-16 h-16 rounded-full border-2 border-coffee-500/50 border-t-coffee-500 animate-spin" />
           <div>
             <p className="font-display text-2xl text-cream-50 tracking-wider mb-2">REDIRECIONANDO</p>
-            <p className="text-sm text-ink-400">Levando você para o pagamento seguro via PagBank…</p>
+            <p className="text-sm text-ink-400">Levando você para o pagamento seguro via Mercado Pago…</p>
           </div>
         </motion.div>
       </div>
@@ -357,8 +348,8 @@ export default function Checkout() {
               </div>
               <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
                 {payMethod === 'pix'
-                  ? 'Você será redirecionado para a página de pagamento do PagBank onde o QR PIX será exibido.'
-                  : 'Você será redirecionado para o ambiente seguro do PagBank para inserir os dados do cartão.'}
+                  ? 'Você será redirecionado para a página do Mercado Pago onde o QR PIX será exibido.'
+                  : 'Você será redirecionado para o ambiente seguro do Mercado Pago para inserir os dados do cartão.'}
               </p>
             </div>
 
@@ -514,7 +505,7 @@ export default function Checkout() {
               </button>
 
               <p className="text-center text-[11px] font-mono text-ink-600 uppercase tracking-wider">
-                Pagamento via PagBank — 100% seguro
+                Pagamento via Mercado Pago — 100% seguro
               </p>
             </div>
           </motion.div>

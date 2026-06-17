@@ -9,6 +9,8 @@ export interface CartItem {
   price: number
   quantity: number
   selectedOption?: string
+  category?: string
+  collection_name?: string
 }
 
 interface CartStore {

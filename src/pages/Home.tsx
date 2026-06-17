@@ -8,6 +8,7 @@ import { Testimonials } from '../components/home/Testimonials'
 import { InstagramGrid } from '../components/home/InstagramGrid'
 import { FAQ } from '../components/home/FAQ'
 import { CTASection } from '../components/home/CTASection'
+import { HomeCollections } from '../components/home/HomeCollections'
 
 const CarouselSection = lazy(() => import('../components/home/CarouselSection'))
 
@@ -24,6 +25,7 @@ export default function Home() {
       </Suspense>
       <Categories />
       <Featured />
+      <HomeCollections />
       <HowItWorks />
       <Testimonials />
       <InstagramGrid />

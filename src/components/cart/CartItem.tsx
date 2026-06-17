@@ -1,7 +1,17 @@
-import { Trash2 } from 'lucide-react'
+import { Trash2, Tag } from 'lucide-react'
 import type { CartItem as CartItemType } from '../../hooks/useCart'
 import { useCart } from '../../hooks/useCart'
 import { formatPrice } from '../../lib/currency'
+
+const categoryLabels: Record<string, string> = {
+  camisetas: 'Camiseta',
+  moletons: 'Moletom',
+  calcas: 'Calça',
+  shorts: 'Shorts',
+  bones: 'Boné',
+  conjuntos: 'Conjunto',
+  acessorios: 'Acessório',
+}
 
 interface CartItemProps {
   item: CartItemType
@@ -9,6 +19,7 @@ interface CartItemProps {
 
 export function CartItem({ item }: CartItemProps) {
   const { removeItem, updateQuantity } = useCart()
+  const catLabel = item.category ? categoryLabels[item.category] ?? item.category : null
 
   return (
     <div className="flex items-start gap-3 p-4">
@@ -17,12 +28,33 @@ export function CartItem({ item }: CartItemProps) {
       </div>
 
       <div className="flex-1 min-w-0">
+        {/* Badges */}
+        {(catLabel || item.collection_name) && (
+          <div className="flex flex-wrap items-center gap-1 mb-1">
+            {catLabel && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-coffee-400/15 text-coffee-300 text-[9px] font-mono uppercase tracking-wider">
+                {catLabel}
+              </span>
+            )}
+            {item.collection_name && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/8 text-ink-400 text-[9px] font-mono uppercase tracking-wider">
+                <Tag size={7} strokeWidth={2} />
+                {item.collection_name}
+              </span>
+            )}
+          </div>
+        )}
+
         <p className="text-sm font-medium text-cream-100 line-clamp-2 leading-snug">
           {item.name}
         </p>
+
         {item.selectedOption && (
-          <p className="text-xs text-ink-500 mt-0.5">{item.selectedOption}</p>
+          <p className="text-[10px] font-mono text-ink-500 mt-0.5 uppercase tracking-widest">
+            Tam. {item.selectedOption}
+          </p>
         )}
+
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-2 border border-white/10 rounded-full px-1 py-0.5">
             <button
@@ -41,9 +73,16 @@ export function CartItem({ item }: CartItemProps) {
               +
             </button>
           </div>
-          <span className="font-mono text-sm font-medium text-coffee-400 tabular-nums">
-            {formatPrice(item.price * item.quantity)}
-          </span>
+          <div className="text-right">
+            <span className="font-mono text-sm font-medium text-coffee-400 tabular-nums block">
+              {formatPrice(item.price * item.quantity)}
+            </span>
+            {item.quantity > 1 && (
+              <span className="font-mono text-[9px] text-ink-600 tabular-nums">
+                {formatPrice(item.price)} / un
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

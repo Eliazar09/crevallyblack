@@ -57,6 +57,8 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
       image: product.image,
       price: product.price,
       quantity: 1,
+      category: product.category,
+      collection_name: product.collection_name,
     })
   }
 
@@ -87,11 +89,16 @@ export function ProductCard({ product, dark = false, onQuickView }: ProductCardP
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
           </Link>
 
-          {/* Category badge */}
-          <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-ink-900 text-[11px] font-medium px-3 py-1 rounded-full shadow-sm">
+          {/* Badges row — category left, collection right */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1 items-start">
+            <span className="inline-flex items-center bg-white/95 backdrop-blur-sm text-ink-900 text-[10px] font-medium px-2.5 py-0.5 rounded-full shadow-sm">
               {categoryLabels[product.category] ?? product.category}
             </span>
+            {product.collection_name && (
+              <span className="inline-flex items-center bg-coffee-500/90 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-0.5 rounded-full shadow-sm">
+                {product.collection_name}
+              </span>
+            )}
           </div>
 
           {/* Quick view */}

@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense } from 'react'
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
 import { CartDrawer } from './components/cart/CartDrawer'
@@ -16,19 +16,16 @@ import Checkout from './pages/Checkout'
 import Kits from './pages/Kits'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import Colecao from './pages/Colecao'
+import PedidoConfirmado from './pages/PedidoConfirmado'
 import NotFound from './pages/NotFound'
 import Login from './pages/admin/Login'
-
-function PedidoConfirmado() {
-  const navigate = useNavigate()
-  useEffect(() => { navigate('/', { replace: true }) }, [navigate])
-  return null
-}
 
 // Páginas admin — carregamento lazy
 const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
 const Produtos     = lazy(() => import('./pages/admin/Productos'))
 const ProdutoForm  = lazy(() => import('./pages/admin/ProductoForm'))
+const Colecoes     = lazy(() => import('./pages/admin/Colecoes'))
 const Vendas       = lazy(() => import('./pages/admin/Ventas'))
 const VendaNova    = lazy(() => import('./pages/admin/VentaNueva'))
 const Clientes     = lazy(() => import('./pages/admin/Clientes'))
@@ -67,6 +64,7 @@ function AppLayout() {
             <Route path="/" element={<Home />} />
             <Route path="/loja" element={<Shop />} />
             <Route path="/produto/:id" element={<Product />} />
+            <Route path="/colecao/:slug" element={<Colecao />} />
             <Route path="/carrinho" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/kits" element={<Kits />} />
@@ -110,6 +108,9 @@ export default function App() {
             } />
             <Route path="/admin/produtos/:id" element={
               <Suspense fallback={<AdminSuspense />}><ProdutoForm /></Suspense>
+            } />
+            <Route path="/admin/colecoes" element={
+              <Suspense fallback={<AdminSuspense />}><Colecoes /></Suspense>
             } />
             <Route path="/admin/vendas" element={
               <Suspense fallback={<AdminSuspense />}><Vendas /></Suspense>

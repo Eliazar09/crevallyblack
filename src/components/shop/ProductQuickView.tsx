@@ -32,6 +32,8 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
       price: product!.price,
       quantity,
       selectedOption: selectedSize,
+      category: product!.category,
+      collection_name: product!.collection_name,
     })
     setAdded(true)
     setTimeout(() => {

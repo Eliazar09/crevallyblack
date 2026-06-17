@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Plus, Search, Package, Pencil, Trash2 } from 'lucide-react'
 import { getProducts, deleteProduct, type DbProduct } from '../../lib/queries/products'
+import { getActiveCollections, type DbCollection } from '../../lib/queries/collections'
 import { formatPrice } from '../../lib/currency'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { ConfirmDialog } from '../../components/admin/ui/ConfirmDialog'
@@ -29,19 +30,23 @@ export default function Produtos() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string>('all')
+  const [collectionId, setCollectionId] = useState<string>('all')
+  const [collections, setCollections] = useState<DbCollection[]>([])
   const [toDelete, setToDelete] = useState<DbProduct | null>(null)
   const [deleting, setDeleting] = useState(false)
   const { push } = useToast()
 
+  useEffect(() => { getActiveCollections().then(setCollections).catch(() => {}) }, [])
+
   async function load() {
     setLoading(true)
     try {
-      const data = await getProducts({ category: category as any, search })
+      const data = await getProducts({ category: category as any, search, collection_id: collectionId as any })
       setProducts(data)
     } finally { setLoading(false) }
   }
 
-  useEffect(() => { load() }, [category, search])
+  useEffect(() => { load() }, [category, search, collectionId])
 
   async function handleDelete() {
     if (!toDelete) return
@@ -69,24 +74,47 @@ export default function Produtos() {
         </Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar produto…"
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-coffee-500/40 transition-colors" />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar produto…"
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-coffee-500/40 transition-colors" />
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {categories.map((c) => (
+              <button key={c} onClick={() => setCategory(c)}
+                className={cn('px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                  category === c
+                    ? 'bg-ink-900 text-white border-ink-900'
+                    : 'bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:border-gray-300')}>
+                {catLabel[c]}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {categories.map((c) => (
-            <button key={c} onClick={() => setCategory(c)}
+        {collections.length > 0 && (
+          <div className="flex gap-1.5 flex-wrap items-center">
+            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mr-1">Coleção:</span>
+            <button onClick={() => setCollectionId('all')}
               className={cn('px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
-                category === c
-                  ? 'bg-ink-900 text-white border-ink-900'
+                collectionId === 'all'
+                  ? 'bg-coffee-600 text-white border-coffee-600'
                   : 'bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:border-gray-300')}>
-              {catLabel[c]}
+              Todas
             </button>
-          ))}
-        </div>
+            {collections.map((col) => (
+              <button key={col.id} onClick={() => setCollectionId(col.id)}
+                className={cn('px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                  collectionId === col.id
+                    ? 'bg-coffee-600 text-white border-coffee-600'
+                    : 'bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:border-gray-300')}>
+                {col.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -111,7 +139,10 @@ export default function Produtos() {
                 <div className="p-3 flex flex-col flex-1 gap-2">
                   <div>
                     <p className="text-gray-900 font-semibold text-sm leading-tight line-clamp-2">{p.name}</p>
-                    <p className="text-[11px] text-gray-400 capitalize mt-0.5">{catLabel[p.category] ?? p.category}</p>
+                    <p className="text-[11px] text-gray-400 capitalize mt-0.5">
+                      {catLabel[p.category] ?? p.category}
+                      {p.collection_name && <span className="ml-1 text-coffee-600">· {p.collection_name}</span>}
+                    </p>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-mono font-bold text-gray-900 text-sm">{formatPrice(p.price)}</span>
@@ -155,7 +186,10 @@ export default function Produtos() {
                         <p className="text-gray-900 font-medium truncate max-w-[200px]">{p.name}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-xs capitalize">{catLabel[p.category] ?? p.category}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">
+                      <span className="capitalize">{catLabel[p.category] ?? p.category}</span>
+                      {p.collection_name && <span className="ml-1 text-coffee-600 font-medium">· {p.collection_name}</span>}
+                    </td>
                     <td className="px-4 py-3 font-mono font-semibold text-gray-900">{formatPrice(p.price)}</td>
                     <td className="px-4 py-3 font-mono text-gray-700">{p.stock_quantity}</td>
                     <td className="px-4 py-3">

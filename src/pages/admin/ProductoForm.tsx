@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { getProductById, createProduct, updateProduct, type DbProduct } from '../../lib/queries/products'
+import { getActiveCollections, type DbCollection } from '../../lib/queries/collections'
 import { MultiPhotoUploader } from '../../components/admin/products/MultiPhotoUploader'
 import { useToast } from '../../hooks/useToast'
 import type { ProductCategory } from '../../data/products'
@@ -23,17 +24,17 @@ type FormState = {
   stock_quantity: string
   sizes: string[]
   colors: string
+  collection_id: string
 }
 
 const empty: FormState = {
   name:'', short:'', description:'', composition:'', care:'', model_info:'', images:[],
   price:'', category:'camisetas',
   featured:false, status:'ativo', stock_quantity:'0',
-  sizes:[], colors:'',
+  sizes:[], colors:'', collection_id:'',
 }
 
 function fromDb(p: DbProduct): FormState {
-  // junta image principal com o array images, sem duplicatas
   const allImages = p.image
     ? [p.image, ...(p.images ?? []).filter((u) => u !== p.image)]
     : (p.images ?? [])
@@ -45,6 +46,7 @@ function fromDb(p: DbProduct): FormState {
     stock_quantity: String(p.stock_quantity),
     sizes: p.sizes ?? [],
     colors: (p.colors ?? []).join(', '),
+    collection_id: p.collection_id ?? '',
   }
 }
 
@@ -59,8 +61,10 @@ export default function ProdutoForm() {
   const [form, setForm] = useState<FormState>(empty)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
+  const [collections, setCollections] = useState<DbCollection[]>([])
 
   useEffect(() => {
+    getActiveCollections().then(setCollections).catch(() => {})
     if (!isNew) {
       getProductById(id!).then((p) => { setForm(fromDb(p)); setLoading(false) })
         .catch(() => { push('Produto não encontrado', 'error'); navigate('/admin/produtos') })
@@ -104,6 +108,7 @@ export default function ProdutoForm() {
         sizes: form.sizes,
         colors: form.colors.split(',').map((c) => c.trim()).filter(Boolean),
         options: [],
+        collection_id: form.collection_id || null,
       }
       if (isNew) await createProduct(payload as any)
       else await updateProduct(id!, payload)
@@ -248,6 +253,15 @@ export default function ProdutoForm() {
               </select>
             </div>
           </div>
+          {collections.length > 0 && (
+            <div className="space-y-1">
+              <label className={lbl}>Coleção</label>
+              <select value={form.collection_id} onChange={(e) => set('collection_id', e.target.value)} className={field}>
+                <option value="">Sem coleção</option>
+                {collections.map((col) => <option key={col.id} value={col.id}>{col.name}</option>)}
+              </select>
+            </div>
+          )}
           <label className="flex items-center gap-2.5 cursor-pointer select-none w-fit">
             <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)}
               className="accent-coffee-600 w-4 h-4 rounded" />

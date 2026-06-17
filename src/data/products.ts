@@ -29,6 +29,9 @@ export interface Product {
   sizes: string[]
   colors: string[]
   options?: ProductOption[]
+  collection_id?: string | null
+  collection_name?: string | null
+  collection_slug?: string | null
 }
 
 export const products: Product[] = [

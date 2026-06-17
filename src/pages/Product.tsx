@@ -85,6 +85,8 @@ export default function Product() {
       price: product!.price,
       quantity,
       selectedOption: selectedSize,
+      category: product!.category,
+      collection_name: product!.collection_name,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)

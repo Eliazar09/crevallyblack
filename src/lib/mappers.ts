@@ -17,5 +17,8 @@ export function dbProductToPublic(p: DbProduct): Product {
     price: p.price,
     category: p.category,
     featured: p.featured,
+    collection_id: p.collection_id,
+    collection_name: p.collection_name,
+    collection_slug: p.collection_slug,
   }
 }

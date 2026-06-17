@@ -1,22 +1,20 @@
-import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, ArrowRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../hooks/useCart'
 import { CartItem } from './CartItem'
-import { CheckoutForm } from './CheckoutForm'
 import { Button } from '../ui/Button'
 import { formatPrice } from '../../lib/currency'
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, total, itemCount } = useCart()
-  const [showCheckout, setShowCheckout] = useState(false)
+  const navigate = useNavigate()
 
   const count = itemCount()
   const totalAmount = total()
 
   function handleClose() {
     closeCart()
-    setShowCheckout(false)
   }
 
   return (
@@ -76,11 +74,6 @@ export function CartDrawer() {
                     <ArrowRight size={14} />
                   </Button>
                 </div>
-              ) : showCheckout ? (
-                <CheckoutForm
-                  onBack={() => setShowCheckout(false)}
-                  onClose={handleClose}
-                />
               ) : (
                 <div className="divide-y divide-white/8">
                   {items.map((item) => (
@@ -91,7 +84,7 @@ export function CartDrawer() {
             </div>
 
             {/* Footer */}
-            {items.length > 0 && !showCheckout && (
+            {items.length > 0 && (
               <div className="p-5 border-t border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-ink-500">Total</span>
@@ -100,7 +93,7 @@ export function CartDrawer() {
                   </span>
                 </div>
                 <Button
-                  onClick={() => setShowCheckout(true)}
+                  onClick={() => { handleClose(); navigate('/carrinho') }}
                   size="md"
                   variant="primary"
                   className="w-full justify-center"
