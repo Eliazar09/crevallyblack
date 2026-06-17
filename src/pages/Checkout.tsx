@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Loader, CreditCard, QrCode, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader, CreditCard, QrCode, ExternalLink } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
