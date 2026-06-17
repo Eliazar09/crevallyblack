@@ -17,8 +17,8 @@ export default async function handler(req: any, res: any) {
     return
   }
 
-  const { orderId, items } = req.body
-  console.log(`[${route}] orderId=${orderId} items=${items?.length}`)
+  const { orderId, items, buyer } = req.body
+  console.log(`[${route}] orderId=${orderId} items=${items?.length} buyer=${buyer?.nome}`)
 
   // ── Preços vêm do banco — nunca do cliente ──────────────────────
   let itemsPayload: any[] = []
@@ -61,8 +61,28 @@ export default async function handler(req: any, res: any) {
   const total = itemsPayload.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
   console.log(`[${route}] total=R$${total.toFixed(2)}`)
 
+  // Dados do comprador para pré-preencher o checkout do MP
+  const payer = buyer ? (() => {
+    const parts = String(buyer.nome ?? '').trim().split(' ')
+    const phone = String(buyer.telefone ?? '').replace(/\D/g, '')
+    return {
+      name:    parts[0] ?? '',
+      surname: parts.slice(1).join(' ') || parts[0] ?? '',
+      email:   buyer.email ?? `${orderId.slice(-8)}@crevally.com`,
+      phone:   phone.length >= 10 ? {
+        area_code: phone.slice(0, 2),
+        number:    phone.slice(2),
+      } : undefined,
+      identification: buyer.cpf ? {
+        type:   'CPF',
+        number: String(buyer.cpf).replace(/\D/g, ''),
+      } : undefined,
+    }
+  })() : undefined
+
   const preference = {
     items: itemsPayload,
+    ...(payer ? { payer } : {}),
     external_reference: orderId,
     back_urls: {
       success: `${APP_URL}/pedido-confirmado?id=${orderId}`,

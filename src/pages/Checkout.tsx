@@ -171,6 +171,12 @@ export default function Checkout() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: saleId,
+          buyer: {
+            nome:     form.nome.trim(),
+            cpf:      form.cpf,
+            email:    form.email.trim(),
+            telefone: form.telefone,
+          },
           items: items.map((item) => ({
             productId: item.productId,
             name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
@@ -347,9 +353,7 @@ export default function Checkout() {
                 ))}
               </div>
               <p className="text-[11px] text-ink-500 bg-white/3 rounded-xl px-3 py-2">
-                {payMethod === 'pix'
-                  ? 'Você será redirecionado para a página do Mercado Pago onde o QR PIX será exibido.'
-                  : 'Você será redirecionado para o ambiente seguro do Mercado Pago para inserir os dados do cartão.'}
+                Você será redirecionado para o Mercado Pago, onde pode escolher pagar com PIX (QR Code instantâneo) ou cartão de crédito/débito.
               </p>
             </div>
 
@@ -498,9 +502,7 @@ export default function Checkout() {
               >
                 {saving
                   ? <><Loader size={15} className="animate-spin" /> PROCESSANDO…</>
-                  : payMethod === 'pix'
-                    ? <><QrCode size={16} /> IR PARA PIX</>
-                    : <><CreditCard size={16} /> IR PARA CARTÃO</>
+                  : <><ArrowRight size={16} /> IR PARA O PAGAMENTO</>
                 }
               </button>
 
