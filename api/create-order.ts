@@ -79,7 +79,7 @@ async function run(req: any, res: any) {
     const phone = String(buyer.telefone ?? '').replace(/\D/g, '')
     payer = {
       name:    parts[0] ?? '',
-      surname: parts.slice(1).join(' ') || parts[0] ?? '',
+      surname: parts.slice(1).join(' ') || parts[0] || '',
       email:   buyer.email ?? `pedido-${orderId.slice(-6)}@crevally.com`,
       ...(phone.length >= 10 ? { phone: { area_code: phone.slice(0, 2), number: phone.slice(2) } } : {}),
       ...(buyer.cpf ? { identification: { type: 'CPF', number: String(buyer.cpf).replace(/\D/g, '') } } : {}),
