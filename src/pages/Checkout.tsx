@@ -37,7 +37,7 @@ function fmtPhone(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
 }
 
-const inp = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-100 placeholder:text-ink-600 focus:outline-none focus:border-coffee-500/50 focus:bg-white/7 transition-all'
+const inp = 'w-full bg-gray-50 border border-ink-900/12 rounded-xl px-4 py-3 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-coffee-500 focus:bg-white transition-all'
 const lbl = 'block text-[10px] font-mono uppercase tracking-[0.2em] text-ink-500 mb-1.5'
 
 export default function Checkout() {
@@ -50,6 +50,7 @@ export default function Checkout() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
+
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
     return null
@@ -104,9 +105,6 @@ export default function Checkout() {
     setSaveError(null)
     try {
       const subtotal = total()
-
-      // 1. Salva o pedido no Supabase
-      // Gera UUID no cliente — evita precisar de SELECT policy no RLS
       const saleId = crypto.randomUUID()
 
       const { error: saleErr } = await supabase
@@ -117,7 +115,7 @@ export default function Checkout() {
           subtotal,
           discount: 0,
           total: subtotal,
-          payment_method: 'outro', // método real definido pelo MP no webhook
+          payment_method: 'outro',
           payment_status: 'pendente',
           notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
         })
@@ -158,7 +156,6 @@ export default function Checkout() {
 
       setOrderId(saleId)
 
-      // 2. Cria preference no Mercado Pago (Checkout Pro)
       const pgRes = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -213,10 +210,10 @@ export default function Checkout() {
     }
   }
 
-  // ── Redirecionando para o Mercado Pago ───────────────────
+  // ── Redirecionando ────────────────────────────────────────
   if (screen === 'redirecting') {
     return (
-      <div className="min-h-[100dvh] bg-[#0a0a0c] flex items-center justify-center px-4">
+      <div className="min-h-[100dvh] bg-ink-900 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -234,21 +231,21 @@ export default function Checkout() {
 
   // ── Formulário ────────────────────────────────────────────
   return (
-    <div className="min-h-[100dvh] bg-[#0a0a0c] pt-24 pb-24">
+    <div className="min-h-[100dvh] bg-cream-50 pt-24 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
         <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <Link
             to="/carrinho"
-            className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-ink-600 hover:text-cream-300 transition-colors mb-7 group"
+            className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-ink-500 hover:text-ink-900 transition-colors mb-7 group"
           >
             <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
             Voltar ao carrinho
           </Link>
-          <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)] text-cream-50 tracking-wider leading-none">
+          <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)] text-ink-900 tracking-wider leading-none">
             FINALIZAR PEDIDO
           </h1>
-          <div className="h-px bg-white/8 mt-5" />
+          <div className="h-px bg-ink-900/8 mt-5" />
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
@@ -260,27 +257,25 @@ export default function Checkout() {
             className="space-y-6"
           >
             {/* Pagamento seguro */}
-            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-5">
+            <div className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-5">
               <div>
-                <p className="font-display text-lg text-cream-100 tracking-wider">PAGAMENTO</p>
+                <p className="font-display text-lg text-ink-900 tracking-wider">PAGAMENTO</p>
                 <p className="text-xs text-ink-500 mt-0.5">Ambiente 100% seguro via Mercado Pago</p>
               </div>
 
-              {/* Métodos aceitos */}
               <div className="flex flex-wrap gap-2">
                 {[
-                  { icon: QrCode,      label: 'PIX Instantâneo' },
-                  { icon: CreditCard,  label: 'Cartão de Crédito' },
-                  { icon: CreditCard,  label: 'Cartão de Débito' },
+                  { icon: QrCode,     label: 'PIX Instantâneo' },
+                  { icon: CreditCard, label: 'Cartão de Crédito' },
+                  { icon: CreditCard, label: 'Cartão de Débito' },
                 ].map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-ink-400 text-xs">
+                  <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-coffee-50 border border-coffee-200 text-coffee-700 text-xs font-medium">
                     <Icon size={11} strokeWidth={1.5} />
                     {label}
                   </div>
                 ))}
               </div>
 
-              {/* Selos de confiança */}
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Lock,        text: 'Dados criptografados' },
@@ -289,56 +284,63 @@ export default function Checkout() {
                   { icon: Truck,       text: 'Entrega para todo Brasil' },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-coffee-500/10 flex items-center justify-center flex-shrink-0">
-                      <Icon size={13} className="text-coffee-400" strokeWidth={1.5} />
+                    <div className="w-7 h-7 rounded-lg bg-coffee-50 flex items-center justify-center flex-shrink-0">
+                      <Icon size={13} className="text-coffee-600" strokeWidth={1.5} />
                     </div>
-                    <p className="text-[11px] text-ink-400 leading-tight">{text}</p>
+                    <p className="text-[11px] text-ink-600 leading-tight">{text}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-white/8 pt-4">
+              <div className="border-t border-ink-900/8 pt-4">
                 <p className="text-[11px] text-ink-500 leading-relaxed">
-                  Ao clicar em <span className="text-cream-400 font-medium">IR PARA O PAGAMENTO</span>, você será redirecionado para o ambiente seguro do Mercado Pago para concluir sua compra. Seus dados pessoais são protegidos e nunca compartilhados.
+                  Ao clicar em <span className="text-coffee-600 font-semibold">IR PARA O PAGAMENTO</span>, você será redirecionado para o ambiente seguro do Mercado Pago. Seus dados pessoais são protegidos e nunca compartilhados com terceiros.
                 </p>
               </div>
             </div>
 
             {/* Dados pessoais */}
-            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-5">
-              <p className="font-display text-lg text-cream-100 tracking-wider">SEUS DADOS</p>
+            <div className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-5">
+              <div>
+                <p className="font-display text-lg text-ink-900 tracking-wider">SEUS DADOS</p>
+                <p className="text-xs text-ink-500 mt-1 leading-relaxed">
+                  Usamos seu nome e CPF para emitir a nota fiscal, e o WhatsApp para enviar a confirmação e o código de rastreio do pedido.
+                </p>
+              </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>Nome completo</label>
                 <input value={form.nome} onChange={(e) => set('nome', e.target.value)} className={inp} placeholder="Seu nome completo" />
-                {errors.nome && <p className="text-[10px] text-red-400 font-mono">{errors.nome}</p>}
+                {errors.nome && <p className="text-[10px] text-red-500 font-mono">{errors.nome}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>CPF</label>
                   <input value={form.cpf} onChange={(e) => set('cpf', fmtCPF(e.target.value))} className={inp} placeholder="000.000.000-00" inputMode="numeric" />
-                  {errors.cpf && <p className="text-[10px] text-red-400 font-mono">{errors.cpf}</p>}
+                  {errors.cpf && <p className="text-[10px] text-red-500 font-mono">{errors.cpf}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>WhatsApp</label>
                   <input value={form.telefone} onChange={(e) => set('telefone', fmtPhone(e.target.value))} className={inp} placeholder="(11) 99999-9999" inputMode="tel" />
-                  {errors.telefone && <p className="text-[10px] text-red-400 font-mono">{errors.telefone}</p>}
+                  {errors.telefone && <p className="text-[10px] text-red-500 font-mono">{errors.telefone}</p>}
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>E-mail</label>
                 <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={inp} placeholder="seu@email.com" />
-                {errors.email && <p className="text-[10px] text-red-400 font-mono">{errors.email}</p>}
+                {errors.email && <p className="text-[10px] text-red-500 font-mono">{errors.email}</p>}
               </div>
             </div>
 
             {/* Endereço */}
-            <div className="bg-white/3 border border-white/8 rounded-3xl p-6 space-y-5">
+            <div className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-5">
               <div>
-                <p className="font-display text-lg text-cream-100 tracking-wider">ENDEREÇO DE ENTREGA</p>
-                <p className="text-xs text-ink-500 mt-0.5">Digite o CEP e preenchemos automaticamente</p>
+                <p className="font-display text-lg text-ink-900 tracking-wider">ENDEREÇO DE ENTREGA</p>
+                <p className="text-xs text-ink-500 mt-1 leading-relaxed">
+                  Precisamos do seu endereço completo para calcular o frete e garantir que seu pedido chegue até você. Digite o CEP e preenchemos o restante automaticamente.
+                </p>
               </div>
 
               <div className="space-y-1.5">
@@ -355,22 +357,22 @@ export default function Checkout() {
                     placeholder="00000-000"
                     inputMode="numeric"
                   />
-                  {cepLoading && <Loader size={13} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-coffee-400" />}
+                  {cepLoading && <Loader size={13} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-coffee-500" />}
                 </div>
-                {errors.cep && <p className="text-[10px] text-red-400 font-mono">{errors.cep}</p>}
+                {errors.cep && <p className="text-[10px] text-red-500 font-mono">{errors.cep}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <label className={lbl}>Rua / Avenida</label>
                 <input value={form.rua} onChange={(e) => set('rua', e.target.value)} className={inp} placeholder="Rua das Flores" />
-                {errors.rua && <p className="text-[10px] text-red-400 font-mono">{errors.rua}</p>}
+                {errors.rua && <p className="text-[10px] text-red-500 font-mono">{errors.rua}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>Número</label>
                   <input value={form.numero} onChange={(e) => set('numero', e.target.value)} className={inp} placeholder="123" />
-                  {errors.numero && <p className="text-[10px] text-red-400 font-mono">{errors.numero}</p>}
+                  {errors.numero && <p className="text-[10px] text-red-500 font-mono">{errors.numero}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>Complemento</label>
@@ -387,18 +389,18 @@ export default function Checkout() {
                 <div className="col-span-2 space-y-1.5">
                   <label className={lbl}>Cidade</label>
                   <input value={form.cidade} onChange={(e) => set('cidade', e.target.value)} className={inp} placeholder="São Paulo" />
-                  {errors.cidade && <p className="text-[10px] text-red-400 font-mono">{errors.cidade}</p>}
+                  {errors.cidade && <p className="text-[10px] text-red-500 font-mono">{errors.cidade}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className={lbl}>Estado</label>
                   <input value={form.estado} onChange={(e) => set('estado', e.target.value.toUpperCase().slice(0, 2))} className={inp} placeholder="SP" maxLength={2} />
-                  {errors.estado && <p className="text-[10px] text-red-400 font-mono">{errors.estado}</p>}
+                  {errors.estado && <p className="text-[10px] text-red-500 font-mono">{errors.estado}</p>}
                 </div>
               </div>
             </div>
 
             {saveError && (
-              <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3 font-mono">
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 font-mono">
                 {saveError}
               </p>
             )}
@@ -411,33 +413,33 @@ export default function Checkout() {
             transition={{ delay: 0.2 }}
             className="lg:sticky lg:top-28"
           >
-            <div className="bg-white/4 border border-white/10 rounded-3xl p-6 space-y-5 backdrop-blur-sm">
-              <p className="font-display text-xl text-cream-50 tracking-widest">RESUMO</p>
+            <div className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-5">
+              <p className="font-display text-xl text-ink-900 tracking-widest">RESUMO</p>
 
               <div className="space-y-3">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-ink-800 flex-shrink-0">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-cream-100 flex-shrink-0">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-cream-200 truncate font-medium">{item.name}</p>
+                      <p className="text-xs text-ink-900 truncate font-medium">{item.name}</p>
                       {item.selectedOption && (
-                        <p className="text-[10px] font-mono text-ink-500 uppercase">{item.selectedOption}</p>
+                        <p className="text-[10px] font-mono text-ink-400 uppercase">{item.selectedOption}</p>
                       )}
                     </div>
-                    <span className="font-mono text-xs text-cream-300 flex-shrink-0 tabular-nums">
+                    <span className="font-mono text-xs text-ink-700 flex-shrink-0 tabular-nums">
                       {formatPrice(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="h-px bg-white/10" />
+              <div className="h-px bg-ink-900/8" />
 
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-ink-500">Total</span>
-                <span className="font-mono text-2xl font-medium text-coffee-400 tabular-nums">
+                <span className="font-mono text-2xl font-medium text-coffee-600 tabular-nums">
                   {formatPrice(total())}
                 </span>
               </div>
@@ -445,7 +447,7 @@ export default function Checkout() {
               <button
                 onClick={handleSubmit}
                 disabled={saving}
-                className="w-full py-4 bg-coffee-500 hover:bg-coffee-400 disabled:opacity-60 active:scale-[0.98] text-white font-display text-sm tracking-[0.18em] rounded-2xl transition-all flex items-center justify-center gap-3"
+                className="w-full py-4 bg-coffee-500 hover:bg-coffee-400 disabled:opacity-60 active:scale-[0.98] text-white font-display text-sm tracking-[0.18em] rounded-2xl transition-all flex items-center justify-center gap-3 shadow-md shadow-coffee-500/20"
               >
                 {saving
                   ? <><Loader size={15} className="animate-spin" /> PROCESSANDO…</>
@@ -453,7 +455,7 @@ export default function Checkout() {
                 }
               </button>
 
-              <p className="text-center text-[11px] font-mono text-ink-600 uppercase tracking-wider">
+              <p className="text-center text-[11px] font-mono text-ink-400 uppercase tracking-wider">
                 Pagamento via Mercado Pago — 100% seguro
               </p>
             </div>
