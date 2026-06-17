@@ -180,19 +180,20 @@ export default function Checkout() {
         }),
       })
 
-      // Parse seguro — em dev local a rota não existe e retorna HTML 404
       let pgData: any = {}
       try {
         pgData = await pgRes.json()
       } catch {
         const text = await pgRes.text().catch(() => '')
-        console.error('[checkout] MP resposta não-JSON:', pgRes.status, text.slice(0, 200))
+        setSaveError(`Erro ${pgRes.status}: resposta inesperada do servidor. ${text.slice(0, 120)}`)
+        setSaving(false)
+        return
       }
 
       if (!pgRes.ok) {
-        console.error('[checkout] MP error:', pgRes.status, JSON.stringify(pgData))
-        clearCart()
-        setScreen('fallback')
+        const detail = pgData?.error?.message ?? pgData?.error ?? pgData?.detail ?? JSON.stringify(pgData)
+        setSaveError(`Erro ao criar pagamento (${pgRes.status}): ${detail}`)
+        setSaving(false)
         return
       }
 
@@ -201,9 +202,8 @@ export default function Checkout() {
         setScreen('redirecting')
         setTimeout(() => { window.location.href = pgData.redirect_url }, 800)
       } else {
-        console.error('[checkout] MP sem redirect_url:', JSON.stringify(pgData))
-        clearCart()
-        setScreen('fallback')
+        setSaveError(`Mercado Pago não retornou URL de pagamento. Resposta: ${JSON.stringify(pgData).slice(0, 200)}`)
+        setSaving(false)
       }
 
     } catch (err: unknown) {
