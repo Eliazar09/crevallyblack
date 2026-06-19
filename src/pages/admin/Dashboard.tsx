@@ -21,6 +21,7 @@ interface RecentSale {
   total: number
   payment_method: string
   created_at: string
+  notes: string | null
 }
 
 const methodLabels: Record<string, string> = {
@@ -46,10 +47,11 @@ export default function Dashboard() {
       const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
       const [salesRes, clientsRes, stockRes, recentRes] = await Promise.all([
-        supabase.from('sales').select('total').gte('created_at', from),
+        supabase.from('sales').select('total').eq('payment_status', 'pago').gte('created_at', from),
         supabase.from('clients').select('id', { count: 'exact', head: true }),
         supabase.from('v_low_stock').select('id', { count: 'exact', head: true }),
-        supabase.from('sales').select('id,client_name,total,payment_method,created_at')
+        supabase.from('sales').select('id,client_name,total,payment_method,created_at,notes')
+          .eq('payment_status', 'pago')
           .order('created_at', { ascending: false }).limit(5),
       ])
 
@@ -133,7 +135,7 @@ export default function Dashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  {['Cliente', 'Método', 'Total', 'Data'].map((h) => (
+                  {['Cliente / Endereço', 'Método', 'Total', 'Data'].map((h) => (
                     <th key={h} className="px-5 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                   ))}
                 </tr>
@@ -142,7 +144,14 @@ export default function Dashboard() {
                 {recent.map((s, i) => (
                   <motion.tr key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
                     className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3.5 font-medium text-gray-900">{s.client_name}</td>
+                    <td className="px-5 py-3.5">
+                      <p className="font-medium text-gray-900">{s.client_name}</p>
+                      {s.notes && (
+                        <p className="text-[11px] text-gray-400 mt-0.5 max-w-[260px] truncate" title={s.notes}>
+                          {s.notes.replace('Email: ', '').split(' · ').slice(1).join(' · ')}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-5 py-3.5">
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium">
                         {methodLabels[s.payment_method] ?? s.payment_method}

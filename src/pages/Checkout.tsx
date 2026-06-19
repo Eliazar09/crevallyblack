@@ -117,7 +117,7 @@ export default function Checkout() {
           total: subtotal,
           payment_method: 'outro',
           payment_status: 'pendente',
-          notes: `Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.cidade}/${form.estado}`,
+          notes: `Email: ${form.email.trim()} · Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.bairro}, ${form.cidade}/${form.estado} · CEP: ${form.cep}`,
         })
 
       if (saleErr) throw new Error(`[sales] ${saleErr.message} (code: ${saleErr.code})`)
@@ -133,26 +133,6 @@ export default function Checkout() {
         }))
       )
       if (itemsErr) console.error('[checkout] sale_items error:', itemsErr.message)
-
-      const { error: invErr } = await supabase.from('inventory_movements').insert(
-        items.map((item) => ({
-          product_id: item.productId,
-          type: 'saida',
-          quantity: -Math.abs(item.quantity),
-          reason: 'Pedido online',
-          related_sale_id: saleId,
-        }))
-      )
-      if (invErr) console.error('[checkout] inventory_movements error:', invErr.message)
-
-      void supabase.from('transactions').insert({
-        type: 'receita',
-        category: 'Venda Online',
-        amount: subtotal,
-        description: `Pedido #${saleId.slice(-6).toUpperCase()} — ${form.nome.trim()}`,
-        related_sale_id: saleId,
-        date: new Date().toISOString().slice(0, 10),
-      })
 
       setOrderId(saleId)
 

@@ -53,7 +53,7 @@ export function CategoriesNav({ active, onChange }: CategoriesNavProps) {
   return (
     <div className="bg-white border-b border-ink-900/8 py-5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex gap-1 sm:gap-3 overflow-x-auto scrollbar-none snap-x snap-mandatory">
+        <div className="flex gap-1 sm:gap-3 overflow-x-auto scrollbar-none snap-x snap-mandatory sm:justify-center">
           {CATS.map((cat) => {
             const isActive = active === cat.value
             return (

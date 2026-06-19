@@ -81,8 +81,45 @@ export default async function handler(req: any, res: any) {
         .update({ payment_status: 'pago', payment_method: paymentMethod })
         .eq('id', orderId)
 
-      if (error) console.error('[webhook-mp] Supabase error:', error.message)
-      else console.log(`[webhook-mp] Pedido ${orderId} PAGO via ${paymentMethod}`)
+      if (error) {
+        console.error('[webhook-mp] Supabase error:', error.message)
+      } else {
+        console.log(`[webhook-mp] Pedido ${orderId} PAGO via ${paymentMethod}`)
+
+        // Decrementa estoque e registra receita só após pagamento confirmado
+        const { data: saleItems } = await supabase
+          .from('sale_items')
+          .select('product_id, quantity')
+          .eq('sale_id', orderId)
+
+        if (saleItems && saleItems.length > 0) {
+          const { error: invErr } = await supabase.from('inventory_movements').insert(
+            saleItems.map((item: any) => ({
+              product_id: item.product_id,
+              type: 'saida',
+              quantity: -Math.abs(item.quantity),
+              reason: 'Pedido online',
+              related_sale_id: orderId,
+            }))
+          )
+          if (invErr) console.error('[webhook-mp] inventory_movements error:', invErr.message)
+        }
+
+        const { data: sale } = await supabase
+          .from('sales')
+          .select('total, client_name')
+          .eq('id', orderId)
+          .single()
+
+        await supabase.from('transactions').insert({
+          type: 'receita',
+          category: 'Venda Online',
+          amount: sale?.total ?? payment.transaction_amount ?? 0,
+          description: `Pedido #${orderId.slice(-6).toUpperCase()} — ${sale?.client_name ?? ''}`,
+          related_sale_id: orderId,
+          date: new Date().toISOString().slice(0, 10),
+        })
+      }
     }
 
     if (payment.status === 'rejected' || payment.status === 'cancelled') {
