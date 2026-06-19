@@ -29,7 +29,6 @@ const methodLabels: Record<string, string> = {
 }
 
 const quickLinks = [
-  { to: '/admin/vendas/nova',    label: 'Nova venda',     icon: ShoppingCart, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
   { to: '/admin/produtos/novo',  label: 'Novo produto',   icon: Package,      color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
   { to: '/admin/clientes',       label: 'Ver clientes',   icon: Users,        color: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100' },
 ]
@@ -118,10 +117,7 @@ export default function Dashboard() {
             <p className="text-sm font-semibold text-gray-900">Últimas vendas</p>
             <p className="text-xs text-gray-400 mt-0.5">Atividade recente</p>
           </div>
-          <Link to="/admin/vendas"
-            className="flex items-center gap-1.5 text-xs font-medium text-coffee-600 hover:text-coffee-500 transition-colors bg-coffee-50 px-3 py-1.5 rounded-full border border-coffee-200">
-            Ver todas <ArrowRight size={11} />
-          </Link>
+          <span className="text-xs text-gray-400">Atividade recente</span>
         </div>
 
         {recent.length === 0 ? (
@@ -130,9 +126,7 @@ export default function Dashboard() {
               <ShoppingCart size={20} className="text-gray-400" strokeWidth={1.5} />
             </div>
             <p className="text-sm text-gray-500">Sem vendas este mês</p>
-            <Link to="/admin/vendas/nova" className="text-xs text-coffee-600 hover:underline font-medium">
-              Registrar primeira venda →
-            </Link>
+            <p className="text-xs text-gray-400">Nenhuma venda registrada ainda</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
