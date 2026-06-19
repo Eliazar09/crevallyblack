@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard, Package, ShoppingCart, Users,
+  LayoutDashboard, Package, Users,
   Boxes, BarChart2, LogOut, X, CalendarDays, Shirt, Layers2
 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
@@ -11,7 +11,6 @@ const nav = [
   { to: '/admin',            icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/produtos',   icon: Package,          label: 'Produtos' },
   { to: '/admin/colecoes',   icon: Layers2,          label: 'Coleções' },
-  { to: '/admin/vendas',     icon: ShoppingCart,     label: 'Vendas' },
   { to: '/admin/clientes',   icon: Users,            label: 'Clientes' },
   { to: '/admin/estoque',    icon: Boxes,            label: 'Estoque' },
   { to: '/admin/financas',   icon: BarChart2,        label: 'Finanças' },

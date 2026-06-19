@@ -26,8 +26,6 @@ const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
 const Produtos     = lazy(() => import('./pages/admin/Productos'))
 const ProdutoForm  = lazy(() => import('./pages/admin/ProductoForm'))
 const Colecoes     = lazy(() => import('./pages/admin/Colecoes'))
-const Vendas       = lazy(() => import('./pages/admin/Ventas'))
-const VendaNova    = lazy(() => import('./pages/admin/VentaNueva'))
 const Clientes     = lazy(() => import('./pages/admin/Clientes'))
 const Estoque      = lazy(() => import('./pages/admin/Inventario'))
 const Financas     = lazy(() => import('./pages/admin/Finanzas'))
@@ -111,12 +109,6 @@ export default function App() {
             } />
             <Route path="/admin/colecoes" element={
               <Suspense fallback={<AdminSuspense />}><Colecoes /></Suspense>
-            } />
-            <Route path="/admin/vendas" element={
-              <Suspense fallback={<AdminSuspense />}><Vendas /></Suspense>
-            } />
-            <Route path="/admin/vendas/nova" element={
-              <Suspense fallback={<AdminSuspense />}><VendaNova /></Suspense>
             } />
             <Route path="/admin/clientes" element={
               <Suspense fallback={<AdminSuspense />}><Clientes /></Suspense>
