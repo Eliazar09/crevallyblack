@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const APP_URL = process.env.APP_URL ?? 'https://crevallyblack.vercel.app'
+const APP_URL = process.env.APP_URL ?? 'https://crevallyblack-teste.vercel.app'
 
 export default async function handler(req: any, res: any) {
   // Garante sempre JSON — nunca HTML 500 do Vercel
