@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const rawUrl  = process.env.APP_URL || 'https://crevallyblack-teste.vercel.app'
+const rawUrl  = process.env.APP_URL || 'https://crevallyblack.vercel.app'
 const APP_URL = rawUrl.replace(/\/+$/, '').startsWith('http') ? rawUrl.replace(/\/+$/, '') : `https://${rawUrl.replace(/\/+$/, '')}`
 
 export default async function handler(req: any, res: any) {
