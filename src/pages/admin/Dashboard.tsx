@@ -20,6 +20,7 @@ interface RecentSale {
   client_name: string
   total: number
   payment_method: string
+  payment_status: string
   created_at: string
   notes: string | null
 }
@@ -50,8 +51,7 @@ export default function Dashboard() {
         supabase.from('sales').select('total').eq('payment_status', 'pago').gte('created_at', from),
         supabase.from('clients').select('id', { count: 'exact', head: true }),
         supabase.from('v_low_stock').select('id', { count: 'exact', head: true }),
-        supabase.from('sales').select('id,client_name,total,payment_method,created_at,notes')
-          .eq('payment_status', 'pago')
+        supabase.from('sales').select('id,client_name,total,payment_method,payment_status,created_at,notes')
           .order('created_at', { ascending: false }).limit(5),
       ])
 
@@ -135,7 +135,7 @@ export default function Dashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  {['Cliente / Endereço', 'Método', 'Total', 'Data'].map((h) => (
+                  {['Cliente / Endereço', 'Status', 'Total', 'Data'].map((h) => (
                     <th key={h} className="px-5 py-3 text-left font-semibold text-[10px] uppercase tracking-widest text-gray-400">{h}</th>
                   ))}
                 </tr>
@@ -153,8 +153,13 @@ export default function Dashboard() {
                       )}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium">
-                        {methodLabels[s.payment_method] ?? s.payment_method}
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        s.payment_status === 'pago'      ? 'bg-emerald-100 text-emerald-700' :
+                        s.payment_status === 'pendente'  ? 'bg-amber-100 text-amber-700' :
+                        s.payment_status === 'cancelado' ? 'bg-red-100 text-red-600' :
+                                                           'bg-gray-100 text-gray-500'
+                      }`}>
+                        {s.payment_status === 'pago' ? 'Pago' : s.payment_status === 'pendente' ? 'Pendente' : s.payment_status === 'cancelado' ? 'Cancelado' : s.payment_status}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 font-mono font-semibold text-emerald-600">{formatPrice(s.total)}</td>

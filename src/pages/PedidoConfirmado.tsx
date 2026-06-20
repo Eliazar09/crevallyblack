@@ -22,7 +22,7 @@ export default function PedidoConfirmado() {
 
   // Só limpa o carrinho quando o pagamento for confirmado como aprovado
   useEffect(() => {
-    if (status === 'approved') clearCart()
+    if (status && status !== 'rejected' && status !== 'cancelled' && status !== 'failure') clearCart()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Approved ────────────────────────────────────────────────────
