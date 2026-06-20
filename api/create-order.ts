@@ -103,7 +103,7 @@ async function run(req: any, res: any) {
     expiration_date_to: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
   }
 
-  console.log('[create-order] preference:', JSON.stringify(preference))
+  console.log('[create-order] preference items:', itemsPayload.length, 'total=R$' + total.toFixed(2))
 
   const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
     method:  'POST',
@@ -112,7 +112,7 @@ async function run(req: any, res: any) {
   })
 
   const data = await response.json()
-  console.log(`[create-order] MP status=${response.status}`, JSON.stringify(data))
+  console.log(`[create-order] MP status=${response.status} preference_id=${data?.id ?? 'err'}`)
 
   if (!response.ok) {
     res.status(response.status).json({ error: data?.message || 'Mercado Pago recusou a preference', cause: data?.cause, detail: data }); return

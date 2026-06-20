@@ -76,49 +76,67 @@ export default async function handler(req: any, res: any) {
     const paymentMethod = methodMap[payment.payment_type_id] || 'outro'
 
     if (payment.status === 'approved') {
-      const { error } = await supabase
+      // Idempotência: busca o estado atual para não duplicar movimentos
+      const { data: currentSale } = await supabase
         .from('sales')
-        .update({ payment_status: 'pago', payment_method: paymentMethod })
+        .select('payment_status, total, client_name')
         .eq('id', orderId)
+        .single()
 
-      if (error) {
-        console.error('[webhook-mp] Supabase error:', error.message)
+      if (!currentSale) {
+        console.warn(`[webhook-mp] Pedido ${orderId} não encontrado`)
+      } else if (currentSale.payment_status === 'pago') {
+        console.log(`[webhook-mp] Pedido ${orderId} já estava PAGO — ignorando duplicata`)
       } else {
-        console.log(`[webhook-mp] Pedido ${orderId} PAGO via ${paymentMethod}`)
-
-        // Decrementa estoque e registra receita só após pagamento confirmado
-        const { data: saleItems } = await supabase
-          .from('sale_items')
-          .select('product_id, quantity')
-          .eq('sale_id', orderId)
-
-        if (saleItems && saleItems.length > 0) {
-          const { error: invErr } = await supabase.from('inventory_movements').insert(
-            saleItems.map((item: any) => ({
-              product_id: item.product_id,
-              type: 'saida',
-              quantity: -Math.abs(item.quantity),
-              reason: 'Pedido online',
-              related_sale_id: orderId,
-            }))
-          )
-          if (invErr) console.error('[webhook-mp] inventory_movements error:', invErr.message)
-        }
-
-        const { data: sale } = await supabase
+        const { error } = await supabase
           .from('sales')
-          .select('total, client_name')
+          .update({ payment_status: 'pago', payment_method: paymentMethod })
           .eq('id', orderId)
-          .single()
 
-        await supabase.from('transactions').insert({
-          type: 'receita',
-          category: 'Venda Online',
-          amount: sale?.total ?? payment.transaction_amount ?? 0,
-          description: `Pedido #${orderId.slice(-6).toUpperCase()} — ${sale?.client_name ?? ''}`,
-          related_sale_id: orderId,
-          date: new Date().toISOString().slice(0, 10),
-        })
+        if (error) {
+          console.error('[webhook-mp] Supabase error:', error.message)
+        } else {
+          console.log(`[webhook-mp] Pedido ${orderId} PAGO via ${paymentMethod}`)
+
+          // Decrementa estoque e registra receita só após pagamento confirmado
+          const { data: saleItems } = await supabase
+            .from('sale_items')
+            .select('product_id, quantity, unit_price, subtotal')
+            .eq('sale_id', orderId)
+
+          if (saleItems && saleItems.length > 0) {
+            const { error: invErr } = await supabase.from('inventory_movements').insert(
+              saleItems.map((item: any) => ({
+                product_id: item.product_id,
+                type: 'saida',
+                quantity: -Math.abs(item.quantity),
+                reason: 'Pedido online',
+                related_sale_id: orderId,
+              }))
+            )
+            if (invErr) console.error('[webhook-mp] inventory_movements error:', invErr.message)
+
+            // Recalcula total usando preços do banco (mitigação de manipulação no frontend)
+            const dbTotal = saleItems.reduce((s: number, i: any) => s + Number(i.subtotal ?? 0), 0)
+            if (dbTotal > 0 && Math.abs(dbTotal - currentSale.total) > 0.01) {
+              await supabase.from('sales').update({ total: dbTotal, subtotal: dbTotal }).eq('id', orderId)
+              console.log(`[webhook-mp] Total corrigido: R$${currentSale.total} → R$${dbTotal.toFixed(2)}`)
+            }
+          }
+
+          const amount = saleItems
+            ? saleItems.reduce((s: number, i: any) => s + Number(i.subtotal ?? 0), 0) || payment.transaction_amount
+            : currentSale.total ?? payment.transaction_amount ?? 0
+
+          await supabase.from('transactions').insert({
+            type: 'receita',
+            category: 'Venda Online',
+            amount,
+            description: `Pedido #${orderId.slice(-6).toUpperCase()} — ${currentSale.client_name ?? ''}`,
+            related_sale_id: orderId,
+            date: new Date().toISOString().slice(0, 10),
+          })
+        }
       }
     }
 

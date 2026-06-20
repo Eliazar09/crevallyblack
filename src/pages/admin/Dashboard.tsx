@@ -119,7 +119,7 @@ export default function Dashboard() {
             <p className="text-sm font-semibold text-gray-900">Últimas vendas</p>
             <p className="text-xs text-gray-400 mt-0.5">Atividade recente</p>
           </div>
-          <span className="text-xs text-gray-400">Atividade recente</span>
+          <span className="text-xs text-gray-400">últimas {recent.length}</span>
         </div>
 
         {recent.length === 0 ? (
