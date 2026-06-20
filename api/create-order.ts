@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const APP_URL = process.env.APP_URL ?? 'https://crevallyblack-teste.vercel.app'
+const rawUrl  = process.env.APP_URL || 'https://crevallyblack-teste.vercel.app'
+const APP_URL = rawUrl.replace(/\/+$/, '').startsWith('http') ? rawUrl.replace(/\/+$/, '') : `https://${rawUrl.replace(/\/+$/, '')}`
 
 export default async function handler(req: any, res: any) {
   // Garante sempre JSON — nunca HTML 500 do Vercel
@@ -92,9 +93,9 @@ async function run(req: any, res: any) {
     ...(payer ? { payer } : {}),
     external_reference: orderId,
     back_urls: {
-      success: `${APP_URL}/pedido-confirmado?id=${orderId}`,
-      failure: `${APP_URL}/pedido-confirmado?id=${orderId}`,
-      pending: `${APP_URL}/pedido-confirmado?id=${orderId}`,
+      success: `${APP_URL}/pedido-confirmado`,
+      failure: `${APP_URL}/pedido-confirmado`,
+      pending: `${APP_URL}/pedido-confirmado`,
     },
     auto_return:      'approved',
     notification_url: `${APP_URL}/api/webhook-mp`,
