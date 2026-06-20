@@ -167,8 +167,9 @@ export default function Checkout() {
       }
 
       if (!pgRes.ok) {
-        const detail = pgData?.error?.message ?? pgData?.error ?? pgData?.detail ?? JSON.stringify(pgData)
-        setSaveError(`Erro ao criar pagamento (${pgRes.status}): ${detail}`)
+        const msg    = pgData?.error || pgData?.message || 'Erro desconhecido'
+        const causes = pgData?.cause?.map((c: any) => c?.description || c?.code).filter(Boolean).join('; ')
+        setSaveError(`Erro MP (${pgRes.status}): ${msg}${causes ? ` — ${causes}` : ''}`)
         setSaving(false)
         return
       }
