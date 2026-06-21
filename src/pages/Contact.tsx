@@ -141,8 +141,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-ink-900">WhatsApp</p>
-                  <p className="text-sm text-ink-500">Resposta em minutos</p>
-                  <p className="text-xs text-coffee-600 mt-1 group-hover:underline">Clique para abrir a conversa</p>
+                  <p className="text-sm text-ink-500">(12) 99202-4748</p>
+                  <p className="text-xs text-coffee-600 mt-1 group-hover:underline">Resposta em minutos · Clique para abrir</p>
                 </div>
               </motion.a>
 

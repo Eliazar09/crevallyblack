@@ -74,7 +74,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-neutral-200 transition-colors"
                 >
-                  WhatsApp
+                  WhatsApp · (12) 99202-4748
                 </a>
               </li>
               <li>

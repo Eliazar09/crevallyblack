@@ -1,6 +1,6 @@
 import type { CartItem } from '../hooks/useCart'
 
-const WHATSAPP_NUMBER = '584128590616'
+const WHATSAPP_NUMBER = '5512992024748'
 
 export interface CustomerData {
   nome: string
