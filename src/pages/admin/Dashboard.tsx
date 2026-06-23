@@ -10,7 +10,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 interface DashStats {
   receitas: number
-  vendas: number
+  pedidos: number
   clientes: number
   estoqueBaixo: number
 }
@@ -25,12 +25,8 @@ interface RecentSale {
   notes: string | null
 }
 
-const methodLabels: Record<string, string> = {
-  pix: 'Pix', cartao_credito: 'Cartão Créd.', cartao_debito: 'Cartão Déb.',
-  dinheiro: 'Dinheiro', transferencia: 'Transf.', boleto: 'Boleto', outro: 'Outro',
-}
-
 const quickLinks = [
+  { to: '/admin/pedidos',        label: 'Ver pedidos',    icon: ShoppingCart, color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
   { to: '/admin/produtos/novo',  label: 'Novo produto',   icon: Package,      color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
   { to: '/admin/clientes',       label: 'Ver clientes',   icon: Users,        color: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100' },
 ]
@@ -41,29 +37,42 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashStats | null>(null)
   const [recent, setRecent] = useState<RecentSale[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
-      const now = new Date()
-      const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+      try {
+        const now = new Date()
+        const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-      const [salesRes, clientsRes, stockRes, recentRes] = await Promise.all([
-        supabase.from('sales').select('total').eq('payment_status', 'pago').gte('created_at', from),
-        supabase.from('clients').select('id', { count: 'exact', head: true }),
-        supabase.from('v_low_stock').select('id', { count: 'exact', head: true }),
-        supabase.from('sales').select('id,client_name,total,payment_method,payment_status,created_at,notes')
-          .order('created_at', { ascending: false }).limit(5),
-      ])
+        const [allSalesRes, clientsRes, stockRes, recentRes] = await Promise.all([
+          // Busca TODAS as vendas do mês (todos os status)
+          supabase.from('sales').select('total,payment_status').gte('created_at', from),
+          supabase.from('clients').select('id', { count: 'exact', head: true }),
+          supabase.from('v_low_stock').select('id', { count: 'exact', head: true }),
+          supabase.from('sales').select('id,client_name,total,payment_method,payment_status,created_at,notes')
+            .order('created_at', { ascending: false }).limit(8),
+        ])
 
-      const receitas = (salesRes.data ?? []).reduce((s, r) => s + (r.total ?? 0), 0)
-      setStats({
-        receitas,
-        vendas: salesRes.data?.length ?? 0,
-        clientes: clientsRes.count ?? 0,
-        estoqueBaixo: stockRes.count ?? 0,
-      })
-      setRecent(recentRes.data ?? [])
-      setLoading(false)
+        // Receita = só pedidos pagos; Pedidos = todos (inclusive pendentes)
+        const allSales = allSalesRes.data ?? []
+        const receitas = allSales
+          .filter((s) => s.payment_status === 'pago')
+          .reduce((acc, s) => acc + (s.total ?? 0), 0)
+
+        setStats({
+          receitas,
+          pedidos: allSales.length,
+          clientes: clientsRes.count ?? 0,
+          estoqueBaixo: stockRes.count ?? 0,
+        })
+        setRecent(recentRes.data ?? [])
+      } catch (err: any) {
+        console.error('[dashboard] load error:', err?.message)
+        setLoadError('Erro ao carregar dados. Tente recarregar a página.')
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [])
@@ -85,16 +94,23 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
+      {/* Error state */}
+      {loadError && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-3 text-sm text-red-700">
+          {loadError}
+        </div>
+      )}
+
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
           <>
-            <StatCard title="Receita do mês"  value={formatPrice(stats?.receitas ?? 0)}    icon={DollarSign}  accent="green" delay={0} />
-            <StatCard title="Vendas do mês"   value={String(stats?.vendas ?? 0)}            icon={ShoppingCart} accent="gold"  delay={0.05} />
-            <StatCard title="Clientes"         value={String(stats?.clientes ?? 0)}          icon={Users}        accent="blue"  delay={0.1} />
-            <StatCard title="Estoque baixo"    value={String(stats?.estoqueBaixo ?? 0)}      icon={Package}      accent="red"   delay={0.15} subtitle="produtos com alerta" />
+            <StatCard title="Receita do mês"   value={formatPrice(stats?.receitas ?? 0)}     icon={DollarSign}   accent="green" delay={0}    subtitle="pedidos pagos" />
+            <StatCard title="Pedidos do mês"   value={String(stats?.pedidos ?? 0)}            icon={ShoppingCart} accent="gold"  delay={0.05} subtitle="todos os status" />
+            <StatCard title="Clientes"          value={String(stats?.clientes ?? 0)}           icon={Users}        accent="blue"  delay={0.1} />
+            <StatCard title="Estoque baixo"     value={String(stats?.estoqueBaixo ?? 0)}       icon={Package}      accent="red"   delay={0.15} subtitle="produtos com alerta" />
           </>
         )}
       </div>
@@ -116,10 +132,12 @@ export default function Dashboard() {
         className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
-            <p className="text-sm font-semibold text-gray-900">Últimas vendas</p>
-            <p className="text-xs text-gray-400 mt-0.5">Atividade recente</p>
+            <p className="text-sm font-semibold text-gray-900">Últimos pedidos</p>
+            <p className="text-xs text-gray-400 mt-0.5">Todos os status</p>
           </div>
-          <span className="text-xs text-gray-400">últimas {recent.length}</span>
+          <Link to="/admin/pedidos" className="text-xs text-coffee-600 hover:underline font-medium flex items-center gap-1">
+            Ver todos <ArrowRight size={11} />
+          </Link>
         </div>
 
         {recent.length === 0 ? (
@@ -127,8 +145,8 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center">
               <ShoppingCart size={20} className="text-gray-400" strokeWidth={1.5} />
             </div>
-            <p className="text-sm text-gray-500">Sem vendas este mês</p>
-            <p className="text-xs text-gray-400">Nenhuma venda registrada ainda</p>
+            <p className="text-sm text-gray-500">Nenhum pedido ainda</p>
+            <p className="text-xs text-gray-400">Os pedidos aparecerão aqui</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

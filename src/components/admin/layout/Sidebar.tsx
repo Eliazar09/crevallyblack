@@ -2,13 +2,14 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Package, Users,
-  Boxes, BarChart2, LogOut, X, CalendarDays, Shirt, Layers2
+  Boxes, BarChart2, LogOut, X, CalendarDays, Shirt, Layers2, ShoppingCart
 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
 import { cn } from '../../../lib/cn'
 
 const nav = [
   { to: '/admin',            icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/pedidos',    icon: ShoppingCart,     label: 'Pedidos' },
   { to: '/admin/produtos',   icon: Package,          label: 'Produtos' },
   { to: '/admin/colecoes',   icon: Layers2,          label: 'Coleções' },
   { to: '/admin/clientes',   icon: Users,            label: 'Clientes' },

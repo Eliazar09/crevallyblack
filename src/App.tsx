@@ -23,6 +23,7 @@ import Login from './pages/admin/Login'
 
 // Páginas admin — carregamento lazy
 const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
+const Pedidos      = lazy(() => import('./pages/admin/Ventas'))
 const Produtos     = lazy(() => import('./pages/admin/Productos'))
 const ProdutoForm  = lazy(() => import('./pages/admin/ProductoForm'))
 const Colecoes     = lazy(() => import('./pages/admin/Colecoes'))
@@ -97,6 +98,9 @@ export default function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={
               <Suspense fallback={<AdminSuspense />}><Dashboard /></Suspense>
+            } />
+            <Route path="/admin/pedidos" element={
+              <Suspense fallback={<AdminSuspense />}><Pedidos /></Suspense>
             } />
             <Route path="/admin/produtos" element={
               <Suspense fallback={<AdminSuspense />}><Produtos /></Suspense>
