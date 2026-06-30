@@ -33,6 +33,8 @@ export interface SalePayload {
   notes: string | null
 }
 
+export type ShippingStatus = 'aguardando' | 'enviado' | 'entregue'
+
 export interface DbSale {
   id: string
   client_id: string | null
@@ -42,6 +44,8 @@ export interface DbSale {
   total: number
   payment_method: PaymentMethod
   payment_status: PaymentStatus
+  shipping_status?: ShippingStatus
+  tracking_code?: string | null
   notes: string | null
   created_at: string
   sale_items?: Array<{ product_name: string; quantity: number; unit_price: number; subtotal: number }>
@@ -121,5 +125,12 @@ export async function getSales(filters?: { from?: string; to?: string }) {
 
 export async function deleteSale(id: string) {
   const { error } = await supabase.from('sales').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function updateShipping(id: string, shipping_status: ShippingStatus, tracking_code?: string) {
+  const patch: Record<string, unknown> = { shipping_status }
+  if (tracking_code !== undefined) patch.tracking_code = tracking_code
+  const { error } = await supabase.from('sales').update(patch).eq('id', id)
   if (error) throw error
 }
