@@ -1,7 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-const rawUrl  = process.env.APP_URL || 'https://crevallyblack.vercel.app'
-const APP_URL = rawUrl.replace(/\/+$/, '').startsWith('http') ? rawUrl.replace(/\/+$/, '') : `https://${rawUrl.replace(/\/+$/, '')}`
+// Sempre usa HTTPS e remove barras/espaços extras
+function buildAppUrl(): string {
+  const raw = (process.env.APP_URL || '').trim().replace(/\/+$/, '')
+  if (!raw) return 'https://crevallyblack.vercel.app'
+  if (raw.startsWith('https://')) return raw
+  if (raw.startsWith('http://'))  return raw.replace('http://', 'https://')
+  return `https://${raw}`
+}
+const APP_URL = buildAppUrl()
 
 export default async function handler(req: any, res: any) {
   // Garante sempre JSON — nunca HTML 500 do Vercel
@@ -31,7 +38,7 @@ async function run(req: any, res: any) {
     res.status(400).json({ error: 'Payload inválido', got: { orderId, itemsLen: items?.length } }); return
   }
 
-  console.log(`[create-order] orderId=${orderId} items=${items.length} buyer=${buyer?.nome ?? '?'}`)
+  console.log(`[create-order] orderId=${orderId} items=${items.length} buyer=${buyer?.nome ?? '?'} APP_URL=${APP_URL}`)
 
   // ── Busca preços no banco (nunca confia no cliente) ──────────────
   let itemsPayload: any[] = []
