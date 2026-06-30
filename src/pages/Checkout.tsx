@@ -6,6 +6,15 @@ import { useCart } from '../hooks/useCart'
 import { formatPrice } from '../lib/currency'
 import { supabase } from '../lib/supabase'
 
+interface FreightOption {
+  id: string
+  name: string
+  company: string
+  price: number
+  delivery_time: number
+  delivery_range?: { min: number; max: number }
+}
+
 type Screen = 'form' | 'redirecting'
 type FormData = {
   nome: string; cpf: string; email: string; telefone: string
@@ -44,12 +53,18 @@ export default function Checkout() {
   const { items, total } = useCart()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(empty)
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'frete', string>>>({})
   const [cepLoading, setCepLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('form')
   const [orderId, setOrderId] = useState('')
+
+  // Frete
+  const [freightOptions, setFreightOptions] = useState<FreightOption[]>([])
+  const [selectedFreight, setSelectedFreight] = useState<FreightOption | null>(null)
+  const [freightLoading, setFreightLoading] = useState(false)
+  const [freightError, setFreightError] = useState<string | null>(null)
 
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
@@ -59,6 +74,32 @@ export default function Checkout() {
   function set<K extends keyof FormData>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }))
     setErrors((e) => ({ ...e, [k]: undefined }))
+  }
+
+  async function calculateFreight(cep: string) {
+    const digits = cep.replace(/\D/g, '')
+    if (digits.length !== 8) return
+    setFreightLoading(true)
+    setFreightError(null)
+    setFreightOptions([])
+    setSelectedFreight(null)
+    try {
+      const res = await fetch('/api/freight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cep: digits, itemCount: items.reduce((s, i) => s + i.quantity, 0) }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.options?.length) {
+        setFreightError('Não foi possível calcular o frete para esse CEP. O frete será combinado.')
+        return
+      }
+      setFreightOptions(data.options)
+    } catch {
+      setFreightError('Erro ao calcular frete. O frete será combinado.')
+    } finally {
+      setFreightLoading(false)
+    }
   }
 
   async function fetchCEP(cep: string) {
@@ -71,16 +112,17 @@ export default function Checkout() {
       if (!data.erro) {
         setForm((f) => ({
           ...f,
-          rua: data.logradouro ?? f.rua,
-          bairro: data.bairro ?? f.bairro,
+          rua:    data.logradouro ?? f.rua,
+          bairro: data.bairro     ?? f.bairro,
           cidade: data.localidade ?? f.cidade,
-          estado: data.uf ?? f.estado,
+          estado: data.uf         ?? f.estado,
         }))
       }
     } catch (err) {
       console.warn('[checkout] ViaCEP falhou:', err)
     } finally {
       setCepLoading(false)
+      calculateFreight(cep)
     }
   }
 
@@ -95,6 +137,7 @@ export default function Checkout() {
     if (!form.numero.trim()) e.numero = 'Obrigatório'
     if (!form.cidade.trim()) e.cidade = 'Obrigatório'
     if (!form.estado.trim()) e.estado = 'Obrigatório'
+    if (freightOptions.length > 0 && !selectedFreight) e.frete = 'Selecione uma opção de frete'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -104,37 +147,60 @@ export default function Checkout() {
     setSaving(true)
     setSaveError(null)
     try {
-      const subtotal = total()
-      const saleId = crypto.randomUUID()
+      const subtotal     = total()
+      const freightPrice = selectedFreight?.price ?? 0
+      const grandTotal   = subtotal + freightPrice
+      const saleId       = crypto.randomUUID()
+
+      const freightNote = selectedFreight
+        ? ` · Frete: ${selectedFreight.company} ${selectedFreight.name} R$${freightPrice.toFixed(2)} (${selectedFreight.delivery_time} dias úteis)`
+        : ''
 
       const { error: saleErr } = await supabase
         .from('sales')
         .insert({
           id: saleId,
-          client_name: form.nome.trim(),
+          client_name:    form.nome.trim(),
           subtotal,
-          discount: 0,
-          total: subtotal,
+          discount:       0,
+          total:          grandTotal,
           payment_method: 'outro',
           payment_status: 'pendente',
-          notes: `Email: ${form.email.trim()} · Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.bairro}, ${form.cidade}/${form.estado} · CEP: ${form.cep}`,
+          notes: `Email: ${form.email.trim()} · Tel: ${form.telefone} · CPF: ${form.cpf} · ${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''} — ${form.bairro}, ${form.cidade}/${form.estado} · CEP: ${form.cep}${freightNote}`,
         })
 
       if (saleErr) throw new Error(`[sales] ${saleErr.message} (code: ${saleErr.code})`)
 
       const { error: itemsErr } = await supabase.from('sale_items').insert(
         items.map((item) => ({
-          sale_id: saleId,
-          product_id: item.productId,
+          sale_id:      saleId,
+          product_id:   item.productId,
           product_name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
-          quantity: item.quantity,
-          unit_price: item.price,
-          subtotal: item.price * item.quantity,
+          quantity:     item.quantity,
+          unit_price:   item.price,
+          subtotal:     item.price * item.quantity,
         }))
       )
       if (itemsErr) console.error('[checkout] sale_items error:', itemsErr.message)
 
       setOrderId(saleId)
+
+      // Itens para o MP (inclui frete como item extra se selecionado)
+      const mpItems: any[] = items.map((item) => ({
+        productId:  item.productId,
+        name:       item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
+        quantity:   item.quantity,
+        unit_price: item.price,
+      }))
+
+      if (selectedFreight) {
+        mpItems.push({
+          productId:  'frete',
+          name:       `Frete ${selectedFreight.company} — ${selectedFreight.name}`,
+          quantity:   1,
+          unit_price: selectedFreight.price,
+        })
+      }
 
       const pgRes = await fetch('/api/create-order', {
         method: 'POST',
@@ -147,31 +213,22 @@ export default function Checkout() {
             email:    form.email.trim(),
             telefone: form.telefone,
           },
-          items: items.map((item) => ({
-            productId: item.productId,
-            name: item.selectedOption ? `${item.name} — ${item.selectedOption}` : item.name,
-            quantity: item.quantity,
-            unit_price: item.price,
-          })),
+          items: mpItems,
         }),
       })
 
       let pgData: any = {}
       const rawText = await pgRes.text().catch(() => '')
-      try {
-        pgData = JSON.parse(rawText)
-      } catch {
+      try { pgData = JSON.parse(rawText) } catch {
         setSaveError(`[${pgRes.status}] Resposta do servidor: ${rawText.slice(0, 300) || '(vazia)'}`)
-        setSaving(false)
-        return
+        setSaving(false); return
       }
 
       if (!pgRes.ok) {
         const msg    = pgData?.error || pgData?.message || 'Erro desconhecido'
         const causes = pgData?.cause?.map((c: any) => c?.description || c?.code).filter(Boolean).join('; ')
         setSaveError(`Erro MP (${pgRes.status}): ${msg}${causes ? ` — ${causes}` : ''}`)
-        setSaving(false)
-        return
+        setSaving(false); return
       }
 
       if (pgData.redirect_url) {
@@ -210,6 +267,8 @@ export default function Checkout() {
     )
   }
 
+  const grandTotal = total() + (selectedFreight?.price ?? 0)
+
   // ── Formulário ────────────────────────────────────────────
   return (
     <div className="min-h-[100dvh] bg-cream-50 pt-24 pb-24">
@@ -243,7 +302,6 @@ export default function Checkout() {
                 <p className="font-display text-lg text-ink-900 tracking-wider">PAGAMENTO</p>
                 <p className="text-xs text-ink-500 mt-0.5">Ambiente 100% seguro via Mercado Pago</p>
               </div>
-
               <div className="flex flex-wrap gap-2">
                 {[
                   { icon: QrCode,     label: 'PIX Instantâneo' },
@@ -256,7 +314,6 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Lock,        text: 'Dados criptografados' },
@@ -272,10 +329,9 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-
               <div className="border-t border-ink-900/8 pt-4">
                 <p className="text-[11px] text-ink-500 leading-relaxed">
-                  Ao clicar em <span className="text-coffee-600 font-semibold">IR PARA O PAGAMENTO</span>, você será redirecionado para o ambiente seguro do Mercado Pago. Seus dados pessoais são protegidos e nunca compartilhados com terceiros.
+                  Ao clicar em <span className="text-coffee-600 font-semibold">IR PARA O PAGAMENTO</span>, você será redirecionado para o ambiente seguro do Mercado Pago.
                 </p>
               </div>
             </div>
@@ -285,16 +341,14 @@ export default function Checkout() {
               <div>
                 <p className="font-display text-lg text-ink-900 tracking-wider">SEUS DADOS</p>
                 <p className="text-xs text-ink-500 mt-1 leading-relaxed">
-                  Usamos seu nome e CPF para emitir a nota fiscal, e o WhatsApp para enviar a confirmação e o código de rastreio do pedido.
+                  Usamos seu nome e CPF para emitir a nota fiscal, e o WhatsApp para enviar a confirmação e o código de rastreio.
                 </p>
               </div>
-
               <div className="space-y-1.5">
                 <label className={lbl}>Nome completo</label>
                 <input value={form.nome} onChange={(e) => set('nome', e.target.value)} className={inp} placeholder="Seu nome completo" />
                 {errors.nome && <p className="text-[10px] text-red-500 font-mono">{errors.nome}</p>}
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>CPF</label>
@@ -307,7 +361,6 @@ export default function Checkout() {
                   {errors.telefone && <p className="text-[10px] text-red-500 font-mono">{errors.telefone}</p>}
                 </div>
               </div>
-
               <div className="space-y-1.5">
                 <label className={lbl}>E-mail</label>
                 <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={inp} placeholder="seu@email.com" />
@@ -320,10 +373,9 @@ export default function Checkout() {
               <div>
                 <p className="font-display text-lg text-ink-900 tracking-wider">ENDEREÇO DE ENTREGA</p>
                 <p className="text-xs text-ink-500 mt-1 leading-relaxed">
-                  Precisamos do seu endereço completo para calcular o frete e garantir que seu pedido chegue até você. Digite o CEP e preenchemos o restante automaticamente.
+                  Digite o CEP para preencher o endereço e calcular o frete automaticamente.
                 </p>
               </div>
-
               <div className="space-y-1.5">
                 <label className={lbl}>CEP</label>
                 <div className="relative">
@@ -342,13 +394,11 @@ export default function Checkout() {
                 </div>
                 {errors.cep && <p className="text-[10px] text-red-500 font-mono">{errors.cep}</p>}
               </div>
-
               <div className="space-y-1.5">
                 <label className={lbl}>Rua / Avenida</label>
                 <input value={form.rua} onChange={(e) => set('rua', e.target.value)} className={inp} placeholder="Rua das Flores" />
                 {errors.rua && <p className="text-[10px] text-red-500 font-mono">{errors.rua}</p>}
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className={lbl}>Número</label>
@@ -360,12 +410,10 @@ export default function Checkout() {
                   <input value={form.complemento} onChange={(e) => set('complemento', e.target.value)} className={inp} placeholder="Apto, bloco…" />
                 </div>
               </div>
-
               <div className="space-y-1.5">
                 <label className={lbl}>Bairro</label>
                 <input value={form.bairro} onChange={(e) => set('bairro', e.target.value)} className={inp} placeholder="Centro" />
               </div>
-
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-1.5">
                   <label className={lbl}>Cidade</label>
@@ -379,6 +427,76 @@ export default function Checkout() {
                 </div>
               </div>
             </div>
+
+            {/* Frete */}
+            {(freightLoading || freightOptions.length > 0 || freightError) && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-4"
+              >
+                <div>
+                  <p className="font-display text-lg text-ink-900 tracking-wider">FRETE</p>
+                  <p className="text-xs text-ink-500 mt-0.5">Selecione a forma de entrega</p>
+                </div>
+
+                {freightLoading && (
+                  <div className="flex items-center gap-3 text-sm text-ink-500 py-2">
+                    <Loader size={14} className="animate-spin text-coffee-500 flex-shrink-0" />
+                    Calculando opções de frete para o seu CEP…
+                  </div>
+                )}
+
+                {freightError && !freightLoading && (
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                    {freightError}
+                  </p>
+                )}
+
+                {!freightLoading && freightOptions.length > 0 && (
+                  <div className="space-y-2">
+                    {freightOptions.map((option) => (
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${
+                          selectedFreight?.id === option.id
+                            ? 'border-coffee-500 bg-coffee-50/60'
+                            : 'border-ink-900/10 hover:border-coffee-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="frete"
+                          value={option.id}
+                          checked={selectedFreight?.id === option.id}
+                          onChange={() => {
+                            setSelectedFreight(option)
+                            setErrors((e) => ({ ...e, frete: undefined }))
+                          }}
+                          className="accent-coffee-500 w-4 h-4 flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-ink-900">
+                            {option.company} · {option.name}
+                          </p>
+                          <p className="text-xs text-ink-400 mt-0.5">
+                            {option.delivery_range
+                              ? `${option.delivery_range.min}–${option.delivery_range.max} dias úteis`
+                              : `${option.delivery_time} dias úteis`}
+                          </p>
+                        </div>
+                        <span className="font-mono font-semibold text-sm text-ink-900 flex-shrink-0">
+                          {formatPrice(option.price)}
+                        </span>
+                      </label>
+                    ))}
+                    {errors.frete && (
+                      <p className="text-[10px] text-red-500 font-mono pt-1">{errors.frete}</p>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             {saveError && (
               <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 font-mono">
@@ -418,10 +536,34 @@ export default function Checkout() {
 
               <div className="h-px bg-ink-900/8" />
 
+              {/* Subtotal */}
+              <div className="flex items-baseline justify-between text-sm">
+                <span className="text-ink-500">Subtotal</span>
+                <span className="font-mono text-ink-700 tabular-nums">{formatPrice(total())}</span>
+              </div>
+
+              {/* Frete selecionado */}
+              {selectedFreight ? (
+                <div className="flex items-baseline justify-between text-sm">
+                  <span className="text-ink-500">
+                    Frete <span className="text-[11px] text-ink-400">({selectedFreight.name})</span>
+                  </span>
+                  <span className="font-mono text-ink-700 tabular-nums">+{formatPrice(selectedFreight.price)}</span>
+                </div>
+              ) : freightLoading ? (
+                <div className="flex items-center justify-between text-sm text-ink-400">
+                  <span>Frete</span>
+                  <span className="flex items-center gap-1.5"><Loader size={11} className="animate-spin" /> calculando…</span>
+                </div>
+              ) : null}
+
+              <div className="h-px bg-ink-900/8" />
+
+              {/* Total */}
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-ink-500">Total</span>
                 <span className="font-mono text-2xl font-medium text-coffee-600 tabular-nums">
-                  {formatPrice(total())}
+                  {formatPrice(grandTotal)}
                 </span>
               </div>
 

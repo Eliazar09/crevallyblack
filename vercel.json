@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/create-order.ts": { "maxDuration": 30 },
-    "api/webhook-mp.ts":   { "maxDuration": 30 }
+    "api/webhook-mp.ts":   { "maxDuration": 30 },
+    "api/freight.ts":      { "maxDuration": 20 }
   },
   "headers": [
     {

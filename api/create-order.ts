@@ -40,7 +40,9 @@ async function run(req: any, res: any) {
       process.env.VITE_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
-    const productIds = items.map((i: any) => i.productId).filter(Boolean)
+    // Filtra apenas UUIDs válidos (exclui itens especiais como "frete")
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const productIds = items.map((i: any) => i.productId).filter((id: any) => id && UUID_REGEX.test(String(id)))
     const { data: products, error } = await admin
       .from('products')
       .select('id, price, name')
