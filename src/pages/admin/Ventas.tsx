@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ShoppingCart, DollarSign, TrendingUp, Trash2, RefreshCw,
-  Copy, Truck, CheckCircle2, Package, X, Check
+  Copy, Truck, CheckCircle2, Package, X
 } from 'lucide-react'
-import { getSales, deleteSale, updateShipping, methodLabels, type DbSale, type ShippingStatus } from '../../lib/queries/sales'
+import { getSales, deleteSale, updateShipping, type DbSale, type ShippingStatus } from '../../lib/queries/sales'
 import { ConfirmDialog } from '../../components/admin/ui/ConfirmDialog'
 import { formatPrice } from '../../lib/currency'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
@@ -12,7 +12,6 @@ import { Skeleton } from '../../components/admin/ui/Skeleton'
 import { StatCard } from '../../components/admin/ui/StatCard'
 import { cn } from '../../lib/cn'
 import { useToast } from '../../hooks/useToast'
-import { supabase } from '../../lib/supabase'
 
 /* ─── Helpers ──────────────────────────────────────────────── */
 
@@ -194,8 +193,6 @@ export default function Pedidos() {
   const [deleting, setDeleting]   = useState(false)
   const [trackModal, setTrackModal] = useState<DbSale | null>(null)
   const { push } = useToast()
-  const copiedRef = useRef<string | null>(null)
-
   function load() {
     setLoading(true)
     getSales()
@@ -233,7 +230,6 @@ export default function Pedidos() {
   function copyAddress(sale: DbSale) {
     const text = parseAddressFromNotes(sale)
     navigator.clipboard.writeText(text).then(() => {
-      copiedRef.current = sale.id
       push('Endereço copiado! Cole no Melhor Envio 📋')
     })
   }
@@ -302,7 +298,6 @@ export default function Pedidos() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {sales.map((s, i) => {
-                  const cur            = currentStepIndex(s)
                   const canMarkEnviado = s.payment_status === 'pago' && (s.shipping_status ?? 'aguardando') === 'aguardando'
                   const canMarkEntregue = s.payment_status === 'pago' && (s.shipping_status ?? 'aguardando') === 'enviado'
                   return (
