@@ -186,12 +186,15 @@ function TrackingModal({
 
 /* ─── Componente principal ──────────────────────────────────── */
 
+type Filter = 'pago' | 'pendente' | 'todos'
+
 export default function Pedidos() {
-  const [sales, setSales]         = useState<DbSale[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [toDelete, setToDelete]   = useState<DbSale | null>(null)
-  const [deleting, setDeleting]   = useState(false)
+  const [sales, setSales]           = useState<DbSale[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [toDelete, setToDelete]     = useState<DbSale | null>(null)
+  const [deleting, setDeleting]     = useState(false)
   const [trackModal, setTrackModal] = useState<DbSale | null>(null)
+  const [filter, setFilter]         = useState<Filter>('pago')
   const { push } = useToast()
   function load() {
     setLoading(true)
@@ -240,21 +243,43 @@ export default function Pedidos() {
   const monthTotal    = monthPago.reduce((a, s) => a + s.total, 0)
   const avgTicket     = monthPago.length ? monthTotal / monthPago.length : 0
 
+  const visible = filter === 'todos' ? sales
+    : sales.filter((s) => s.payment_status === filter)
+
   return (
     <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl text-gray-900 tracking-wide">PEDIDOS</h1>
-          <p className="text-sm text-gray-500">{sales.length} pedido{sales.length !== 1 ? 's' : ''} no total</p>
+          <p className="text-sm text-gray-500">{visible.length} de {sales.length} pedido{sales.length !== 1 ? 's' : ''}</p>
         </div>
-        <button
-          onClick={load}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw size={14} />
-          Atualizar
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Filtros */}
+          {(['pago', 'pendente', 'todos'] as Filter[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                'px-4 py-2 rounded-full text-xs font-semibold border transition-colors',
+                filter === f
+                  ? f === 'pago'     ? 'bg-emerald-500 text-white border-emerald-500'
+                  : f === 'pendente' ? 'bg-amber-400 text-white border-amber-400'
+                  :                   'bg-gray-700 text-white border-gray-700'
+                  : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+              )}
+            >
+              {f === 'pago' ? '✅ Pagos' : f === 'pendente' ? '⏳ Pendentes' : '📋 Todos'}
+            </button>
+          ))}
+          <button
+            onClick={load}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 font-semibold text-xs hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw size={13} />
+            Atualizar
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -283,8 +308,8 @@ export default function Pedidos() {
       {/* Tabela */}
       {loading ? (
         <div className="space-y-2">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
-      ) : sales.length === 0 ? (
-        <EmptyState icon={ShoppingCart} title="Sem pedidos" description="Nenhum pedido registrado ainda." />
+      ) : visible.length === 0 ? (
+        <EmptyState icon={ShoppingCart} title="Nenhum pedido aqui" description={filter === 'pago' ? 'Nenhum pedido pago ainda. Use "Todos" para ver pendentes.' : 'Nenhum pedido encontrado.'} />
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -297,7 +322,7 @@ export default function Pedidos() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {sales.map((s, i) => {
+                {visible.map((s, i) => {
                   const canMarkEnviado = s.payment_status === 'pago' && (s.shipping_status ?? 'aguardando') === 'aguardando'
                   const canMarkEntregue = s.payment_status === 'pago' && (s.shipping_status ?? 'aguardando') === 'enviado'
                   return (
