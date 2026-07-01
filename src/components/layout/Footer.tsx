@@ -37,7 +37,7 @@ export function Footer() {
                 <MessageCircle size={16} strokeWidth={1.5} />
               </a>
               <a
-                href="https://instagram.com/crevallyblack"
+                href="https://instagram.com/crevallyblack_oficial"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-neutral-300"
@@ -79,12 +79,12 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/crevallyblack"
+                  href="https://instagram.com/crevallyblack_oficial"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-neutral-200 transition-colors"
                 >
-                  @crevallyblack
+                  @crevallyblack_oficial
                 </a>
               </li>
               <li className="text-ink-500/60 text-xs pt-1">

@@ -147,7 +147,7 @@ export default function Contact() {
               </motion.a>
 
               <motion.a
-                href="https://instagram.com/crevallyblack"
+                href="https://instagram.com/crevallyblack_oficial"
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, x: 20 }}
@@ -160,7 +160,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-ink-900">Instagram</p>
-                  <p className="text-sm text-ink-500">@crevallyblack</p>
+                  <p className="text-sm text-ink-500">@crevallyblack_oficial</p>
                   <p className="text-xs text-coffee-600 mt-1 group-hover:underline">Ver catálogo visual</p>
                 </div>
               </motion.a>
