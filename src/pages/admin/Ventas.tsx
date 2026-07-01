@@ -343,7 +343,16 @@ export default function Pedidos() {
                           </p>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono font-semibold text-emerald-600 whitespace-nowrap">{formatPrice(s.total)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <p className="font-mono font-semibold text-emerald-600">{formatPrice(s.total)}</p>
+                        {s.total - s.subtotal > 0.5 && (
+                          <div className="text-[10px] text-gray-400 font-mono mt-0.5 leading-tight">
+                            <span className="text-gray-500">Prod:</span> {formatPrice(s.subtotal)}
+                            {' · '}
+                            <span className="text-blue-500">Frete:</span> {formatPrice(s.total - s.subtotal)}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <span className={cn('px-2.5 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap', statusPayColor[s.payment_status] ?? 'text-gray-600 bg-gray-50 border-gray-200')}>
                           {statusPayLabel[s.payment_status] ?? s.payment_status}
