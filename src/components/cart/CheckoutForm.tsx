@@ -132,27 +132,6 @@ export function CheckoutForm({ onBack, onClose }: CheckoutFormProps) {
         }))
       )
 
-      // 3. Estoque
-      await supabase.from('inventory_movements').insert(
-        items.map((item) => ({
-          product_id: item.productId,
-          type: 'saida',
-          quantity: -Math.abs(item.quantity),
-          reason: 'Pedido online',
-          related_sale_id: sale.id,
-        }))
-      )
-
-      // 4. Financeiro
-      await supabase.from('transactions').insert({
-        type: 'receita',
-        category: 'Venda Online',
-        amount: subtotal,
-        description: `Pedido #${sale.id.slice(-6).toUpperCase()} — ${form.nome.trim()}`,
-        related_sale_id: sale.id,
-        date: new Date().toISOString().slice(0, 10),
-      })
-
       setOrderId(sale.id)
       clearCart()
 
