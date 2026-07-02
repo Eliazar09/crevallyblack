@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Package, Users,
-  Boxes, BarChart2, LogOut, X, CalendarDays, Shirt, Layers2, ShoppingCart
+  Boxes, BarChart2, LogOut, X, CalendarDays, Layers2, ShoppingCart
 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
 import { cn } from '../../../lib/cn'

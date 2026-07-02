@@ -84,7 +84,6 @@ export default function Dashboard() {
       try {
         const now = new Date()
         const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-        const week = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
         const [allSalesRes, clientsRes, stockRes, recentRes] = await Promise.all([
           supabase.from('sales').select('total,payment_status,created_at').gte('created_at', from),
