@@ -189,11 +189,10 @@ function TrackingModal({ sale, onClose, onConfirm }: {
 
 /* ─── Order Card ────────────────────────────────────────────── */
 
-function OrderCard({ sale, index, onCopy, onMarkEnviado, onMarkEntregue, onDelete, onTrack }: {
+function OrderCard({ sale, index, onCopy, onMarkEntregue, onDelete, onTrack }: {
   sale: DbSale
   index: number
   onCopy: () => void
-  onMarkEnviado: () => void
   onMarkEntregue: () => void
   onDelete: () => void
   onTrack: () => void
@@ -495,7 +494,6 @@ export default function Pedidos() {
               sale={s}
               index={i}
               onCopy={() => copyAddress(s)}
-              onMarkEnviado={() => handleMarkEnviado(s, '')}
               onMarkEntregue={() => handleMarkEntregue(s)}
               onDelete={() => setToDelete(s)}
               onTrack={() => setTrackModal(s)}
