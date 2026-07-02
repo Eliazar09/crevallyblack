@@ -459,12 +459,12 @@ export default function Checkout() {
                 <div className="bg-coffee-50 border border-coffee-200 rounded-2xl px-4 py-3 space-y-1">
                   <p className="text-sm font-semibold text-coffee-800">Como funciona:</p>
                   <p className="text-sm text-coffee-700 leading-relaxed">
-                    Finalize o pagamento normalmente e entre em contato pelo <span className="font-semibold">WhatsApp</span> para combinar a entrega diretamente com a gente. Sem custo de frete!
+                    Finalize o pagamento normalmente e entre em contato pelo <span className="font-semibold">WhatsApp</span> para combinar a entrega. O valor do frete local será definido pelo vendedor conforme a forma de entrega escolhida (pessoalmente, mototaxi, Uber etc.).
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-ink-500">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                  Frete grátis para Piquete/SP — entrega combinada
+                  <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+                  Piquete/SP — frete a combinar pelo WhatsApp após o pagamento
                 </div>
               </motion.div>
             )}
