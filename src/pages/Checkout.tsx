@@ -244,6 +244,7 @@ export default function Checkout() {
       }
 
       if (pgData.redirect_url) {
+        if (isLocalDelivery) sessionStorage.setItem('crevally_local_order', saleId)
         setScreen('redirecting')
         setTimeout(() => { window.location.href = pgData.redirect_url }, 800)
       } else {

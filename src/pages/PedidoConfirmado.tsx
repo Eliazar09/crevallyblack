@@ -1,93 +1,177 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { CheckCircle2, Clock, XCircle, ArrowRight, MessageCircle, ShoppingBag } from 'lucide-react'
+import { CheckCircle2, Clock, XCircle, ArrowRight, MessageCircle, ShoppingBag, Loader, MapPin } from 'lucide-react'
 import { buildDirectWhatsAppLink } from '../lib/whatsapp'
 import { useCart } from '../hooks/useCart'
 
-// Mercado Pago adiciona esses parâmetros na URL de retorno:
-// ?collection_status=approved&external_reference=<orderId>&payment_type=pix&...
 type MPStatus = 'approved' | 'pending' | 'in_process' | 'rejected' | 'cancelled' | 'failure' | null
 
 export default function PedidoConfirmado() {
   const [params] = useSearchParams()
   const { clearCart } = useCart()
 
-  const status    = (params.get('collection_status') ?? params.get('status')) as MPStatus
-  const orderId   = params.get('external_reference') ?? params.get('id') ?? ''
-  const payType   = params.get('payment_type') ?? ''
-  const paymentId = params.get('collection_id') ?? params.get('payment_id') ?? ''
+  const mpStatus   = (params.get('collection_status') ?? params.get('status')) as MPStatus
+  const orderId    = params.get('external_reference') ?? params.get('id') ?? ''
+  const payType    = params.get('payment_type') ?? ''
+  const paymentId  = params.get('collection_id') ?? params.get('payment_id') ?? ''
+  const shortId    = orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''
 
-  const shortId   = orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''
+  // Verifica se era entrega local (Piquete) via sessionStorage
+  const isLocal = orderId
+    ? sessionStorage.getItem('crevally_local_order') === orderId
+    : false
 
-  // Só limpa o carrinho quando o pagamento for confirmado como aprovado
+  // Estado de polling: quando MP diz "pending" verificamos no banco
+  const [confirmedStatus, setConfirmedStatus] = useState<'approved' | 'pending' | 'rejected' | null>(
+    mpStatus === 'approved' ? 'approved'
+    : (mpStatus === 'rejected' || mpStatus === 'cancelled' || mpStatus === 'failure') ? 'rejected'
+    : 'pending'
+  )
+  const [polling, setPolling] = useState(false)
+
   useEffect(() => {
-    if (status && status !== 'rejected' && status !== 'cancelled' && status !== 'failure') clearCart()
+    if (confirmedStatus === 'approved') {
+      clearCart()
+      if (isLocal) sessionStorage.removeItem('crevally_local_order')
+      return
+    }
+    if (confirmedStatus === 'rejected' || !orderId) return
+
+    // Polling: verifica status real no banco a cada 4 segundos por até 90 segundos
+    setPolling(true)
+    let tries = 0
+    const max = 22
+
+    const interval = setInterval(async () => {
+      tries++
+      try {
+        const res = await fetch(`/api/order-status?id=${orderId}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.payment_status === 'pago') {
+            setConfirmedStatus('approved')
+            clearCart()
+            if (isLocal) sessionStorage.removeItem('crevally_local_order')
+            clearInterval(interval)
+            setPolling(false)
+            return
+          }
+          if (data.payment_status === 'cancelado') {
+            setConfirmedStatus('rejected')
+            clearInterval(interval)
+            setPolling(false)
+            return
+          }
+        }
+      } catch { /* ignora erros de rede */ }
+
+      if (tries >= max) {
+        clearInterval(interval)
+        setPolling(false)
+      }
+    }, 4000)
+
+    return () => clearInterval(interval)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Approved ────────────────────────────────────────────────────
-  if (status === 'approved') {
+  // ── Aprovado / Confirmado ────────────────────────────────────────
+  if (confirmedStatus === 'approved') {
     return (
-      <PageShell bg="bg-cream-50">
+      <PageShell>
         <IconCircle color="bg-green-50 border-green-200">
           <CheckCircle2 size={32} className="text-green-600" strokeWidth={1.5} />
         </IconCircle>
 
-        <Badge color="bg-green-100 text-green-700">Pagamento aprovado</Badge>
+        <Badge color="bg-green-100 text-green-700">Pagamento confirmado</Badge>
 
         <h1 className="font-display text-[clamp(2rem,5vw,3.5rem)] text-ink-900 tracking-wide leading-tight">
           Pedido <em className="text-green-600">confirmado!</em>
         </h1>
 
-        <p className="text-ink-500 text-base leading-relaxed max-w-[38ch] text-center">
-          Seu pagamento foi aprovado. Em breve você receberá a confirmação e o rastreio pelo WhatsApp.
-        </p>
+        {isLocal ? (
+          <>
+            <p className="text-ink-500 text-base leading-relaxed max-w-[40ch] text-center">
+              Seu pagamento foi aprovado! Como você é de <strong className="text-ink-800">Piquete/SP</strong>, entre em contato pelo WhatsApp para combinar a entrega com o vendedor.
+            </p>
 
-        {shortId && (
-          <div className="bg-white border border-ink-900/8 rounded-2xl px-10 py-4 text-center shadow-sm">
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-ink-400 mb-1">Número do pedido</p>
-            <p className="font-mono text-3xl font-bold text-ink-900 tracking-widest">{shortId}</p>
-            {payType && (
-              <p className="text-[11px] font-mono text-ink-400 mt-1 uppercase tracking-wider">
-                via {payTypeLabel(payType)}
-              </p>
-            )}
-          </div>
+            {shortId && <OrderBadge shortId={shortId} payType={payType} />}
+
+            <a
+              href={buildDirectWhatsAppLink(`Olá! Acabei de realizar o pagamento do pedido ${shortId}. Gostaria de combinar a entrega. 😊`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full max-w-xs flex items-center justify-center gap-3 px-6 py-4 bg-green-500 hover:bg-green-400 text-white font-bold text-base rounded-2xl transition-colors shadow-lg shadow-green-200"
+            >
+              <MessageCircle size={20} strokeWidth={2} />
+              Combinar entrega pelo WhatsApp
+            </a>
+
+            <div className="flex items-center gap-2 text-xs text-ink-400">
+              <MapPin size={12} />
+              Entrega local Piquete/SP — frete a combinar com o vendedor
+            </div>
+
+            <Link
+              to="/"
+              className="text-sm text-ink-500 hover:text-ink-900 underline underline-offset-4 transition-colors"
+            >
+              Voltar à loja
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-ink-500 text-base leading-relaxed max-w-[38ch] text-center">
+              Seu pagamento foi aprovado. Em breve você receberá a confirmação e o rastreio pelo WhatsApp.
+            </p>
+
+            {shortId && <OrderBadge shortId={shortId} payType={payType} />}
+
+            <InfoRow items={[
+              'Confirmação enviada por WhatsApp',
+              'Postagem em até 2 dias úteis',
+              'Rastreio enviado após postagem',
+            ]} />
+
+            <Actions primary={{ href: '/', label: 'Voltar à loja' }} whatsapp />
+          </>
         )}
-
-        <InfoRow items={[
-          'Confirmação enviada por WhatsApp',
-          'Postagem em até 2 dias úteis',
-          'Rastreio enviado após postagem',
-        ]} />
-
-        <Actions primary={{ href: '/', label: 'Voltar à loja' }} whatsapp />
       </PageShell>
     )
   }
 
-  // ── Pending / In process ─────────────────────────────────────────
-  if (status === 'pending' || status === 'in_process') {
+  // ── Pendente / verificando ───────────────────────────────────────
+  if (confirmedStatus === 'pending') {
     return (
-      <PageShell bg="bg-cream-50">
-        <IconCircle color="bg-amber-50 border-amber-200">
-          <Clock size={32} className="text-amber-600" strokeWidth={1.5} />
+      <PageShell>
+        <IconCircle color={polling ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}>
+          {polling
+            ? <Loader size={32} className="text-blue-500 animate-spin" strokeWidth={1.5} />
+            : <Clock size={32} className="text-amber-600" strokeWidth={1.5} />
+          }
         </IconCircle>
 
-        <Badge color="bg-amber-100 text-amber-700">Pagamento em análise</Badge>
+        <Badge color={polling ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}>
+          {polling ? 'Verificando pagamento…' : 'Pagamento em processamento'}
+        </Badge>
 
         <h1 className="font-display text-[clamp(2rem,5vw,3.5rem)] text-ink-900 tracking-wide leading-tight">
           Pedido <em className="text-amber-600">recebido!</em>
         </h1>
 
         <p className="text-ink-500 text-base leading-relaxed max-w-[40ch] text-center">
-          Seu pedido foi registrado e o pagamento está sendo processado. Assim que for confirmado, você receberá o aviso pelo WhatsApp.
+          {polling
+            ? 'Estamos verificando a confirmação do seu pagamento. Esta página atualiza automaticamente…'
+            : 'Seu pedido foi registrado. Assim que o pagamento for confirmado, você receberá o aviso pelo WhatsApp.'
+          }
         </p>
 
-        {shortId && (
-          <div className="bg-white border border-ink-900/8 rounded-2xl px-10 py-4 text-center shadow-sm">
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-ink-400 mb-1">Número do pedido</p>
-            <p className="font-mono text-3xl font-bold text-ink-900 tracking-widest">{shortId}</p>
+        {shortId && <OrderBadge shortId={shortId} />}
+
+        {polling && (
+          <div className="flex items-center gap-2 text-xs text-blue-500">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            Atualizando a cada 4 segundos…
           </div>
         )}
 
@@ -102,10 +186,10 @@ export default function PedidoConfirmado() {
     )
   }
 
-  // ── Rejected / Cancelled / Failure ───────────────────────────────
-  if (status === 'rejected' || status === 'cancelled' || status === 'failure') {
+  // ── Rejeitado / Cancelado ────────────────────────────────────────
+  if (confirmedStatus === 'rejected') {
     return (
-      <PageShell bg="bg-cream-50">
+      <PageShell>
         <IconCircle color="bg-red-50 border-red-200">
           <XCircle size={32} className="text-red-500" strokeWidth={1.5} />
         </IconCircle>
@@ -117,7 +201,7 @@ export default function PedidoConfirmado() {
         </h1>
 
         <p className="text-ink-500 text-base leading-relaxed max-w-[40ch] text-center">
-          O pagamento não foi aprovado. Você pode tentar novamente com outro método de pagamento ou entrar em contato pelo WhatsApp.
+          O pagamento não foi aprovado. Tente novamente ou entre em contato pelo WhatsApp.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -142,21 +226,18 @@ export default function PedidoConfirmado() {
     )
   }
 
-  // ── Fallback: chegou na página sem parâmetros (acesso direto) ────
+  // ── Fallback ─────────────────────────────────────────────────────
   return (
-    <PageShell bg="bg-cream-50">
+    <PageShell>
       <IconCircle color="bg-coffee-50 border-coffee-200">
         <CheckCircle2 size={32} className="text-coffee-500" strokeWidth={1.5} />
       </IconCircle>
-
       <h1 className="font-display text-[clamp(2rem,5vw,3.5rem)] text-ink-900 tracking-wide">
         Pedido registrado
       </h1>
-
       <p className="text-ink-500 text-base leading-relaxed max-w-[38ch] text-center">
         Seu pedido foi salvo. Entraremos em contato pelo WhatsApp com as próximas etapas.
       </p>
-
       <Actions primary={{ href: '/', label: 'Voltar à loja' }} whatsapp />
     </PageShell>
   )
@@ -166,20 +247,17 @@ export default function PedidoConfirmado() {
 
 function payTypeLabel(type: string) {
   const map: Record<string, string> = {
-    pix: 'PIX',
-    credit_card: 'Cartão de Crédito',
-    debit_card: 'Cartão de Débito',
-    bank_transfer: 'Transferência',
-    ticket: 'Boleto',
+    pix: 'PIX', credit_card: 'Cartão de Crédito',
+    debit_card: 'Cartão de Débito', bank_transfer: 'Transferência', ticket: 'Boleto',
   }
   return map[type] ?? type
 }
 
 // ── Sub-components ─────────────────────────────────────────────────
 
-function PageShell({ children, bg }: { children: React.ReactNode; bg: string }) {
+function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`min-h-[100dvh] ${bg} pt-28 pb-20 flex items-center justify-center px-4`}>
+    <div className="min-h-[100dvh] bg-cream-50 pt-28 pb-20 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -210,6 +288,20 @@ function Badge({ children, color }: { children: React.ReactNode; color: string }
     <span className={`px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest ${color}`}>
       {children}
     </span>
+  )
+}
+
+function OrderBadge({ shortId, payType }: { shortId: string; payType?: string }) {
+  return (
+    <div className="bg-white border border-ink-900/8 rounded-2xl px-10 py-4 text-center shadow-sm">
+      <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-ink-400 mb-1">Número do pedido</p>
+      <p className="font-mono text-3xl font-bold text-ink-900 tracking-widest">{shortId}</p>
+      {payType && (
+        <p className="text-[11px] font-mono text-ink-400 mt-1 uppercase tracking-wider">
+          via {payTypeLabel(payType)}
+        </p>
+      )}
+    </div>
   )
 }
 
