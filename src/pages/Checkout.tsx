@@ -65,6 +65,7 @@ export default function Checkout() {
   const [selectedFreight, setSelectedFreight] = useState<FreightOption | null>(null)
   const [freightLoading, setFreightLoading] = useState(false)
   const [freightError, setFreightError] = useState<string | null>(null)
+  const [isLocalDelivery, setIsLocalDelivery] = useState(false)
 
   if (items.length === 0 && screen === 'form' && !orderId) {
     navigate('/carrinho', { replace: true })
@@ -83,6 +84,7 @@ export default function Checkout() {
     setFreightError(null)
     setFreightOptions([])
     setSelectedFreight(null)
+    setIsLocalDelivery(false)
     try {
       const res = await fetch('/api/freight', {
         method: 'POST',
@@ -90,7 +92,17 @@ export default function Checkout() {
         body: JSON.stringify({ cep: digits, itemCount: items.reduce((s, i) => s + i.quantity, 0) }),
       })
       const data = await res.json()
-      if (!res.ok || !data.options?.length) {
+      if (!res.ok) {
+        setFreightError('Não foi possível calcular o frete para esse CEP. O frete será combinado.')
+        return
+      }
+      // Entrega local: Piquete/SP
+      if (data.isLocal && data.options?.length) {
+        setIsLocalDelivery(true)
+        setSelectedFreight(data.options[0]) // seleciona automático (preço R$0)
+        return
+      }
+      if (!data.options?.length) {
         setFreightError('Não foi possível calcular o frete para esse CEP. O frete será combinado.')
         return
       }
@@ -428,8 +440,37 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Frete */}
-            {(freightLoading || freightOptions.length > 0 || freightError) && (
+            {/* Frete — Entrega local Piquete */}
+            {isLocalDelivery && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border border-ink-900/8 rounded-3xl p-6 shadow-sm space-y-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-coffee-50 border border-coffee-200 flex items-center justify-center flex-shrink-0">
+                    <Truck size={18} className="text-coffee-600" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <p className="font-display text-base text-ink-900 tracking-wider">ENTREGA LOCAL — PIQUETE/SP</p>
+                    <p className="text-xs text-ink-500 mt-0.5">Detectamos que você é de Piquete</p>
+                  </div>
+                </div>
+                <div className="bg-coffee-50 border border-coffee-200 rounded-2xl px-4 py-3 space-y-1">
+                  <p className="text-sm font-semibold text-coffee-800">Como funciona:</p>
+                  <p className="text-sm text-coffee-700 leading-relaxed">
+                    Finalize o pagamento normalmente e entre em contato pelo <span className="font-semibold">WhatsApp</span> para combinar a entrega diretamente com a gente. Sem custo de frete!
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-ink-500">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                  Frete grátis para Piquete/SP — entrega combinada
+                </div>
+              </motion.div>
+            )}
+
+            {/* Frete — Melhor Envio */}
+            {(freightLoading || freightOptions.length > 0 || freightError) && !isLocalDelivery && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}

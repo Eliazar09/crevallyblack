@@ -72,14 +72,19 @@ export default async function handler(req: any, res: any) {
 
     // Entrega local: CEPs de Piquete/SP começam com 1262
     if (digits.startsWith('1262')) {
-      options.unshift({
-        id:             'local',
-        name:           'Entrega Local',
-        company:        'Crevally Black',
-        price:          10,
-        delivery_time:  1,
-        delivery_range: { min: 1, max: 2 },
+      console.log('[freight] CEP de Piquete — retorna entrega local')
+      res.status(200).json({
+        options: [{
+          id:             'local',
+          name:           'Entrega Local',
+          company:        'Crevally Black',
+          price:          0,
+          delivery_time:  1,
+          delivery_range: { min: 1, max: 2 },
+        }],
+        isLocal: true,
       })
+      return
     }
 
     console.log(`[freight] opções válidas=${options.length}`)
