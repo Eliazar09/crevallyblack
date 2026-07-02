@@ -70,6 +70,18 @@ export default async function handler(req: any, res: any) {
       }))
       .sort((a: any, b: any) => a.price - b.price)
 
+    // Entrega local: CEPs de Piquete/SP começam com 1262
+    if (digits.startsWith('1262')) {
+      options.unshift({
+        id:             'local',
+        name:           'Entrega Local',
+        company:        'Crevally Black',
+        price:          10,
+        delivery_time:  1,
+        delivery_range: { min: 1, max: 2 },
+      })
+    }
+
     console.log(`[freight] opções válidas=${options.length}`)
     res.status(200).json({ options })
   } catch (err: any) {
